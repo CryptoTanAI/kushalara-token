@@ -199,11 +199,12 @@ const HomePage = () => {
         </div>
         
         <button 
-          onClick={connectWallet}
-          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-        >
-          Continue to Payment
-        </button>
+  onClick={openCryptoPayment}
+  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+>
+  Continue to Payment
+</button>
+
         
         <div className="text-center text-sm text-gray-400">
           Secure wallet integration • Multiple payment options
@@ -250,11 +251,11 @@ const HomePage = () => {
         </div>
         
         <button 
-          onClick={buyTokens}
-          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-        >
-          Continue to MoonPay
-        </button>
+  onClick={openFiatPayment}
+  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+>
+  Continue to MoonPay
+</button>
         
         <div className="text-center text-sm text-gray-400">
           Minimum purchase amount is $20 USD.
