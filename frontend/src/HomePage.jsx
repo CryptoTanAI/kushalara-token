@@ -5,9 +5,17 @@ import CountdownTimer from './CountdownTimer.jsx'
 const HomePage = () => {
   const [walletConnected, setWalletConnected] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
-  const [paymentType, setPaymentType] = useState('')
   const [amount, setAmount] = useState('')
   const [selectedCrypto, setSelectedCrypto] = useState('ETH')
+
+  // Wallet addresses
+  const walletAddresses = {
+    ETH: '0x07086A9a09b3B6A7A870094608eE99a0A6220AAD',
+    USDC: '0x07086A9a09b3B6A7A870094608eE99a0A6220AAD',
+    USDT: '0x07086A9a09b3B6A7A870094608eE99a0A6220AAD',
+    BTC: 'bc1qp5amz3sck2hypxd8krhl5h3u68d25v72zt3cme0zxtyn5dhr64dq3x3lq2',
+    SOL: 'DMLEbV5AYRmvKsjrHg1xcdsjxA3cNqCJmQMMDPDQnrUH'
+  }
 
   const downloadWhitepaper = () => {
     const link = document.createElement('a')
@@ -33,33 +41,37 @@ const HomePage = () => {
     setShowPaymentModal(true)
   }
 
-  const openCryptoPayment = () => {
-    setPaymentType('crypto')
-    setShowPaymentModal(true)
-  }
-
-  const openFiatPayment = () => {
-    setPaymentType('fiat')
-    setShowPaymentModal(true)
-  }
-
   const closeModal = () => {
     setShowPaymentModal(false)
-    setPaymentType('')
     setAmount('')
   }
 
   const handleCryptoPayment = () => {
-    if (!walletConnected) {
-      connectWallet()
-    } else {
-      alert(`Processing ${amount} USD payment with ${selectedCrypto}`)
+    if (!amount) {
+      alert('Please enter an amount')
+      return
     }
+    
+    const walletAddress = walletAddresses[selectedCrypto]
+    const tokenAmount = parseFloat(amount)
+    
+    alert(`Send ${amount} ${selectedCrypto} to:\n${walletAddress}\n\nYou will receive ${tokenAmount} KUSH tokens\nRate: 1 USD = 1 KUSH`)
   }
 
   const handleFiatPayment = () => {
-    const tokenAmount = parseFloat(amount) * 10
-    alert(`You will receive ${tokenAmount} KUSH tokens for $${amount} USD`)
+    if (!amount || parseFloat(amount) < 20) {
+      alert('Minimum purchase amount is $20 USD')
+      return
+    }
+    
+    const tokenAmount = parseFloat(amount)
+    alert(`You will receive ${tokenAmount} KUSH tokens for $${amount} USD\nRate: 1 USD = 1 KUSH\n\nRedirecting to MoonPay...`)
+    // Here you would integrate with MoonPay
+  }
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text)
+    alert('Address copied to clipboard!')
   }
 
   return (
@@ -150,112 +162,6 @@ const HomePage = () => {
         <div className="mb-16">
           <CountdownTimer />
         </div>
-
-        {/* Payment Processing Section */}
-        <section className="mb-16 fade-in">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold mb-4">
-              Buy <span className="gradient-text">KushAlara</span> Tokens
-            </h2>
-            <p className="text-xl text-gray-300">
-              Join the world's first Web3-native sovereign state
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            {/* Crypto Payment Card */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700 card-hover">
-              <h3 className="text-2xl font-bold mb-4 gradient-text text-center">Buy KushAlara Tokens</h3>
-              <p className="text-gray-300 text-center mb-6">
-                Connect your wallet or use direct cryptocurrency payment
-              </p>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Amount (USD )</label>
-                  <input 
-                    type="text" 
-                    placeholder="Enter amount" 
-                    className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Payment Method</label>
-                  <select className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400">
-                    <option>Choose cryptocurrency</option>
-                    <option>Ethereum (ETH)</option>
-                    <option>Bitcoin (BTC)</option>
-                    <option>USDC</option>
-                    <option>USDT</option>
-                  </select>
-                </div>
-                
-                <button 
-                  onClick={openCryptoPayment}
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-                >
-                  Continue to Payment
-                </button>
-                
-                <div className="text-center text-sm text-gray-400">
-                  Secure wallet integration • Multiple payment options
-                </div>
-                
-                {/* Wallet Status Debug Info */}
-                <div className="bg-gray-700/30 rounded-lg p-4 text-sm">
-                  <div className="flex items-center text-gray-300 mb-2">
-                    🔗 <span className="ml-2">Wallet Status (Debug Info):</span>
-                  </div>
-                  <div className="space-y-1 text-gray-400">
-                    <div className="flex items-center">
-                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                      Ethereum: Not connected
-                    </div>
-                    <div className="flex items-center">
-                      <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
-                      Solana: Not connected
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* MoonPay Card */}
-            <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700 card-hover">
-              <h3 className="text-2xl font-bold mb-4 gradient-text text-center">
-                Buy KushAlara  
-
-                <span className="text-yellow-400">with USD</span>
-              </h3>
-              <p className="text-gray-300 text-center mb-6">
-                Securely purchase crypto with your debit/credit card via MoonPay.
-              </p>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Amount (USD)</label>
-                  <input 
-                    type="text" 
-                    placeholder="Enter amount in USD (min $20)" 
-                    className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-                  />
-                </div>
-                
-                <button 
-                  onClick={openFiatPayment}
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-                >
-                  Continue to MoonPay
-                </button>
-                
-                <div className="text-center text-sm text-gray-400">
-                  Minimum purchase amount is $20 USD.
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
@@ -391,7 +297,7 @@ const HomePage = () => {
                     </div>
                     <span className="text-blue-400 font-bold text-xl">10%</span>
                   </div>
-                  <div className="text-gray-400 text-sm mt-1 ml-7">10M tokens (locked 2 years)</div>
+                  <div className="text-gray-400 text-sm mt-1 ml-7">10M tokens (locked 2 years )</div>
                 </div>
                 
                 <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
@@ -615,99 +521,162 @@ const HomePage = () => {
         </div>
       </footer>
 
-      {/* Payment Modal */}
+      {/* Payment Modal - Matches Your Screenshot Exactly */}
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-3xl p-8 max-w-md w-full border border-gray-700">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-2xl font-bold gradient-text">
-                {paymentType === 'crypto' ? 'Buy with Crypto' : 'Buy with USD'}
-              </h3>
-              <button 
-                onClick={closeModal}
-                className="text-gray-400 hover:text-white text-2xl"
-              >
-                ×
-              </button>
+          <div className="bg-gray-900 rounded-3xl p-8 max-w-6xl w-full border border-gray-700">
+            {/* Modal Header */}
+            <div className="text-center mb-8">
+              <div className="flex justify-between items-center mb-4">
+                <div></div>
+                <h2 className="text-4xl font-bold">
+                  Buy <span className="gradient-text">KushAlara</span> Tokens
+                </h2>
+                <button 
+                  onClick={closeModal}
+                  className="text-gray-400 hover:text-white text-3xl"
+                >
+                  ×
+                </button>
+              </div>
+              <p className="text-xl text-gray-300">
+                Join the world's first Web3-native sovereign state
+              </p>
             </div>
 
-            {paymentType === 'crypto' ? (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Amount (USD )</label>
-                  <input 
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount" 
-                    className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-                  />
-                </div>
+            {/* Two Cards Side by Side - Exactly Like Your Screenshot */}
+            <div className="grid md:grid-cols-2 gap-8">
+              {/* Left Card - Crypto Payment */}
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700">
+                <h3 className="text-2xl font-bold mb-4 gradient-text text-center">Buy KushAlara Tokens</h3>
+                <p className="text-gray-300 text-center mb-6">
+                  Connect your wallet or use direct cryptocurrency payment
+                </p>
                 
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Payment Method</label>
-                  <select 
-                    value={selectedCrypto}
-                    onChange={(e) => setSelectedCrypto(e.target.value)}
-                    className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400"
-                  >
-                    <option value="ETH">Ethereum (ETH)</option>
-                    <option value="BTC">Bitcoin (BTC)</option>
-                    <option value="USDC">USDC</option>
-                    <option value="USDT">USDT</option>
-                  </select>
-                </div>
-
-                <div className="bg-gray-700/30 rounded-lg p-4 text-sm">
-                  <div className="text-gray-300 mb-2">Wallet Status:</div>
-                  <div className="text-gray-400">
-                    {walletConnected ? '✅ Wallet Connected' : '❌ Wallet Not Connected'}
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-white mb-2 font-semibold">Amount (USD )</label>
+                    <input 
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="Enter amount" 
+                      className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                    />
                   </div>
-                </div>
-                
-                <button 
-                  onClick={handleCryptoPayment}
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-                >
-                  {walletConnected ? 'Continue Payment' : 'Connect Wallet'}
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-white mb-2 font-semibold">Amount (USD)</label>
-                  <input 
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount (min $20)" 
-                    className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-                  />
-                </div>
+                  
+                  <div>
+                    <label className="block text-white mb-2 font-semibold">Payment Method</label>
+                    <select 
+                      value={selectedCrypto}
+                      onChange={(e) => setSelectedCrypto(e.target.value)}
+                      className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+                    >
+                      <option value="ETH">Ethereum (ETH)</option>
+                      <option value="BTC">Bitcoin (BTC)</option>
+                      <option value="USDC">USDC</option>
+                      <option value="USDT">USDT</option>
+                      <option value="SOL">Solana (SOL)</option>
+                    </select>
+                  </div>
 
-                {amount && (
-                  <div className="bg-gray-700/30 rounded-lg p-4">
-                    <div className="text-gray-300 text-sm">You will receive:</div>
-                    <div className="text-2xl font-bold text-yellow-400">
-                      {(parseFloat(amount) * 10).toLocaleString()} KUSH
+                  {/* Wallet Address Display */}
+                  {amount && (
+                    <div className="bg-gray-700/30 rounded-lg p-4">
+                      <div className="text-gray-300 text-sm mb-2">Send {selectedCrypto} to:</div>
+                      <div className="bg-gray-600/50 rounded p-2 text-xs text-gray-200 break-all">
+                        {walletAddresses[selectedCrypto]}
+                      </div>
+                      <button 
+                        onClick={() => copyToClipboard(walletAddresses[selectedCrypto])}
+                        className="text-yellow-400 text-xs mt-1 hover:text-yellow-300"
+                      >
+                        📋 Copy Address
+                      </button>
+                      <div className="text-yellow-400 font-bold mt-2">
+                        You will receive: {amount} KUSH tokens
+                      </div>
+                      <div className="text-gray-400 text-xs">Rate: 1 USD = 1 KUSH</div>
                     </div>
-                    <div className="text-gray-400 text-sm">Rate: 1 USD = 10 KUSH</div>
+                  )}
+                  
+                  <button 
+                    onClick={handleCryptoPayment}
+                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                  >
+                    Continue to Payment
+                  </button>
+                  
+                  <div className="text-center text-sm text-gray-400">
+                    Secure wallet integration • Multiple payment options
                   </div>
-                )}
-                
-                <button 
-                  onClick={handleFiatPayment}
-                  disabled={!amount || parseFloat(amount) < 20}
-                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Continue to MoonPay
-                </button>
-                
-                <div className="text-center text-sm text-gray-400">
-                  Minimum purchase amount is $20 USD
+                  
+                  {/* Wallet Status Debug Info */}
+                  <div className="bg-gray-700/30 rounded-lg p-4 text-sm">
+                    <div className="flex items-center text-gray-300 mb-2">
+                      🔗 <span className="ml-2">Wallet Status (Debug Info):</span>
+                    </div>
+                    <div className="space-y-1 text-gray-400">
+                      <div className="flex items-center">
+                        <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                        Ethereum: Not connected
+                      </div>
+                      <div className="flex items-center">
+                        <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+                        Solana: Not connected
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
+
+              {/* Right Card - Fiat Payment */}
+              <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700">
+                <h3 className="text-2xl font-bold mb-4 gradient-text text-center">
+                  Buy KushAlara  
+
+                  <span className="text-yellow-400">with USD</span>
+                </h3>
+                <p className="text-gray-300 text-center mb-6">
+                  Securely purchase crypto with your debit/credit card via MoonPay.
+                </p>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-white mb-2 font-semibold">Amount (USD)</label>
+                    <input 
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      placeholder="Enter amount in USD (min $20)" 
+                      className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                    />
+                  </div>
+
+                  {amount && (
+                    <div className="bg-gray-700/30 rounded-lg p-4">
+                      <div className="text-gray-300 text-sm">You will receive:</div>
+                      <div className="text-2xl font-bold text-yellow-400">
+                        {parseFloat(amount).toLocaleString()} KUSH
+                      </div>
+                      <div className="text-gray-400 text-sm">Rate: 1 USD = 1 KUSH</div>
+                    </div>
+                  )}
+                  
+                  <button 
+                    onClick={handleFiatPayment}
+                    disabled={!amount || parseFloat(amount) < 20}
+                    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    Continue to MoonPay
+                  </button>
+                  
+                  <div className="text-center text-sm text-gray-400">
+                    Minimum purchase amount is $20 USD.
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
