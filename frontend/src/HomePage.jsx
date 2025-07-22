@@ -1,7 +1,8 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import CountdownTimer from '../components/CountdownTimer'
+import CountdownTimer from '../components/CountdownTimer.jsx'
 
+// Rest of your HomePage component stays the same...
 const HomePage = () => {
   const downloadWhitepaper = () => {
     // Create a simple PDF download link
@@ -114,8 +115,7 @@ const HomePage = () => {
         </div>
       </footer>
     </div>
-  )
+   )
 }
 
 export default HomePage
-
