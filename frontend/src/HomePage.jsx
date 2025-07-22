@@ -421,47 +421,59 @@ const HomePage = () => {
 
 
         {/* Development Roadmap */}
-        <section id="roadmap" className="mb-16 fade-in">
-          <h2 className="text-4xl font-bold mb-12 gradient-text text-center">Development Roadmap</h2>
-          <div className="space-y-8">
-            <div className="flex items-start space-x-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-black font-bold">
-                Q1
-              </div>
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 flex-1">
-                <h3 className="text-xl font-bold mb-3 text-yellow-400">Foundation & Launch</h3>
-                <p className="text-gray-300">Token launch, initial governance framework, citizenship applications open, basic DeFi integration.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold">
-                Q2
-              </div>
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 flex-1">
-                <h3 className="text-xl font-bold mb-3 text-blue-400">Governance & Services</h3>
-                <p className="text-gray-300">DAO implementation, digital identity system, business registration portal, legal framework establishment.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold">
-                Q3
-              </div>
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 flex-1">
-                <h3 className="text-xl font-bold mb-3 text-green-400">Economic Expansion</h3>
-                <p className="text-gray-300">DeFi ecosystem launch, NFT marketplace, cross-chain integration, international partnerships.</p>
-              </div>
-            </div>
-            <div className="flex items-start space-x-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold">
-                Q4
-              </div>
-              <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 flex-1">
-                <h3 className="text-xl font-bold mb-3 text-purple-400">Global Recognition</h3>
-                <p className="text-gray-300">International recognition efforts, advanced governance features, metaverse integration, full sovereignty.</p>
-              </div>
-            </div>
-          </div>
-        </section>
+<section id="roadmap" className="mb-16 fade-in">
+  <h2 className="text-4xl font-bold mb-12 gradient-text text-center">Development Roadmap</h2>
+  <div className="space-y-8 max-w-4xl mx-auto">
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 card-hover">
+      <div className="flex items-start space-x-6">
+        <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center text-black font-bold text-lg">
+          Phase 1
+        </div>
+        <div className="flex-1">
+          <h3 className="text-2xl font-bold mb-3 text-yellow-400">Foundation & Launch</h3>
+          <p className="text-gray-300">Token launch, initial governance framework, citizenship applications open, basic DeFi integration.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 card-hover">
+      <div className="flex items-start space-x-6">
+        <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+          Phase 2
+        </div>
+        <div className="flex-1">
+          <h3 className="text-2xl font-bold mb-3 text-blue-400">Governance & Services</h3>
+          <p className="text-gray-300">DAO implementation, digital identity system, business registration portal, legal framework establishment.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 card-hover">
+      <div className="flex items-start space-x-6">
+        <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-green-400 to-green-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+          Phase 3
+        </div>
+        <div className="flex-1">
+          <h3 className="text-2xl font-bold mb-3 text-green-400">Economic Expansion</h3>
+          <p className="text-gray-300">DeFi ecosystem launch, NFT marketplace, cross-chain integration, international partnerships.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 card-hover">
+      <div className="flex items-start space-x-6">
+        <div className="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+          Phase 4
+        </div>
+        <div className="flex-1">
+          <h3 className="text-2xl font-bold mb-3 text-purple-400">Global Recognition</h3>
+          <p className="text-gray-300">International recognition efforts, advanced governance features, metaverse integration, full sovereignty.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
         {/* Join the Kingdom Section */}
         <section className="mb-16 fade-in">
