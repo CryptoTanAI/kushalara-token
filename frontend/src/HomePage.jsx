@@ -51,31 +51,39 @@ const HomePage = () => {
     <Link to="/citizenship" className="text-gray-300 hover:text-white transition-colors">Contact</Link>
   </div>
   <div className="flex items-center space-x-4">
-    {/* Social Media Icons */}
-    <a 
-      href="https://www.instagram.com/royalkingdomofkush/" 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="text-gray-300 hover:text-white transition-colors text-xl"
-    >
-      📱
-    </a>
-    <a 
-      href="https://x.com/KushKingdom_Gov" 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="text-gray-300 hover:text-white transition-colors text-xl"
-    >
-      🐦
-    </a>
-    {/* Buy KushAlara Button */}
-    <button 
-      onClick={buyTokens}
-      className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-    >
-      Buy KushAlara
-    </button>
-  </div>
+  {/* Download Whitepaper Button */}
+  <button 
+    onClick={downloadWhitepaper}
+    className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-sm"
+  >
+    Download Whitepaper
+  </button>
+  {/* Social Media Icons */}
+  <a 
+    href="https://www.instagram.com/royalkingdomofkush/" 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="text-gray-300 hover:text-white transition-colors text-xl"
+  >
+    📱
+  </a>
+  <a 
+    href="https://x.com/KushKingdom_Gov" 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="text-gray-300 hover:text-white transition-colors text-xl"
+  >
+    🐦
+  </a>
+  {/* Buy KushAlara Button */}
+  <button 
+    onClick={buyTokens}
+    className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+  >
+    Buy KushAlara
+  </button>
+</div>
+
 </nav>
 
 
