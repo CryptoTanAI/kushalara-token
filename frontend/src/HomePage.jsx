@@ -244,37 +244,53 @@ const HomePage = () => {
         </div>
 
         {/* About KushAlara Section */}
-        <section id="about" className="mb-16 fade-in">
-          <div className="bg-gray-800/30 backdrop-blur-sm rounded-3xl p-12 border border-gray-700">
-            <h2 className="text-4xl font-bold mb-8 gradient-text text-center">About KushAlara</h2>
-            <div className="grid md:grid-cols-2 gap-12 items-center">
-              <div>
-                <h3 className="text-2xl font-bold mb-4 text-yellow-400">Historical Legacy</h3>
-                <p className="text-gray-300 mb-6">
-                  KushAlara draws inspiration from the ancient Kingdom of Kush, a powerful civilization that thrived along the Nile River. 
-                  Known for their advanced governance, trade networks, and cultural achievements, the Kushites pioneered many concepts 
-                  that we now implement through blockchain technology.
-                </p>
-                <h3 className="text-2xl font-bold mb-4 text-blue-400">Modern Vision</h3>
-                <p className="text-gray-300">
-                  Today, KushAlara represents the evolution of governance into the digital age. We combine the wisdom of ancient 
-                  civilizations with cutting-edge blockchain technology to create a truly sovereign digital state that serves 
-                  its citizens globally.
-                </p>
-              </div>
-              <div className="bg-gradient-to-br from-yellow-400/20 to-blue-400/20 rounded-2xl p-8">
-                <h3 className="text-2xl font-bold mb-4 text-purple-400">Core Principles</h3>
-                <ul className="text-gray-300 space-y-3">
-                  <li>• <strong>Decentralized Governance:</strong> Community-driven decision making</li>
-                  <li>• <strong>Economic Freedom:</strong> Borderless financial opportunities</li>
-                  <li>• <strong>Digital Rights:</strong> Blockchain-verified identity and citizenship</li>
-                  <li>• <strong>Innovation:</strong> Pioneering the future of digital society</li>
-                  <li>• <strong>Inclusivity:</strong> Open to all who share our vision</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
+<section id="about" className="mb-16 fade-in">
+  <div className="text-center mb-12">
+    <h2 className="text-4xl font-bold mb-4 gradient-text">About KushAlara</h2>
+    <p className="text-xl text-gray-300 max-w-4xl mx-auto">
+      The world's first Web3-native sovereign state, pioneering digital governance and economic innovation
+    </p>
+  </div>
+  
+  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+    {/* Digital Sovereignty */}
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 card-hover text-center">
+      <div className="text-4xl mb-4 text-yellow-400">🛡️</div>
+      <h3 className="text-xl font-bold mb-3 text-white">Digital Sovereignty</h3>
+      <p className="text-gray-300 text-sm">
+        First Web3-native sovereign state with blockchain-integrated governance
+      </p>
+    </div>
+
+    {/* Multi-Utility Token */}
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 card-hover text-center">
+      <div className="text-4xl mb-4 text-yellow-400">🔗</div>
+      <h3 className="text-xl font-bold mb-3 text-white">Multi-Utility Token</h3>
+      <p className="text-gray-300 text-sm">
+        Payments, staking, governance, and citizenship access in one token
+      </p>
+    </div>
+
+    {/* CBDC Integration */}
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 card-hover text-center">
+      <div className="text-4xl mb-4 text-yellow-400">📈</div>
+      <h3 className="text-xl font-bold mb-3 text-white">CBDC Integration</h3>
+      <p className="text-gray-300 text-sm">
+        Central Bank Digital Currency for seamless financial inclusion
+      </p>
+    </div>
+
+    {/* e-Residency Program */}
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 card-hover text-center">
+      <div className="text-4xl mb-4 text-yellow-400">🌐</div>
+      <h3 className="text-xl font-bold mb-3 text-white">e-Residency Program</h3>
+      <p className="text-gray-300 text-sm">
+        Global digital citizenship for innovators and entrepreneurs
+      </p>
+    </div>
+  </div>
+</section>
+
 
         {/* Token Utilities Section */}
         <section id="utilities" className="mb-16 fade-in">
