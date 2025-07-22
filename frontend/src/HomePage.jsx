@@ -320,21 +320,22 @@ const HomePage = () => {
             Download Whitepaper
           </button>
           <a 
-            href="https://instagram.com/kingdomofkush" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="bg-gradient-to-r from-pink-500 to-pink-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 mr-4 mb-4 inline-block"
-          >
-            📱 Follow on Instagram
-          </a>
-          <a 
-            href="https://twitter.com/kingdomofkush" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="bg-gradient-to-r from-blue-400 to-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 mb-4 inline-block"
-          >
-            🐦 Follow on Twitter
-          </a>
+  href="https://www.instagram.com/royalkingdomofkush/" 
+  target="_blank" 
+  rel="noopener noreferrer"
+  className="bg-gradient-to-r from-pink-500 to-pink-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 mr-4 mb-4 inline-block"
+>
+  📱 Follow on Instagram
+</a>
+<a 
+  href="https://x.com/KushKingdom_Gov" 
+  target="_blank" 
+  rel="noopener noreferrer"
+  className="bg-gradient-to-r from-blue-400 to-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 mb-4 inline-block"
+>
+  🐦 Follow on X (Twitter )
+</a>
+
         </div>
       </div>
 
@@ -369,12 +370,12 @@ const HomePage = () => {
             <div>
               <h4 className="text-lg font-semibold mb-4 text-white">Connect</h4>
               <div className="flex space-x-4">
-                <a href="https://instagram.com/kingdomofkush" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  📱
-                </a>
-                <a href="https://twitter.com/kingdomofkush" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
-                  🐦
-                </a>
+                <a href="https://www.instagram.com/royalkingdomofkush/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+  📱
+</a>
+<a href="https://x.com/KushKingdom_Gov" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-white transition-colors">
+  🐦
+</a>
                 <a href="#" className="text-gray-400 hover:text-white transition-colors">
                   💬
                 </a>
