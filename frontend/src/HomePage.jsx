@@ -323,60 +323,102 @@ const HomePage = () => {
           </div>
         </section>
 
-        {/* Tokenomics Section */}
-        <section id="tokenomics" className="mb-16 fade-in">
-          <div className="bg-gray-800/30 backdrop-blur-sm rounded-3xl p-12 border border-gray-700">
-            <h2 className="text-4xl font-bold mb-12 gradient-text text-center">Tokenomics</h2>
-            <div className="grid md:grid-cols-2 gap-12">
-              <div>
-                <h3 className="text-2xl font-bold mb-6 text-yellow-400">Token Distribution</h3>
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-4 bg-gray-700/50 rounded-lg">
-                    <span className="text-gray-300">Public Sale</span>
-                    <span className="text-white font-bold">40%</span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-gray-700/50 rounded-lg">
-                    <span className="text-gray-300">Development</span>
-                    <span className="text-white font-bold">25%</span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-gray-700/50 rounded-lg">
-                    <span className="text-gray-300">Community Rewards</span>
-                    <span className="text-white font-bold">20%</span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-gray-700/50 rounded-lg">
-                    <span className="text-gray-300">Team & Advisors</span>
-                    <span className="text-white font-bold">10%</span>
-                  </div>
-                  <div className="flex justify-between items-center p-4 bg-gray-700/50 rounded-lg">
-                    <span className="text-gray-300">Reserve Fund</span>
-                    <span className="text-white font-bold">5%</span>
-                  </div>
-                </div>
-              </div>
-              <div>
-                <h3 className="text-2xl font-bold mb-6 text-blue-400">Token Metrics</h3>
-                <div className="space-y-4">
-                  <div className="p-4 bg-gray-700/50 rounded-lg">
-                    <div className="text-gray-300 mb-1">Total Supply</div>
-                    <div className="text-2xl font-bold text-white">1,000,000,000 KUSH</div>
-                  </div>
-                  <div className="p-4 bg-gray-700/50 rounded-lg">
-                    <div className="text-gray-300 mb-1">Initial Price</div>
-                    <div className="text-2xl font-bold text-white">$0.10 USD</div>
-                  </div>
-                  <div className="p-4 bg-gray-700/50 rounded-lg">
-                    <div className="text-gray-300 mb-1">Blockchain</div>
-                    <div className="text-2xl font-bold text-white">Ethereum</div>
-                  </div>
-                  <div className="p-4 bg-gray-700/50 rounded-lg">
-                    <div className="text-gray-300 mb-1">Token Standard</div>
-                    <div className="text-2xl font-bold text-white">ERC-20</div>
-                  </div>
-                </div>
-              </div>
+       {/* Tokenomics Section */}
+<section id="tokenomics" className="mb-16 fade-in">
+  <div className="text-center mb-12">
+    <h2 className="text-4xl font-bold mb-4 gradient-text">Tokenomics</h2>
+    <p className="text-xl text-gray-300">
+      Total Supply: 100 Million KushAlara Tokens
+    </p>
+  </div>
+  
+  <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
+    {/* Token Distribution */}
+    <div>
+      <h3 className="text-2xl font-bold mb-6 text-white">Token Distribution</h3>
+      <div className="space-y-4">
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-yellow-400 rounded-full mr-3"></div>
+              <span className="text-white font-semibold">Public Sale</span>
             </div>
+            <span className="text-yellow-400 font-bold text-xl">88.5%</span>
           </div>
-        </section>
+          <div className="text-gray-400 text-sm mt-1 ml-7">88.5M tokens</div>
+        </div>
+        
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-blue-400 rounded-full mr-3"></div>
+              <span className="text-white font-semibold">Pre-Sale</span>
+            </div>
+            <span className="text-blue-400 font-bold text-xl">10%</span>
+          </div>
+          <div className="text-gray-400 text-sm mt-1 ml-7">10M tokens (locked 2 years)</div>
+        </div>
+        
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-purple-400 rounded-full mr-3"></div>
+              <span className="text-white font-semibold">Kingdom Treasury</span>
+            </div>
+            <span className="text-purple-400 font-bold text-xl">1%</span>
+          </div>
+          <div className="text-gray-400 text-sm mt-1 ml-7">1M tokens</div>
+        </div>
+        
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <div className="w-4 h-4 bg-green-400 rounded-full mr-3"></div>
+              <span className="text-white font-semibold">Community Rewards</span>
+            </div>
+            <span className="text-green-400 font-bold text-xl">0.5%</span>
+          </div>
+          <div className="text-gray-400 text-sm mt-1 ml-7">500K tokens</div>
+        </div>
+      </div>
+    </div>
+
+    {/* Fund Allocation */}
+    <div>
+      <h3 className="text-2xl font-bold mb-6 text-white">Fund Allocation</h3>
+      <div className="space-y-4">
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+          <div className="flex justify-between items-center">
+            <span className="text-white font-semibold">Kingdom Blockchain Development</span>
+            <span className="text-yellow-400 font-bold text-xl">40%</span>
+          </div>
+        </div>
+        
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+          <div className="flex justify-between items-center">
+            <span className="text-white font-semibold">Central Bank & CBDC Development</span>
+            <span className="text-blue-400 font-bold text-xl">30%</span>
+          </div>
+        </div>
+        
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+          <div className="flex justify-between items-center">
+            <span className="text-white font-semibold">Digital IDs & Passports</span>
+            <span className="text-purple-400 font-bold text-xl">20%</span>
+          </div>
+        </div>
+        
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
+          <div className="flex justify-between items-center">
+            <span className="text-white font-semibold">Ecosystem Development</span>
+            <span className="text-green-400 font-bold text-xl">10%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
         {/* Development Roadmap */}
         <section id="roadmap" className="mb-16 fade-in">
