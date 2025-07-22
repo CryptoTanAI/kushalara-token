@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 
-// Import pages
-import HomePage from './pages/HomePage'
-import CitizenshipApplication from './pages/CitizenshipApplication'
-import EResidencyApplication from './pages/EResidencyApplication'
+// Import pages with .jsx extensions
+import HomePage from './pages/HomePage.jsx'
+import CitizenshipApplication from './pages/CitizenshipApplication.jsx'
+import EResidencyApplication from './pages/EResidencyApplication.jsx'
 
 function App() {
   return (
@@ -21,5 +21,3 @@ function App() {
 }
 
 export default App
-
-
