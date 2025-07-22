@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import CountdownTimer from '../components/CountdownTimer.jsx'
+import CountdownTimer from './CountdownTimer.jsx'
 
 // Rest of your HomePage component stays the same...
 const HomePage = () => {
