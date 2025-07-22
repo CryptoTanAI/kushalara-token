@@ -4,11 +4,14 @@ import CountdownTimer from './CountdownTimer.jsx'
 
 const HomePage = () => {
   const [walletConnected, setWalletConnected] = useState(false)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [paymentType, setPaymentType] = useState('')
+  const [amount, setAmount] = useState('')
+  const [selectedCrypto, setSelectedCrypto] = useState('ETH')
 
   const downloadWhitepaper = () => {
-    // Create a simple PDF download link
     const link = document.createElement('a')
-    link.href = '/whitepaper.pdf' // You'll need to add this file to public folder
+    link.href = '/whitepaper.pdf'
     link.download = 'KushAlara-Whitepaper.pdf'
     link.click()
   }
@@ -25,6 +28,38 @@ const HomePage = () => {
       console.error('Error connecting wallet:', error)
     }
   }
+
+  const buyTokens = () => {
+    setShowPaymentModal(true)
+  }
+
+  const openCryptoPayment = () => {
+    setPaymentType('crypto')
+  }
+
+  const openFiatPayment = () => {
+    setPaymentType('fiat')
+  }
+
+  const closeModal = () => {
+    setShowPaymentModal(false)
+    setPaymentType('')
+    setAmount('')
+  }
+
+  const handleCryptoPayment = () => {
+    if (!walletConnected) {
+      connectWallet()
+    } else {
+      alert(`Processing ${amount} USD payment with ${selectedCrypto}`)
+    }
+  }
+
+  const handleFiatPayment = () => {
+    const tokenAmount = parseFloat(amount) * 10
+    alert(`You will receive ${tokenAmount} KUSH tokens for $${amount} USD`)
+  }
+
 
   const buyTokens = () => {
     if (!walletConnected) {
