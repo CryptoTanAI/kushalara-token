@@ -5,6 +5,9 @@ import { RainbowKitProvider } from '@rainbow-me/rainbowkit'
 import { config } from './lib/wagmi'
 import './App.css'
 
+// Import RainbowKit styles
+import '@rainbow-me/rainbowkit/styles.css'
+
 // Import pages
 import HomePage from './HomePage.jsx'
 import CitizenshipApplication from './CitizenshipApplication.jsx'
