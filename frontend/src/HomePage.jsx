@@ -38,28 +38,46 @@ const HomePage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       {/* Navigation */}
-      <nav className="flex justify-center items-center p-6 bg-black/20 backdrop-blur-sm">
-        <div className="flex items-center space-x-8">
-          <div className="text-2xl font-bold gradient-text">KushAlara</div>
-          <div className="hidden md:flex items-center space-x-6">
-            <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
-            <a href="#tokenomics" className="text-gray-300 hover:text-white transition-colors">Tokenomics</a>
-            <a href="#roadmap" className="text-gray-300 hover:text-white transition-colors">Roadmap</a>
-            <Link to="/citizenship" className="text-gray-300 hover:text-white transition-colors">
-              Citizenship
-            </Link>
-            <Link to="/eresidency" className="text-gray-300 hover:text-white transition-colors">
-              e-Residency
-            </Link>
-            <button 
-              onClick={buyTokens}
-              className="payment-btn"
-            >
-              {walletConnected ? 'Buy KushAlara' : 'Connect Wallet'}
-            </button>
-          </div>
-        </div>
-      </nav>
+      {/* Navigation */}
+<nav className="flex justify-between items-center p-6 bg-black/20 backdrop-blur-sm">
+  <div className="text-2xl font-bold gradient-text flex items-center">
+    👑 KushAlara
+  </div>
+  <div className="hidden md:flex items-center space-x-6">
+    <a href="#home" className="text-gray-300 hover:text-white transition-colors">Home</a>
+    <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
+    <a href="#tokenomics" className="text-gray-300 hover:text-white transition-colors">Tokenomics</a>
+    <a href="#roadmap" className="text-gray-300 hover:text-white transition-colors">Roadmap</a>
+    <Link to="/citizenship" className="text-gray-300 hover:text-white transition-colors">Contact</Link>
+  </div>
+  <div className="flex items-center space-x-4">
+    {/* Social Media Icons */}
+    <a 
+      href="https://www.instagram.com/royalkingdomofkush/" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-gray-300 hover:text-white transition-colors text-xl"
+    >
+      📱
+    </a>
+    <a 
+      href="https://x.com/KushKingdom_Gov" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="text-gray-300 hover:text-white transition-colors text-xl"
+    >
+      🐦
+    </a>
+    {/* Buy KushAlara Button */}
+    <button 
+      onClick={buyTokens}
+      className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+    >
+      Buy KushAlara
+    </button>
+  </div>
+</nav>
+
 
       {/* Hero Section */}
       <div className="container mx-auto px-6 py-20">
