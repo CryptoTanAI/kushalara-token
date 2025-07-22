@@ -1,10 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 
-// Import pages with .jsx extensions
-import HomePage from './pages/HomePage.jsx'
-import CitizenshipApplication from './pages/CitizenshipApplication.jsx'
-import EResidencyApplication from './pages/EResidencyApplication.jsx'
+// Import pages from src folder (no pages subfolder)
+import HomePage from './HomePage.jsx'
+import CitizenshipApplication from './CitizenshipApplication.jsx'
+import EResidencyApplication from './EResidencyApplication.jsx'
 
 function App() {
   return (
