@@ -475,64 +475,53 @@ const HomePage = () => {
 </section>
 
 
-        {/* Join the Kingdom Section */}
-        <section className="mb-16 fade-in">
-          <div className="bg-gradient-to-r from-yellow-400/20 via-blue-400/20 to-purple-400/20 rounded-3xl p-12 border border-gray-700 text-center">
-            <h2 className="text-4xl font-bold mb-6 gradient-text">Join the Kingdom</h2>
-            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Become a founding citizen of the world's first Web3 nation. Shape the future of digital governance and be part of history in the making.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-              <Link 
-                to="/citizenship" 
-                className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-              >
-                Become a Citizen
-              </Link>
-              <Link 
-                to="/eresidency" 
-                className="bg-gradient-to-r from-blue-500 to-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-              >
-                Get e-Residency
-              </Link>
-              <button 
-                onClick={buyTokens}
-                className="bg-gradient-to-r from-green-500 to-green-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-              >
-                Buy Tokens
-              </button>
-            </div>
-          </div>
-        </section>
-
-        {/* Call to Action */}
-        <div className="text-center mb-16">
-          <button 
-            onClick={downloadWhitepaper}
-            className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 mr-4 mb-4"
-          >
-            Download Whitepaper
-          </button>
-          <a 
-  href="https://www.instagram.com/royalkingdomofkush/" 
-  target="_blank" 
-  rel="noopener noreferrer"
-  className="bg-gradient-to-r from-pink-500 to-pink-700 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 mr-4 mb-4 inline-block"
->
-  📱 Follow on Instagram
-</a>
-<a 
-  href="https://x.com/KushKingdom_Gov" 
-  target="_blank" 
-  rel="noopener noreferrer"
-  className="bg-gradient-to-r from-blue-400 to-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 mb-4 inline-block"
->
-  🐦 Follow on X (Twitter )
-</a>
-
-        </div>
+       {/* Join the Kingdom Section */}
+<section className="mb-16 fade-in">
+  <div className="text-center mb-12">
+    <h2 className="text-4xl font-bold mb-6 gradient-text">Join the Kingdom</h2>
+    <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+      Become part of the world's first Web3-native sovereign state
+    </p>
+  </div>
+  
+  <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+    {/* Citizenship Card */}
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700 card-hover">
+      <div className="text-center mb-6">
+        <div className="text-4xl mb-4">👑</div>
+        <h3 className="text-2xl font-bold text-white mb-4">Citizenship</h3>
+        <p className="text-gray-300">
+          Become a full citizen of the Kingdom of Kush with voting rights, governance participation, and access to all Kingdom services.
+        </p>
       </div>
+      <Link 
+        to="/citizenship"
+        className="block w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-4 rounded-lg font-semibold text-center hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+      >
+        Apply for Citizenship
+      </Link>
+    </div>
 
+    {/* e-Residency Card */}
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700 card-hover">
+      <div className="text-center mb-6">
+        <div className="text-4xl mb-4">🌐</div>
+        <h3 className="text-2xl font-bold text-white mb-4">e-Residency</h3>
+        <p className="text-gray-300">
+          Access Kingdom digital services, register your business, and participate in our digital economy from anywhere in the world.
+        </p>
+      </div>
+      <Link 
+        to="/eresidency"
+        className="block w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-4 rounded-lg font-semibold text-center hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+      >
+        Apply for e-Residency
+      </Link>
+    </div>
+  </div>
+</section>
+
+        
       {/* Footer */}
       <footer className="bg-black/20 backdrop-blur-sm py-12 mt-20">
         <div className="container mx-auto px-6">
