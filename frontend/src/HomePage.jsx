@@ -115,6 +115,112 @@ const HomePage = () => {
           <CountdownTimer />
         </div>
 
+{/* Payment Processing Section */}
+<section className="mb-16 fade-in">
+  <div className="text-center mb-12">
+    <h2 className="text-4xl font-bold mb-4">
+      Buy <span className="gradient-text">KushAlara</span> Tokens
+    </h2>
+    <p className="text-xl text-gray-300">
+      Join the world's first Web3-native sovereign state
+    </p>
+  </div>
+  
+  <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+    {/* Crypto Payment Card */}
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700 card-hover">
+      <h3 className="text-2xl font-bold mb-4 gradient-text text-center">Buy KushAlara Tokens</h3>
+      <p className="text-gray-300 text-center mb-6">
+        Connect your wallet or use direct cryptocurrency payment
+      </p>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-white mb-2 font-semibold">Amount (USD)</label>
+          <input 
+            type="text" 
+            placeholder="Enter amount" 
+            className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-white mb-2 font-semibold">Payment Method</label>
+          <select className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400">
+            <option>Choose cryptocurrency</option>
+            <option>Ethereum (ETH)</option>
+            <option>Bitcoin (BTC)</option>
+            <option>USDC</option>
+            <option>USDT</option>
+          </select>
+        </div>
+        
+        <button 
+          onClick={connectWallet}
+          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+        >
+          Continue to Payment
+        </button>
+        
+        <div className="text-center text-sm text-gray-400">
+          Secure wallet integration • Multiple payment options
+        </div>
+        
+        {/* Wallet Status Debug Info */}
+        <div className="bg-gray-700/30 rounded-lg p-4 text-sm">
+          <div className="flex items-center text-gray-300 mb-2">
+            🔗 <span className="ml-2">Wallet Status (Debug Info):</span>
+          </div>
+          <div className="space-y-1 text-gray-400">
+            <div className="flex items-center">
+              <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+              Ethereum: Not connected
+            </div>
+            <div className="flex items-center">
+              <span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>
+              Solana: Not connected
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* MoonPay Card */}
+    <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700 card-hover">
+      <h3 className="text-2xl font-bold mb-4 gradient-text text-center">
+        Buy KushAlara  
+
+        <span className="text-yellow-400">with USD</span>
+      </h3>
+      <p className="text-gray-300 text-center mb-6">
+        Securely purchase crypto with your debit/credit card via MoonPay.
+      </p>
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-white mb-2 font-semibold">Amount (USD)</label>
+          <input 
+            type="text" 
+            placeholder="Enter amount in USD (min $20)" 
+            className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+          />
+        </div>
+        
+        <button 
+          onClick={buyTokens}
+          className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+        >
+          Continue to MoonPay
+        </button>
+        
+        <div className="text-center text-sm text-gray-400">
+          Minimum purchase amount is $20 USD.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-8 mb-16">
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 card-hover">
