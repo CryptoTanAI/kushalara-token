@@ -616,6 +616,111 @@ const HomePage = () => {
           </div>
         </div>
       </footer>
+              </footer>
+
+      {/* ADD THIS MODAL CODE HERE */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-3xl p-8 max-w-md w-full border border-gray-700">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-2xl font-bold gradient-text">
+                {paymentType === 'crypto' ? 'Buy with Crypto' : 'Buy with USD'}
+              </h3>
+              <button 
+                onClick={closeModal}
+                className="text-gray-400 hover:text-white text-2xl"
+              >
+                ×
+              </button>
+            </div>
+
+            {paymentType === 'crypto' ? (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-white mb-2 font-semibold">Amount (USD)</label>
+                  <input 
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter amount" 
+                    className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-white mb-2 font-semibold">Payment Method</label>
+                  <select 
+                    value={selectedCrypto}
+                    onChange={(e) => setSelectedCrypto(e.target.value)}
+                    className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+                  >
+                    <option value="ETH">Ethereum (ETH)</option>
+                    <option value="BTC">Bitcoin (BTC)</option>
+                    <option value="USDC">USDC</option>
+                    <option value="USDT">USDT</option>
+                  </select>
+                </div>
+
+                <div className="bg-gray-700/30 rounded-lg p-4 text-sm">
+                  <div className="text-gray-300 mb-2">Wallet Status:</div>
+                  <div className="text-gray-400">
+                    {walletConnected ? '✅ Wallet Connected' : '❌ Wallet Not Connected'}
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={handleCryptoPayment}
+                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                >
+                  {walletConnected ? 'Continue Payment' : 'Connect Wallet'}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-white mb-2 font-semibold">Amount (USD)</label>
+                  <input 
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="Enter amount (min $20)" 
+                    className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                  />
+                </div>
+
+                {amount && (
+                  <div className="bg-gray-700/30 rounded-lg p-4">
+                    <div className="text-gray-300 text-sm">You will receive:</div>
+                    <div className="text-2xl font-bold text-yellow-400">
+                      {(parseFloat(amount) * 10).toLocaleString()} KUSH
+                    </div>
+                    <div className="text-gray-400 text-sm">Rate: 1 USD = 10 KUSH</div>
+                  </div>
+                )}
+                
+                <button 
+                  onClick={handleFiatPayment}
+                  disabled={!amount || parseFloat(amount) < 20}
+                  className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Continue to MoonPay
+                </button>
+                
+                <div className="text-center text-sm text-gray-400">
+                  Minimum purchase amount is $20 USD
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+    </div>
+  )
+}
+
+export default HomePage
+
     </div>
    )
 }
