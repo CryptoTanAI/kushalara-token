@@ -727,22 +727,35 @@ const fetchMoonPayQuote = async () => {
                       </div>
                     </div>
                     
-                    {amount && (
-                      <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
-                        <div className="text-gray-300 text-sm">You will send:</div>
-                        <div className="text-2xl font-bold text-yellow-400">
-                          {totalCrypto.toFixed(8)} {selectedCrypto}
-                        </div>
-                        <div className="text-gray-400 text-sm">
-                          Including network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
-                        </div>
-                        {!hasEnoughBalance && balance && (
-                          <div className="text-red-400 text-sm mt-2">
-                            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
-                          </div>
-                        )}
-                      </div>
-                    )}
+                   {amount && (
+  <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
+    <div className="text-gray-300 text-sm">You will send:</div>
+    {loadingQuote ? (
+      <div className="text-yellow-400 text-lg">
+        🔄 Getting real-time pricing from MoonPay...
+      </div>
+    ) : (
+      <>
+        <div className="text-2xl font-bold text-yellow-400">
+          {totalCrypto.toFixed(8)} {selectedCrypto}
+        </div>
+        <div className="text-gray-400 text-sm">
+          {paymentStep === 'moonpay-widget' ? (
+            <>Network fee: ${networkFee.toFixed(2)} • MoonPay fee: ${processingFee.toFixed(2)}</>
+          ) : (
+            <>Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}</>
+          )}
+        </div>
+        {!hasEnoughBalance && balance && paymentStep === 'payment-confirm' && (
+          <div className="text-red-400 text-sm mt-2">
+            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
+          </div>
+        )}
+      </>
+    )}
+  </div>
+)}
+
                     
                     <button 
                       onClick={selectCryptoPayment}
