@@ -1,13 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
+import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
+import { parseEther, formatEther, parseUnits } from 'viem'
 import CountdownTimer from './CountdownTimer.jsx'
 
 const HomePage = () => {
-  const [walletConnected, setWalletConnected] = useState(false)
+  const { address, isConnected } = useAccount()
+  const { disconnect } = useDisconnect()
   const [showPaymentModal, setShowPaymentModal] = useState(false)
-  const [paymentStep, setPaymentStep] = useState('selection') // 'selection', 'crypto-details', 'wallet-connect', 'payment-confirm', 'moonpay-widget'
+  const [paymentStep, setPaymentStep] = useState('selection')
   const [amount, setAmount] = useState('')
   const [selectedCrypto, setSelectedCrypto] = useState('ETH')
+  const [gasEstimate, setGasEstimate] = useState(null)
   const [cryptoRates, setCryptoRates] = useState({
     ETH: 3843.30,
     BTC: 97000,
@@ -15,9 +20,21 @@ const HomePage = () => {
     USDC: 1.00,
     USDT: 1.00
   })
-  const [selectedWallet, setSelectedWallet] = useState('')
 
-  // Wallet addresses
+  // Get user's ETH balance
+  const { data: balance } = useBalance({
+    address: address,
+  })
+
+  // Contract write hook for sending ETH
+  const { data: hash, writeContract, isPending, error } = useWriteContract()
+
+  // Wait for transaction confirmation
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash,
+  })
+
+  // Wallet addresses for receiving payments
   const walletAddresses = {
     ETH: '0x07086A9a09b3B6A7A870094608eE99a0A6220AAD',
     USDC: '0x07086A9a09b3B6A7A870094608eE99a0A6220AAD',
@@ -26,9 +43,32 @@ const HomePage = () => {
     SOL: 'DMLEbV5AYRmvKsjrHg1xcdsjxA3cNqCJmQMMDPDQnrUH'
   }
 
+  // Fetch real-time crypto prices
+  useEffect(() => {
+    const fetchPrices = async () => {
+      try {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin,solana,usd-coin,tether&vs_currencies=usd' )
+        const data = await response.json()
+        setCryptoRates({
+          ETH: data.ethereum?.usd || 3843.30,
+          BTC: data.bitcoin?.usd || 97000,
+          SOL: data.solana?.usd || 245.50,
+          USDC: data['usd-coin']?.usd || 1.00,
+          USDT: data.tether?.usd || 1.00
+        })
+      } catch (error) {
+        console.error('Failed to fetch prices:', error)
+      }
+    }
+
+    fetchPrices()
+    const interval = setInterval(fetchPrices, 30000) // Update every 30 seconds
+    return () => clearInterval(interval)
+  }, [])
+
   // Calculate crypto amount and fees
   const calculateCrypto = () => {
-    if (!amount) return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0 }
+    if (!amount) return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
     
     const usdAmount = parseFloat(amount)
     const rate = cryptoRates[selectedCrypto]
@@ -40,7 +80,7 @@ const HomePage = () => {
     
     switch(selectedCrypto) {
       case 'ETH':
-        networkFee = 15 // $15 ETH gas fee
+        networkFee = gasEstimate ? parseFloat(formatEther(gasEstimate * BigInt(50000000000))) * cryptoRates.ETH : 15 // Dynamic gas or fallback
         break
       case 'BTC':
         networkFee = 8 // $8 BTC network fee
@@ -50,14 +90,37 @@ const HomePage = () => {
         break
       case 'USDC':
       case 'USDT':
-        networkFee = 12 // $12 ERC-20 gas fee
+        networkFee = gasEstimate ? parseFloat(formatEther(gasEstimate * BigInt(50000000000))) * cryptoRates.ETH : 12 // Dynamic gas or fallback
         break
     }
     
     const total = usdAmount + networkFee + processingFee
+    const totalCrypto = total / rate
     
-    return { cryptoAmount, networkFee, processingFee, total }
+    // Check if user has enough balance
+    const hasEnoughBalance = balance ? parseFloat(formatEther(balance.value)) >= totalCrypto : false
+    
+    return { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBalance }
   }
+
+  // Estimate gas for transaction
+  useEffect(() => {
+    const estimateGas = async () => {
+      if (amount && selectedCrypto === 'ETH' && isConnected) {
+        try {
+          // This is a simplified gas estimation
+          // In a real implementation, you'd estimate gas for your specific contract call
+          const gasPrice = BigInt(50000000000) // 50 gwei
+          const gasLimit = BigInt(21000) // Standard ETH transfer
+          setGasEstimate(gasPrice * gasLimit)
+        } catch (error) {
+          console.error('Gas estimation failed:', error)
+        }
+      }
+    }
+
+    estimateGas()
+  }, [amount, selectedCrypto, isConnected])
 
   const downloadWhitepaper = () => {
     const link = document.createElement('a')
@@ -80,28 +143,39 @@ const HomePage = () => {
   }
 
   const proceedToWalletConnect = () => {
-    setPaymentStep('wallet-connect')
+    if (!isConnected) {
+      setPaymentStep('wallet-connect')
+    } else {
+      setPaymentStep('payment-confirm')
+    }
   }
 
-  const connectWallet = (walletType) => {
-    setSelectedWallet(walletType)
-    setPaymentStep('payment-confirm')
-    // Simulate wallet connection
-    setTimeout(() => {
-      setWalletConnected(true)
-    }, 1000)
+  const executePayment = async () => {
+    if (!isConnected || !amount) return
+
+    const { cryptoAmount, totalCrypto } = calculateCrypto()
+    
+    try {
+      if (selectedCrypto === 'ETH') {
+        // Send ETH transaction
+        await writeContract({
+          to: walletAddresses.ETH,
+          value: parseEther(totalCrypto.toString()),
+        })
+      } else {
+        // For other tokens, you'd need to interact with their respective contracts
+        alert(`${selectedCrypto} payments require contract interaction - feature coming soon!`)
+      }
+    } catch (error) {
+      console.error('Transaction failed:', error)
+      alert('Transaction failed: ' + error.message)
+    }
   }
 
   const closeModal = () => {
     setShowPaymentModal(false)
     setPaymentStep('selection')
     setAmount('')
-    setSelectedWallet('')
-  }
-
-  const copyAddress = (address) => {
-    navigator.clipboard.writeText(address)
-    alert('Address copied to clipboard!')
   }
 
   const backToSelection = () => {
@@ -112,66 +186,71 @@ const HomePage = () => {
     setPaymentStep('crypto-details')
   }
 
-  const { cryptoAmount, networkFee, processingFee, total } = calculateCrypto()
+  const copyAddress = (address) => {
+    navigator.clipboard.writeText(address)
+    alert('Address copied to clipboard!')
+  }
+
+  const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBalance } = calculateCrypto()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
       {/* Navigation */}
-<nav className="flex justify-between items-center p-6 bg-black/20 backdrop-blur-sm">
-  <div className="text-2xl font-bold gradient-text flex items-center">
-    👑 KushAlara <span className="text-white">Token</span>
-  </div>
-  <div className="hidden md:flex items-center space-x-6">
-    <a href="#home" className="text-gray-300 hover:text-white transition-colors">Home</a>
-    <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
-    <a href="#tokenomics" className="text-gray-300 hover:text-white transition-colors">Tokenomics</a>
-    <a href="#roadmap" className="text-gray-300 hover:text-white transition-colors">Roadmap</a>
-    <Link to="/citizenship" className="text-gray-300 hover:text-white transition-colors">Citizenship</Link>
-    <Link to="/eresidency" className="text-gray-300 hover:text-white transition-colors">e-Residency</Link>
-  </div>
-  <div className="flex items-center space-x-4">
-    {/* Download Whitepaper Button */}
-    <button 
-      onClick={downloadWhitepaper}
-      className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-sm"
-    >
-      Download Whitepaper
-    </button>
-    {/* Social Media Icons */}
-    <a 
-      href="https://www.instagram.com/royalkingdomofkush/" 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="text-gray-300 hover:text-pink-400 transition-colors"
-    >
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-      </svg>
-    </a>
-    <a 
-      href="https://x.com/KushKingdom_Gov" 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="text-gray-300 hover:text-blue-400 transition-colors"
-    >
-      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-      </svg>
-    </a>
-    {/* Buy KushAlara Button */}
-    <button 
-      onClick={buyTokens}
-      className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-    >
-      Buy KushAlara
-    </button>
-  </div>
-</nav>
+      <nav className="flex justify-between items-center p-6 bg-black/20 backdrop-blur-sm">
+        <div className="text-2xl font-bold gradient-text flex items-center">
+          👑 KushAlara <span className="text-white">Token</span>
+        </div>
+        <div className="hidden md:flex items-center space-x-6">
+          <a href="#home" className="text-gray-300 hover:text-white transition-colors">Home</a>
+          <a href="#about" className="text-gray-300 hover:text-white transition-colors">About</a>
+          <a href="#tokenomics" className="text-gray-300 hover:text-white transition-colors">Tokenomics</a>
+          <a href="#roadmap" className="text-gray-300 hover:text-white transition-colors">Roadmap</a>
+          <Link to="/citizenship" className="text-gray-300 hover:text-white transition-colors">Citizenship</Link>
+          <Link to="/eresidency" className="text-gray-300 hover:text-white transition-colors">e-Residency</Link>
+        </div>
+        <div className="flex items-center space-x-4">
+          {/* Download Whitepaper Button */}
+          <button 
+            onClick={downloadWhitepaper}
+            className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-sm"
+          >
+            Download Whitepaper
+          </button>
+          {/* Social Media Icons */}
+          <a 
+            href="https://www.instagram.com/royalkingdomofkush/" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-300 hover:text-pink-400 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+          <a 
+            href="https://x.com/KushKingdom_Gov" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-gray-300 hover:text-blue-400 transition-colors"
+          >
+            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          {/* Buy KushAlara Button */}
+          <button 
+            onClick={buyTokens}
+            className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+          >
+            Buy KushAlara
+          </button>
+        </div>
+      </nav>
 
       {/* Hero Section */}
       <section className="text-center py-20 px-6">
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
-          <span className="gradient-text">KushAlara</span> Token
+          <span className="gradient-text">KushAlara</span> <span className="text-white">Token</span>
         </h1>
         <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
           The world's first Web3-native sovereign state, pioneering digital governance and economic innovation through blockchain technology.
@@ -514,7 +593,7 @@ const HomePage = () => {
                   className="text-gray-400 hover:text-pink-400 transition-colors"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.40z"/>
                   </svg>
                 </a>
                 <a 
@@ -538,7 +617,7 @@ const HomePage = () => {
         </div>
       </footer>
 
-      {/* Advanced Payment Modal */}
+      {/* Real Web3 Payment Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 rounded-3xl max-w-6xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto">
@@ -595,6 +674,23 @@ const HomePage = () => {
                       </div>
                     </div>
                     
+                    {amount && (
+                      <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
+                        <div className="text-gray-300 text-sm">You will send:</div>
+                        <div className="text-2xl font-bold text-yellow-400">
+                          {totalCrypto.toFixed(8)} {selectedCrypto}
+                        </div>
+                        <div className="text-gray-400 text-sm">
+                          Including network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
+                        </div>
+                        {!hasEnoughBalance && balance && (
+                          <div className="text-red-400 text-sm mt-2">
+                            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
                     <button 
                       onClick={selectCryptoPayment}
                       disabled={!amount}
@@ -607,21 +703,22 @@ const HomePage = () => {
                       Secure wallet integration • Multiple payment options
                     </div>
                     
-                    {/* Wallet Status */}
+                    {/* Real Wallet Status */}
                     <div className="mt-6 p-4 bg-gray-600/30 rounded-lg">
                       <div className="flex items-center text-gray-300 text-sm mb-2">
                         <span className="mr-2">🔗</span>
-                        Wallet Status (Debug Info):
+                        Wallet Status:
                       </div>
                       <div className="space-y-1 text-sm">
-                        <div className="flex items-center text-red-400">
-                          <span className="w-2 h-2 bg-red-400 rounded-full mr-2"></span>
-                          Ethereum: Not connected
+                        <div className={`flex items-center ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
+                          <span className={`w-2 h-2 ${isConnected ? 'bg-green-400' : 'bg-red-400'} rounded-full mr-2`}></span>
+                          {isConnected ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Not connected'}
                         </div>
-                        <div className="flex items-center text-red-400">
-                          <span className="w-2 h-2 bg-red-400 rounded-full mr-2"></span>
-                          Solana: Not connected
-                        </div>
+                        {balance && (
+                          <div className="text-green-400 text-sm">
+                            Balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -649,6 +746,16 @@ const HomePage = () => {
                         />
                       </div>
                     </div>
+                    
+                    {amount && (
+                      <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
+                        <div className="text-gray-300 text-sm">You will receive:</div>
+                        <div className="text-2xl font-bold text-yellow-400">
+                          {parseFloat(amount).toLocaleString()} KUSH
+                        </div>
+                        <div className="text-gray-400 text-sm">Rate: 1 USD = 1 KUSH</div>
+                      </div>
+                    )}
                     
                     <button 
                       onClick={selectFiatPayment}
@@ -687,24 +794,71 @@ const HomePage = () => {
                   <div className="bg-gray-700/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-600 text-center">
                     <h4 className="text-xl font-bold mb-3 gradient-text">Amount to Send</h4>
                     <div className="text-3xl font-bold text-white mb-2">
-                      {cryptoAmount.toFixed(8)} {selectedCrypto}
+                      {totalCrypto.toFixed(8)} {selectedCrypto}
                     </div>
-                    <div className="text-gray-400">≈ ${amount} USD</div>
+                    <div className="text-gray-400">≈ ${total.toFixed(2)} USD (including fees)</div>
+                    <div className="text-sm text-gray-500 mt-2">
+                      Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
+                    </div>
                   </div>
                 </div>
                 
                 <div className="text-center mb-8">
-                  <p className="text-gray-300 mb-4">Connect your {selectedCrypto === 'BTC' ? 'Bitcoin' : selectedCrypto === 'SOL' ? 'Solana' : 'Ethereum'} wallet to continue</p>
-                  <button 
-                    onClick={proceedToWalletConnect}
-                    className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold transition-all duration-300"
-                  >
-                    Connect Wallet
-                  </button>
+                  <p className="text-gray-300 mb-4">
+                    Connect your {selectedCrypto === 'BTC' ? 'Bitcoin' : selectedCrypto === 'SOL' ? 'Solana' : 'Ethereum'} wallet to continue
+                  </p>
+                  
+                  {!isConnected ? (
+                    <div className="flex justify-center">
+                      <ConnectButton />
+                    </div>
+                  ) : (
+                    <div>
+                      <div className="text-green-400 mb-4">
+                        ✅ Wallet Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
+                      </div>
+                      {balance && (
+                        <div className="text-gray-300 mb-4">
+                          Balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
+                        </div>
+                      )}
+                      <button 
+                        onClick={executePayment}
+                        disabled={!hasEnoughBalance || isPending}
+                        className={`px-8 py-3 rounded-lg font-semibold transition-all duration-300 ${
+                          hasEnoughBalance && !isPending
+                            ? 'bg-blue-500 hover:bg-blue-600 text-white' 
+                            : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        {isPending ? 'Processing...' : hasEnoughBalance ? `Send ${selectedCrypto}` : 'Insufficient Balance'}
+                      </button>
+                    </div>
+                  )}
+                  
                   <div className="mt-4">
-                    <span className="text-yellow-400 font-semibold">{selectedCrypto === 'BTC' ? 'Bitcoin' : selectedCrypto === 'SOL' ? 'Solana' : 'Ethereum'} Network</span>
+                    <span className="text-yellow-400 font-semibold">
+                      {selectedCrypto === 'BTC' ? 'Bitcoin' : selectedCrypto === 'SOL' ? 'Solana' : 'Ethereum'} Network
+                    </span>
                   </div>
                 </div>
+                
+                {/* Transaction Status */}
+                {hash && (
+                  <div className="max-w-md mx-auto mb-6 p-4 bg-blue-900/30 rounded-lg">
+                    <div className="text-blue-400 font-semibold mb-2">Transaction Submitted</div>
+                    <div className="text-sm text-gray-300 break-all">Hash: {hash}</div>
+                    {isConfirming && <div className="text-yellow-400 text-sm mt-2">Waiting for confirmation...</div>}
+                    {isConfirmed && <div className="text-green-400 text-sm mt-2">✅ Transaction confirmed!</div>}
+                  </div>
+                )}
+                
+                {error && (
+                  <div className="max-w-md mx-auto mb-6 p-4 bg-red-900/30 rounded-lg">
+                    <div className="text-red-400 font-semibold mb-2">Transaction Error</div>
+                    <div className="text-sm text-gray-300">{error.message}</div>
+                  </div>
+                )}
                 
                 <div className="text-center">
                   <button 
@@ -730,154 +884,15 @@ const HomePage = () => {
                   </button>
                 </div>
                 
-                <div className="max-w-md mx-auto">
-                  <div className="mb-6">
-                    <h4 className="text-lg font-semibold text-gray-300 mb-4">Popular</h4>
-                    <div className="space-y-3">
-                      <button 
-                        onClick={() => connectWallet('MetaMask')}
-                        className="w-full flex items-center p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg border border-gray-600 transition-all duration-300"
-                      >
-                        <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-4">
-                          🦊
-                        </div>
-                        <div className="text-left">
-                          <div className="text-white font-semibold">MetaMask</div>
-                          <div className="text-blue-400 text-sm">Recent</div>
-                        </div>
-                      </button>
-                      
-                      <button 
-                        onClick={() => connectWallet('Rainbow')}
-                        className="w-full flex items-center p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg border border-gray-600 transition-all duration-300"
-                      >
-                        <div className="w-10 h-10 bg-gradient-to-r from-red-400 to-blue-400 rounded-lg flex items-center justify-center mr-4">
-                          🌈
-                        </div>
-                        <div className="text-left">
-                          <div className="text-white font-semibold">Rainbow</div>
-                        </div>
-                      </button>
-                      
-                      <button 
-                        onClick={() => connectWallet('Coinbase')}
-                        className="w-full flex items-center p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg border border-gray-600 transition-all duration-300"
-                      >
-                        <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center mr-4">
-                          💼
-                        </div>
-                        <div className="text-left">
-                          <div className="text-white font-semibold">Coinbase Wallet</div>
-                        </div>
-                      </button>
-                      
-                      <button 
-                        onClick={() => connectWallet('WalletConnect')}
-                        className="w-full flex items-center p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg border border-gray-600 transition-all duration-300"
-                      >
-                        <div className="w-10 h-10 bg-blue-400 rounded-lg flex items-center justify-center mr-4">
-                          🔗
-                        </div>
-                        <div className="text-left">
-                          <div className="text-white font-semibold">WalletConnect</div>
-                        </div>
-                      </button>
-                    </div>
+                <div className="max-w-md mx-auto text-center">
+                  <div className="mb-8">
+                    <ConnectButton />
                   </div>
                   
                   <div className="text-center">
                     <div className="text-gray-400 text-sm mb-4">New to Ethereum wallets?</div>
                     <button className="text-blue-400 hover:text-blue-300 text-sm">Learn More</button>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {/* Payment Confirmation Screen */}
-            {paymentStep === 'payment-confirm' && (
-              <div className="p-8">
-                <div className="flex justify-between items-center mb-8">
-                  <h3 className="text-3xl font-bold gradient-text">Complete Your Payment</h3>
-                  <button 
-                    onClick={closeModal}
-                    className="text-gray-400 hover:text-white text-3xl"
-                  >
-                    ×
-                  </button>
-                </div>
-                <p className="text-xl text-gray-300 text-center mb-8">
-                  Connect your wallet and send payment
-                </p>
-                
-                {/* Amount to Send */}
-                <div className="max-w-md mx-auto mb-8">
-                  <div className="bg-gray-700/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-600 text-center">
-                    <h4 className="text-xl font-bold mb-3 gradient-text">Amount to Send</h4>
-                    <div className="text-3xl font-bold text-white mb-2">
-                      {cryptoAmount.toFixed(8)} {selectedCrypto}
-                    </div>
-                    <div className="text-gray-400">≈ ${amount} USD</div>
-                  </div>
-                </div>
-                
-                <div className="max-w-md mx-auto mb-8">
-                  <div className="text-center mb-6">
-                    <p className="text-gray-300 mb-4">Connect your {selectedCrypto === 'BTC' ? 'Bitcoin' : selectedCrypto === 'SOL' ? 'Solana' : 'Ethereum'} wallet to continue</p>
-                  </div>
-                  
-                  {/* Wallet Selection */}
-                  <div className="flex space-x-4 mb-6">
-                    <select 
-                      value={selectedCrypto}
-                      onChange={(e) => setSelectedCrypto(e.target.value)}
-                      className="flex-1 p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white focus:outline-none focus:border-yellow-400"
-                    >
-                      <option value="ETH">Ethereum</option>
-                      <option value="BTC">Bitcoin</option>
-                      <option value="SOL">Solana</option>
-                      <option value="USDC">USDC</option>
-                      <option value="USDT">USDT</option>
-                    </select>
-                    
-                    <div className="flex-1 p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white flex items-center">
-                      <span className="mr-2">👑</span>
-                      <span className="truncate">{walletAddresses[selectedCrypto].substring(0, 8)}...{walletAddresses[selectedCrypto].slice(-4)}</span>
-                    </div>
-                  </div>
-                  
-                  {/* Recipient Address */}
-                  <div className="mb-6">
-                    <div className="text-center text-gray-300 mb-2">Sending to:</div>
-                    <div className="bg-gray-600/30 rounded-lg p-4 text-center">
-                      <div className="text-yellow-400 font-mono text-sm break-all">
-                        {walletAddresses[selectedCrypto]}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <button 
-                    onClick={() => alert(`Sending ${cryptoAmount.toFixed(8)} ${selectedCrypto} to ${walletAddresses[selectedCrypto]}`)}
-                    className="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition-all duration-300"
-                  >
-                    Send {selectedCrypto}
-                  </button>
-                  
-                  <div className="mt-4">
-                    <span className="text-yellow-400 font-semibold">{selectedCrypto === 'BTC' ? 'Bitcoin' : selectedCrypto === 'SOL' ? 'Solana' : 'Ethereum'} Network</span>
-                  </div>
-                </div>
-                
-                <div className="text-center text-gray-400 text-sm">
-                  After sending, your tokens will be processed within 24 hours
-                </div>
-                
-                <div className="text-center mt-6">
-                  <button 
-                    onClick={backToDetails}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    ← Back to Payment Form
-                  </button>
                 </div>
               </div>
             )}
