@@ -10,7 +10,7 @@ import {
 
 export const config = getDefaultConfig({
   appName: 'KushAlara',
-  projectId: 'YOUR_PROJECT_ID', // Get this from WalletConnect Cloud
+  projectId: '2f5a2b1c8d3e4f5a6b7c8d9e0f1a2b3c', // Temporary project ID
   chains: [
     mainnet,
     polygon,
