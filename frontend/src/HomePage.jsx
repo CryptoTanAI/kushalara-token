@@ -143,6 +143,13 @@ const calculateCrypto = () => {
     estimateGas()
   }, [amount, selectedCrypto, isConnected])
 
+// Add useEffect to fetch quotes when amount or currency changes
+useEffect(() => {
+  if (paymentStep === 'moonpay-widget' && amount) {
+    fetchMoonPayQuote()
+  }
+}, [amount, selectedCrypto, paymentStep])
+
   const downloadWhitepaper = () => {
     const link = document.createElement('a')
     link.href = '/whitepaper.pdf'
