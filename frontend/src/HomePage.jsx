@@ -4,6 +4,7 @@ import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, us
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { parseEther, formatEther, parseUnits } from 'viem'
 import CountdownTimer from './CountdownTimer.jsx'
+import { moonPayService } from './services/moonpay'
 
 const HomePage = () => {
   const { address, isConnected } = useAccount()
@@ -14,6 +15,9 @@ const HomePage = () => {
   const [selectedCrypto, setSelectedCrypto] = useState('ETH')
   const [gasEstimate, setGasEstimate] = useState(null)
   const [cryptoRates, setCryptoRates] = useState({
+  const [moonPayQuote, setMoonPayQuote] = useState(null)
+  const [loadingQuote, setLoadingQuote] = useState(false)
+
     ETH: 3843.30,
     BTC: 97000,
     SOL: 245.50,
@@ -67,40 +71,57 @@ const HomePage = () => {
   }, [])
 
   // Calculate crypto amount and fees
-  const calculateCrypto = () => {
-    if (!amount) return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
-    
-    const usdAmount = parseFloat(amount)
+const calculateCrypto = () => {
+  if (!amount) return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
+  
+  const usdAmount = parseFloat(amount)
+  
+  // For direct crypto payments (non-MoonPay)
+  if (paymentStep === 'crypto-details') {
     const rate = cryptoRates[selectedCrypto]
     const cryptoAmount = usdAmount / rate
     
-    // Calculate fees based on crypto type
-    let networkFee = 0
-    let processingFee = usdAmount * 0.025 // 2.5% processing fee
-    
+    // Simple network fees for direct crypto
+    let networkFeeUSD = 0
     switch(selectedCrypto) {
-      case 'ETH':
-        networkFee = gasEstimate ? parseFloat(formatEther(gasEstimate * BigInt(50000000000))) * cryptoRates.ETH : 15 // Dynamic gas or fallback
-        break
-      case 'BTC':
-        networkFee = 8 // $8 BTC network fee
-        break
-      case 'SOL':
-        networkFee = 0.5 // $0.50 SOL fee
-        break
+      case 'ETH': networkFeeUSD = 15; break
+      case 'BTC': networkFeeUSD = 8; break
+      case 'SOL': networkFeeUSD = 0.5; break
       case 'USDC':
-      case 'USDT':
-        networkFee = gasEstimate ? parseFloat(formatEther(gasEstimate * BigInt(50000000000))) * cryptoRates.ETH : 12 // Dynamic gas or fallback
-        break
+      case 'USDT': networkFeeUSD = 12; break
     }
     
-    const total = usdAmount + networkFee + processingFee
-    const totalCrypto = total / rate
+    const processingFeeUSD = usdAmount * 0.025
+    const totalUSD = usdAmount + networkFeeUSD + processingFeeUSD
+    const totalCrypto = totalUSD / rate
     
-    // Check if user has enough balance
     const hasEnoughBalance = balance ? parseFloat(formatEther(balance.value)) >= totalCrypto : false
     
-    return { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBalance }
+    return { 
+      cryptoAmount, 
+      networkFee: networkFeeUSD, 
+      processingFee: processingFeeUSD, 
+      total: totalUSD, 
+      totalCrypto, 
+      hasEnoughBalance 
+    }
+  }
+  
+  // For MoonPay quotes - use real API data
+  if (moonPayQuote) {
+    return {
+      cryptoAmount: moonPayQuote.quoteCurrencyAmount,
+      networkFee: moonPayQuote.networkFeeAmount,
+      processingFee: moonPayQuote.feeAmount,
+      total: moonPayQuote.totalAmount,
+      totalCrypto: moonPayQuote.quoteCurrencyAmount,
+      hasEnoughBalance: true
+    }
+  }
+  
+  return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
+}
+
   }
 
   // Estimate gas for transaction
