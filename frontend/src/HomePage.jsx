@@ -159,9 +159,14 @@ const calculateCrypto = () => {
     setPaymentStep('crypto-details')
   }
 
-  const selectFiatPayment = () => {
-    setPaymentStep('moonpay-widget')
+ const selectFiatPayment = () => {
+  setPaymentStep('moonpay-widget')
+  // Fetch initial quote when switching to MoonPay
+  if (amount) {
+    fetchMoonPayQuote()
   }
+}
+
 
   const proceedToWalletConnect = () => {
     if (!isConnected) {
@@ -170,6 +175,26 @@ const calculateCrypto = () => {
       setPaymentStep('payment-confirm')
     }
   }
+// Add function to fetch MoonPay quote
+const fetchMoonPayQuote = async () => {
+  if (!amount || parseFloat(amount) <= 0) return
+  
+  setLoadingQuote(true)
+  try {
+    const quote = await moonPayService.getQuote(
+      parseFloat(amount), 
+      'usd', 
+      selectedCrypto.toLowerCase()
+    )
+    setMoonPayQuote(quote)
+  } catch (error) {
+    console.error('Failed to fetch MoonPay quote:', error)
+    setMoonPayQuote(null)
+  } finally {
+    setLoadingQuote(false)
+  }
+}
+
 
   const executePayment = async () => {
     if (!isConnected || !amount) return
