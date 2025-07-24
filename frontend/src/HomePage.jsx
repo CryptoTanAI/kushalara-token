@@ -4,7 +4,6 @@ import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, us
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { parseEther, formatEther, parseUnits } from 'viem'
 import CountdownTimer from './CountdownTimer.jsx'
-import { moonPayService } from './services/moonpay'
 
 const HomePage = () => {
   const { address, isConnected } = useAccount()
@@ -14,16 +13,13 @@ const HomePage = () => {
   const [amount, setAmount] = useState('')
   const [selectedCrypto, setSelectedCrypto] = useState('ETH')
   const [gasEstimate, setGasEstimate] = useState(null)
-const [cryptoRates, setCryptoRates] = useState({
-  ETH: 3843.30,
-  BTC: 97000,
-  SOL: 245.50,
-  USDC: 1.00,
-  USDT: 1.00
-})
-const [moonPayQuote, setMoonPayQuote] = useState(null)
-const [loadingQuote, setLoadingQuote] = useState(false)
-
+  const [cryptoRates, setCryptoRates] = useState({
+    ETH: 3843.30,
+    BTC: 97000,
+    SOL: 245.50,
+    USDC: 1.00,
+    USDT: 1.00
+  })
 
   // Get user's ETH balance
   const { data: balance } = useBalance({
@@ -70,80 +66,65 @@ const [loadingQuote, setLoadingQuote] = useState(false)
     return () => clearInterval(interval)
   }, [])
 
-  // Calculate crypto amount and fees
-const calculateCrypto = () => {
-  try {
-    if (!amount) return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
+  // Simple, safe calculate crypto function
+  const calculateCrypto = () => {
+    if (!amount || amount === '') {
+      return { 
+        cryptoAmount: 0, 
+        networkFee: 0, 
+        processingFee: 0, 
+        total: 0, 
+        totalCrypto: 0, 
+        hasEnoughBalance: false 
+      }
+    }
     
     const usdAmount = parseFloat(amount)
     if (isNaN(usdAmount) || usdAmount <= 0) {
-      return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
-    }
-
-    // For direct crypto payments (non-MoonPay)
-    if (paymentStep === 'crypto-details') {
-      const rates = {
-        'ETH': cryptoRates.ETH || 3593.89,
-        'BTC': cryptoRates.BTC || 97000,
-        'SOL': cryptoRates.SOL || 245.50,
-        'USDC': cryptoRates.USDC || 1.00,
-        'USDT': cryptoRates.USDT || 1.00
-      }
-      
-      const rate = rates[selectedCrypto] || 1
-      const cryptoAmount = usdAmount / rate
-      
-      let networkFeeUSD = 0
-      switch(selectedCrypto) {
-        case 'ETH': networkFeeUSD = 15; break
-        case 'BTC': networkFeeUSD = 8; break
-        case 'SOL': networkFeeUSD = 0.5; break
-        case 'USDC':
-        case 'USDT': networkFeeUSD = 12; break
-      }
-      
-      const processingFeeUSD = usdAmount * 0.025
-      const totalUSD = usdAmount + networkFeeUSD + processingFeeUSD
-      const totalCrypto = totalUSD / rate
-      
-      const hasEnoughBalance = balance ? parseFloat(formatEther(balance.value)) >= totalCrypto : false
-      
       return { 
-        cryptoAmount, 
-        networkFee: networkFeeUSD, 
-        processingFee: processingFeeUSD, 
-        total: totalUSD, 
-        totalCrypto, 
-        hasEnoughBalance 
+        cryptoAmount: 0, 
+        networkFee: 0, 
+        processingFee: 0, 
+        total: 0, 
+        totalCrypto: 0, 
+        hasEnoughBalance: false 
       }
     }
     
-    // For MoonPay quotes - use real API data
-    if (moonPayQuote) {
-      return {
-        cryptoAmount: moonPayQuote.quoteCurrencyAmount || 0,
-        networkFee: moonPayQuote.networkFeeAmount || 0,
-        processingFee: moonPayQuote.feeAmount || 0,
-        total: moonPayQuote.totalAmount || 0,
-        totalCrypto: moonPayQuote.quoteCurrencyAmount || 0,
-        hasEnoughBalance: true
-      }
+    const rate = cryptoRates[selectedCrypto] || 1
+    const cryptoAmount = usdAmount / rate
+    
+    // Simple network fees
+    let networkFeeUSD = 15 // Default $15
+    switch(selectedCrypto) {
+      case 'ETH': networkFeeUSD = 15; break
+      case 'BTC': networkFeeUSD = 8; break
+      case 'SOL': networkFeeUSD = 0.5; break
+      case 'USDC':
+      case 'USDT': networkFeeUSD = 12; break
     }
     
-    return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
-  } catch (error) {
-    console.error('Error in calculateCrypto:', error)
-    return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
+    const processingFeeUSD = usdAmount * 0.025 // 2.5%
+    const totalUSD = usdAmount + networkFeeUSD + processingFeeUSD
+    const totalCrypto = totalUSD / rate
+    
+    const hasEnoughBalance = balance ? parseFloat(formatEther(balance.value)) >= totalCrypto : false
+    
+    return { 
+      cryptoAmount, 
+      networkFee: networkFeeUSD, 
+      processingFee: processingFeeUSD, 
+      total: totalUSD, 
+      totalCrypto, 
+      hasEnoughBalance 
+    }
   }
-}
 
   // Estimate gas for transaction
   useEffect(() => {
     const estimateGas = async () => {
       if (amount && selectedCrypto === 'ETH' && isConnected) {
         try {
-          // This is a simplified gas estimation
-          // In a real implementation, you'd estimate gas for your specific contract call
           const gasPrice = BigInt(50000000000) // 50 gwei
           const gasLimit = BigInt(21000) // Standard ETH transfer
           setGasEstimate(gasPrice * gasLimit)
@@ -155,13 +136,6 @@ const calculateCrypto = () => {
 
     estimateGas()
   }, [amount, selectedCrypto, isConnected])
-
-// Add useEffect to fetch quotes when amount or currency changes
-// useEffect(() => {
-//   if (paymentStep === 'moonpay-widget' && amount) {
-//     fetchMoonPayQuote()
-//   }
-// }, [amount, selectedCrypto, paymentStep])
 
   const downloadWhitepaper = () => {
     const link = document.createElement('a')
@@ -179,11 +153,9 @@ const calculateCrypto = () => {
     setPaymentStep('crypto-details')
   }
 
-const selectFiatPayment = () => {
-  setPaymentStep('moonpay-widget')
-  // Temporarily disabled MoonPay integration
-}
-
+  const selectFiatPayment = () => {
+    setPaymentStep('moonpay-widget')
+  }
 
   const proceedToWalletConnect = () => {
     if (!isConnected) {
@@ -192,47 +164,19 @@ const selectFiatPayment = () => {
       setPaymentStep('payment-confirm')
     }
   }
-// Add function to fetch MoonPay quote
-const fetchMoonPayQuote = async () => {
-  console.log('fetchMoonPayQuote called with amount:', amount)
-  // Temporarily disabled to prevent crashes
-  return
-  
-  if (!amount || parseFloat(amount) <= 0) return
-  
-  setLoadingQuote(true)
-  try {
-    // Commented out to prevent crashes
-    // const quote = await moonPayService.getQuote(
-    //   parseFloat(amount), 
-    //   'usd', 
-    //   selectedCrypto.toLowerCase()
-    // )
-    // setMoonPayQuote(quote)
-  } catch (error) {
-    console.error('Failed to fetch MoonPay quote:', error)
-    setMoonPayQuote(null)
-  } finally {
-    setLoadingQuote(false)
-  }
-}
-
-
 
   const executePayment = async () => {
     if (!isConnected || !amount) return
 
-    const { cryptoAmount, totalCrypto } = calculateCrypto()
+    const { totalCrypto } = calculateCrypto()
     
     try {
       if (selectedCrypto === 'ETH') {
-        // Send ETH transaction
         await writeContract({
           to: walletAddresses.ETH,
           value: parseEther(totalCrypto.toString()),
         })
       } else {
-        // For other tokens, you'd need to interact with their respective contracts
         alert(`${selectedCrypto} payments require contract interaction - feature coming soon!`)
       }
     } catch (error) {
@@ -251,24 +195,12 @@ const fetchMoonPayQuote = async () => {
     setPaymentStep('selection')
   }
 
-  const backToDetails = () => {
-    setPaymentStep('crypto-details')
-  }
-
   const copyAddress = (address) => {
     navigator.clipboard.writeText(address)
     alert('Address copied to clipboard!')
   }
 
-  const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBalance } = (() => {
-  try {
-    return calculateCrypto()
-  } catch (error) {
-    console.error('Error in calculateCrypto:', error)
-    return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, totalCrypto: 0, hasEnoughBalance: false }
-  }
-})()
-
+  const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBalance } = calculateCrypto()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
@@ -286,14 +218,12 @@ const fetchMoonPayQuote = async () => {
           <Link to="/eresidency" className="text-gray-300 hover:text-white transition-colors">e-Residency</Link>
         </div>
         <div className="flex items-center space-x-4">
-          {/* Download Whitepaper Button */}
           <button 
             onClick={downloadWhitepaper}
             className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-sm"
           >
             Download Whitepaper
           </button>
-          {/* Social Media Icons */}
           <a 
             href="https://www.instagram.com/royalkingdomofkush/" 
             target="_blank" 
@@ -314,7 +244,6 @@ const fetchMoonPayQuote = async () => {
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
             </svg>
           </a>
-          {/* Buy KushAlara Button */}
           <button 
             onClick={buyTokens}
             className="bg-gradient-to-r from-yellow-400 to-yellow-600 text-black px-6 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300"
@@ -376,7 +305,6 @@ const fetchMoonPayQuote = async () => {
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-          {/* Digital Sovereignty */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 card-hover text-center">
             <div className="text-4xl mb-4 text-yellow-400">🛡️</div>
             <h3 className="text-xl font-bold mb-3 text-white">Digital Sovereignty</h3>
@@ -385,7 +313,6 @@ const fetchMoonPayQuote = async () => {
             </p>
           </div>
 
-          {/* Multi-Utility Token */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 card-hover text-center">
             <div className="text-4xl mb-4 text-yellow-400">🔗</div>
             <h3 className="text-xl font-bold mb-3 text-white">Multi-Utility Token</h3>
@@ -394,7 +321,6 @@ const fetchMoonPayQuote = async () => {
             </p>
           </div>
 
-          {/* CBDC Integration */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 card-hover text-center">
             <div className="text-4xl mb-4 text-yellow-400">📈</div>
             <h3 className="text-xl font-bold mb-3 text-white">CBDC Integration</h3>
@@ -403,7 +329,6 @@ const fetchMoonPayQuote = async () => {
             </p>
           </div>
 
-          {/* e-Residency Program */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-700 card-hover text-center">
             <div className="text-4xl mb-4 text-yellow-400">🌐</div>
             <h3 className="text-xl font-bold mb-3 text-white">e-Residency Program</h3>
@@ -447,7 +372,6 @@ const fetchMoonPayQuote = async () => {
         </div>
         
         <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          {/* Token Distribution */}
           <div>
             <h3 className="text-2xl font-bold mb-6 text-white">Token Distribution</h3>
             <div className="space-y-4">
@@ -470,7 +394,7 @@ const fetchMoonPayQuote = async () => {
                   </div>
                   <span className="text-blue-400 font-bold text-xl">10%</span>
                 </div>
-                <div className="text-gray-400 text-sm mt-1 ml-7">10M tokens (locked 2 years )</div>
+                <div className="text-gray-400 text-sm mt-1 ml-7">10M tokens (locked 2 years  )</div>
               </div>
               
               <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 border border-gray-700">
@@ -497,7 +421,6 @@ const fetchMoonPayQuote = async () => {
             </div>
           </div>
           
-          {/* Fund Allocation */}
           <div>
             <h3 className="text-2xl font-bold mb-6 text-white">Fund Allocation</h3>
             <div className="space-y-4">
@@ -597,7 +520,6 @@ const fetchMoonPayQuote = async () => {
         </div>
         
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Citizenship Card */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700 card-hover">
             <div className="text-center mb-6">
               <div className="text-4xl mb-4">👑</div>
@@ -614,7 +536,6 @@ const fetchMoonPayQuote = async () => {
             </Link>
           </div>
 
-          {/* e-Residency Card */}
           <div className="bg-gray-800/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-700 card-hover">
             <div className="text-center mb-6">
               <div className="text-4xl mb-4">🌐</div>
@@ -694,7 +615,7 @@ const fetchMoonPayQuote = async () => {
         </div>
       </footer>
 
-      {/* Real Web3 Payment Modal */}
+      {/* Payment Modal */}
       {showPaymentModal && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-gray-800 rounded-3xl max-w-6xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto">
@@ -725,22 +646,14 @@ const fetchMoonPayQuote = async () => {
                     
                     <div className="space-y-4 mb-6">
                       <div>
-                        <label className="block text-white mb-2 font-semibold">Amount (USD )</label>
+                        <label className="block text-white mb-2 font-semibold">Amount (USD  )</label>
                         <input 
-  type="number"
-  value={amount}
-  onChange={(e) => {
-    try {
-      const value = e.target.value;
-      console.log('Amount input changed to:', value);
-      setAmount(value);
-    } catch (error) {
-      console.error('Error in amount input:', error);
-    }
-  }}
-  placeholder="Enter amount"
-  className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-/>
+                          type="number"
+                          value={amount}
+                          onChange={(e) => setAmount(e.target.value)}
+                          placeholder="Enter amount"
+                          className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                        />
                       </div>
                       
                       <div>
@@ -759,35 +672,22 @@ const fetchMoonPayQuote = async () => {
                       </div>
                     </div>
                     
-                   {amount && (
-  <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
-    <div className="text-gray-300 text-sm">You will send:</div>
-    {loadingQuote ? (
-      <div className="text-yellow-400 text-lg">
-        🔄 Getting real-time pricing from MoonPay...
-      </div>
-    ) : (
-      <>
-        <div className="text-2xl font-bold text-yellow-400">
-          {totalCrypto.toFixed(8)} {selectedCrypto}
-        </div>
-        <div className="text-gray-400 text-sm">
-          {paymentStep === 'moonpay-widget' ? (
-            <>Network fee: ${networkFee.toFixed(2)} • MoonPay fee: ${processingFee.toFixed(2)}</>
-          ) : (
-            <>Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}</>
-          )}
-        </div>
-        {!hasEnoughBalance && balance && paymentStep === 'payment-confirm' && (
-          <div className="text-red-400 text-sm mt-2">
-            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
-          </div>
-        )}
-      </>
-    )}
-  </div>
-)}
-
+                    {amount && (
+                      <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
+                        <div className="text-gray-300 text-sm">You will send:</div>
+                        <div className="text-2xl font-bold text-yellow-400">
+                          {totalCrypto.toFixed(8)} {selectedCrypto}
+                        </div>
+                        <div className="text-gray-400 text-sm">
+                          Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
+                        </div>
+                        {!hasEnoughBalance && balance && (
+                          <div className="text-red-400 text-sm mt-2">
+                            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
+                          </div>
+                        )}
+                      </div>
+                    )}
                     
                     <button 
                       onClick={selectCryptoPayment}
@@ -801,7 +701,7 @@ const fetchMoonPayQuote = async () => {
                       Secure wallet integration • Multiple payment options
                     </div>
                     
-                    {/* Real Wallet Status */}
+                    {/* Wallet Status */}
                     <div className="mt-6 p-4 bg-gray-600/30 rounded-lg">
                       <div className="flex items-center text-gray-300 text-sm mb-2">
                         <span className="mr-2">🔗</span>
@@ -824,9 +724,7 @@ const fetchMoonPayQuote = async () => {
                   {/* MoonPay Card */}
                   <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600">
                     <h4 className="text-2xl font-bold mb-4 gradient-text text-center">
-                      Buy KushAlara  
-
-                      <span className="text-yellow-400">with USD</span>
+                      Buy KushAlara with USD
                     </h4>
                     <p className="text-gray-300 text-center mb-6">
                       Securely purchase crypto with your debit/credit card via MoonPay.
@@ -1011,7 +909,6 @@ const fetchMoonPayQuote = async () => {
                   Securely purchase crypto with your debit/credit card via MoonPay.
                 </p>
                 
-                {/* MoonPay-style Widget */}
                 <div className="max-w-md mx-auto">
                   <div className="bg-white rounded-2xl p-6">
                     <div className="flex justify-between items-center mb-6">
@@ -1019,7 +916,6 @@ const fetchMoonPayQuote = async () => {
                       <button className="text-gray-600">☰</button>
                     </div>
                     
-                    {/* USD Input */}
                     <div className="mb-4">
                       <div className="flex items-center bg-gray-100 rounded-lg p-4">
                         <input 
@@ -1037,21 +933,19 @@ const fetchMoonPayQuote = async () => {
                       </div>
                     </div>
                     
-                    {/* Crypto Output */}
                     <div className="mb-6">
                       <div className="flex items-center bg-gray-100 rounded-lg p-4">
                         <div className="flex-1 text-2xl font-bold text-gray-800">
-                          {amount ? (parseFloat(amount) / cryptoRates[selectedCrypto]).toFixed(4) : '0.0254'}
+                          {amount ? parseFloat(amount).toLocaleString() : '100'}
                         </div>
                         <div className="flex items-center text-gray-600">
-                          <span className="mr-2">⟠</span>
-                          <span className="font-semibold">ETH</span>
+                          <span className="mr-2">👑</span>
+                          <span className="font-semibold">KUSH</span>
                           <span className="ml-2">▼</span>
                         </div>
                       </div>
                     </div>
                     
-                    {/* Quick Amount Buttons */}
                     <div className="grid grid-cols-4 gap-2 mb-6">
                       {['$200', '$300', '$500', '$1,000'].map((amt) => (
                         <button 
@@ -1064,31 +958,30 @@ const fetchMoonPayQuote = async () => {
                       ))}
                     </div>
                     
-                    {/* Summary */}
                     <div className="bg-gray-50 rounded-lg p-4 mb-6">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600">You get {amount ? (parseFloat(amount) / cryptoRates[selectedCrypto]).toFixed(4) : '0.0254'} ETH for ${amount || '100.00'}</span>
+                        <span className="text-gray-600">You get {amount ? parseFloat(amount).toLocaleString() : '100'} KUSH for ${amount || '100'}</span>
                         <span className="text-gray-400">▲</span>
                       </div>
                       
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
-                          <span className="text-gray-600">{amount ? (parseFloat(amount) / cryptoRates[selectedCrypto]).toFixed(4) : '0.0254'} ETH @ ${cryptoRates.ETH.toLocaleString()}</span>
-                          <span className="text-gray-800 font-semibold">${amount ? (parseFloat(amount) - networkFee - processingFee).toFixed(2) : '97.63'}</span>
+                          <span className="text-gray-600">{amount ? parseFloat(amount).toLocaleString() : '100'} KUSH @ $1.00</span>
+                          <span className="text-gray-800 font-semibold">${amount || '100'}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600 flex items-center">
                             Network fee
                             <span className="ml-1 text-gray-400">ⓘ</span>
                           </span>
-                          <span className="text-gray-800">${networkFee.toFixed(2)}</span>
+                          <span className="text-gray-800">$0.00</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600 flex items-center">
                             MoonPay fee
                             <span className="ml-1 text-gray-400">ⓘ</span>
                           </span>
-                          <span className="text-gray-800">as low as ${processingFee.toFixed(2)}</span>
+                          <span className="text-gray-800">as low as $2.50</span>
                         </div>
                       </div>
                     </div>
@@ -1098,7 +991,7 @@ const fetchMoonPayQuote = async () => {
                     </div>
                     
                     <button 
-                      onClick={() => alert(`Processing $${amount} USD purchase for ${(parseFloat(amount || '100') / cryptoRates[selectedCrypto]).toFixed(4)} ETH`)}
+                      onClick={() => alert(`Processing $${amount || '100'} USD purchase for ${amount ? parseFloat(amount).toLocaleString() : '100'} KUSH tokens`)}
                       className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-semibold text-lg transition-all duration-300 flex items-center justify-center"
                     >
                       Continue
