@@ -72,66 +72,70 @@ const [loadingQuote, setLoadingQuote] = useState(false)
 
   // Calculate crypto amount and fees
 const calculateCrypto = () => {
-  if (!amount) return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
-  
-  const usdAmount = parseFloat(amount)
-
-  // For direct crypto payments (non-MoonPay)
-if (paymentStep === 'crypto-details') {
-  // Use real-time rates, fallback to reasonable defaults
-  const rates = {
-    'ETH': cryptoRates.ETH || 3593.89,
-    'BTC': cryptoRates.BTC || 97000,
-    'SOL': cryptoRates.SOL || 245.50,
-    'USDC': cryptoRates.USDC || 1.00,
-    'USDT': cryptoRates.USDT || 1.00
-  }
-  
-  const rate = rates[selectedCrypto]
-  const cryptoAmount = usdAmount / rate
-  
-  // Simple network fees for direct crypto
-  let networkFeeUSD = 0
-  switch(selectedCrypto) {
-    case 'ETH': networkFeeUSD = 15; break
-    case 'BTC': networkFeeUSD = 8; break
-    case 'SOL': networkFeeUSD = 0.5; break
-    case 'USDC':
-    case 'USDT': networkFeeUSD = 12; break
-  }
-  
-  const processingFeeUSD = usdAmount * 0.025
-  const totalUSD = usdAmount + networkFeeUSD + processingFeeUSD
-  const totalCrypto = totalUSD / rate
-  
-  const hasEnoughBalance = balance ? parseFloat(formatEther(balance.value)) >= totalCrypto : false
-  
-  return { 
-    cryptoAmount, 
-    networkFee: networkFeeUSD, 
-    processingFee: processingFeeUSD, 
-    total: totalUSD, 
-    totalCrypto, 
-    hasEnoughBalance 
-  }
-}
-
-  
-  // For MoonPay quotes - use real API data
-  if (moonPayQuote) {
-    return {
-      cryptoAmount: moonPayQuote.quoteCurrencyAmount,
-      networkFee: moonPayQuote.networkFeeAmount,
-      processingFee: moonPayQuote.feeAmount,
-      total: moonPayQuote.totalAmount,
-      totalCrypto: moonPayQuote.quoteCurrencyAmount,
-      hasEnoughBalance: true
+  try {
+    if (!amount) return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
+    
+    const usdAmount = parseFloat(amount)
+    if (isNaN(usdAmount) || usdAmount <= 0) {
+      return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
     }
-  }
-  
-  return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
-}
 
+    // For direct crypto payments (non-MoonPay)
+    if (paymentStep === 'crypto-details') {
+      const rates = {
+        'ETH': cryptoRates.ETH || 3593.89,
+        'BTC': cryptoRates.BTC || 97000,
+        'SOL': cryptoRates.SOL || 245.50,
+        'USDC': cryptoRates.USDC || 1.00,
+        'USDT': cryptoRates.USDT || 1.00
+      }
+      
+      const rate = rates[selectedCrypto] || 1
+      const cryptoAmount = usdAmount / rate
+      
+      let networkFeeUSD = 0
+      switch(selectedCrypto) {
+        case 'ETH': networkFeeUSD = 15; break
+        case 'BTC': networkFeeUSD = 8; break
+        case 'SOL': networkFeeUSD = 0.5; break
+        case 'USDC':
+        case 'USDT': networkFeeUSD = 12; break
+      }
+      
+      const processingFeeUSD = usdAmount * 0.025
+      const totalUSD = usdAmount + networkFeeUSD + processingFeeUSD
+      const totalCrypto = totalUSD / rate
+      
+      const hasEnoughBalance = balance ? parseFloat(formatEther(balance.value)) >= totalCrypto : false
+      
+      return { 
+        cryptoAmount, 
+        networkFee: networkFeeUSD, 
+        processingFee: processingFeeUSD, 
+        total: totalUSD, 
+        totalCrypto, 
+        hasEnoughBalance 
+      }
+    }
+    
+    // For MoonPay quotes - use real API data
+    if (moonPayQuote) {
+      return {
+        cryptoAmount: moonPayQuote.quoteCurrencyAmount || 0,
+        networkFee: moonPayQuote.networkFeeAmount || 0,
+        processingFee: moonPayQuote.feeAmount || 0,
+        total: moonPayQuote.totalAmount || 0,
+        totalCrypto: moonPayQuote.quoteCurrencyAmount || 0,
+        hasEnoughBalance: true
+      }
+    }
+    
+    return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
+  } catch (error) {
+    console.error('Error in calculateCrypto:', error)
+    return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
+  }
+}
 
   // Estimate gas for transaction
   useEffect(() => {
