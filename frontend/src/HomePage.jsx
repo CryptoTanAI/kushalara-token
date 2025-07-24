@@ -132,7 +132,6 @@ if (paymentStep === 'crypto-details') {
   return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, hasEnoughBalance: false }
 }
 
-  }
 
   // Estimate gas for transaction
   useEffect(() => {
