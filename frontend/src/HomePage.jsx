@@ -94,17 +94,17 @@ const HomePage = () => {
     const rate = cryptoRates[selectedCrypto] || 1
     const cryptoAmount = usdAmount / rate
     
-    // Simple network fees
-    let networkFeeUSD = 15 // Default $15
-    switch(selectedCrypto) {
-      case 'ETH': networkFeeUSD = 15; break
-      case 'BTC': networkFeeUSD = 8; break
-      case 'SOL': networkFeeUSD = 0.5; break
-      case 'USDC':
-      case 'USDT': networkFeeUSD = 12; break
-    }
-    
-    const processingFeeUSD = usdAmount * 0.025 // 2.5%
+   // Realistic network fees for crypto-to-crypto
+let networkFeeUSD = 0
+switch(selectedCrypto) {
+  case 'ETH': networkFeeUSD = 25; break // Current ETH gas fees
+  case 'BTC': networkFeeUSD = 3; break  // Bitcoin transaction fee
+  case 'SOL': networkFeeUSD = 0.01; break // Solana is very cheap
+  case 'USDC': networkFeeUSD = 15; break // ERC-20 token transfer
+  case 'USDT': networkFeeUSD = 15; break // ERC-20 token transfer
+}
+
+    const processingFeeUSD = 0 // No processing fee for direct crypto transfers
     const totalUSD = usdAmount + networkFeeUSD + processingFeeUSD
     const totalCrypto = totalUSD / rate
     
@@ -682,10 +682,10 @@ const HomePage = () => {
                           Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
                         </div>
                         {!hasEnoughBalance && balance && (
-                          <div className="text-red-400 text-sm mt-2">
-                            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
-                          </div>
-                        )}
+           <div className="text-red-400 text-sm mt-2">
+            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
+           </div>
+                )}
                       </div>
                     )}
                     
@@ -701,24 +701,39 @@ const HomePage = () => {
                       Secure wallet integration • Multiple payment options
                     </div>
                     
-                    {/* Wallet Status */}
-                    <div className="mt-6 p-4 bg-gray-600/30 rounded-lg">
-                      <div className="flex items-center text-gray-300 text-sm mb-2">
-                        <span className="mr-2">🔗</span>
-                        Wallet Status:
-                      </div>
-                      <div className="space-y-1 text-sm">
-                        <div className={`flex items-center ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
-                          <span className={`w-2 h-2 ${isConnected ? 'bg-green-400' : 'bg-red-400'} rounded-full mr-2`}></span>
-                          {isConnected ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Not connected'}
-                        </div>
-                        {balance && (
-                          <div className="text-green-400 text-sm">
-                            Balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                   {/* Wallet Status */}
+<div className="mt-6 p-4 bg-gray-600/30 rounded-lg">
+  <div className="flex items-center justify-between text-gray-300 text-sm mb-2">
+    <div className="flex items-center">
+      <span className="mr-2">🔗</span>
+      Wallet Status:
+    </div>
+    {isConnected && (
+      <button 
+        onClick={disconnect}
+        className="text-red-400 hover:text-red-300 text-xs underline"
+      >
+        Disconnect
+      </button>
+    )}
+  </div>
+  <div className="space-y-1 text-sm">
+    <div className={`flex items-center ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
+      <span className={`w-2 h-2 ${isConnected ? 'bg-green-400' : 'bg-red-400'} rounded-full mr-2`}></span>
+      {isConnected ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Not connected'}
+    </div>
+    {balance && (
+      <div className="text-green-400 text-sm">
+        Balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
+      </div>
+    )}
+    {!isConnected && (
+      <div className="mt-2">
+        <ConnectButton />
+      </div>
+    )}
+  </div>
+</div>
                   </div>
 
                   {/* MoonPay Card */}
