@@ -14,9 +14,16 @@ const HomePage = () => {
   const [amount, setAmount] = useState('')
   const [selectedCrypto, setSelectedCrypto] = useState('ETH')
   const [gasEstimate, setGasEstimate] = useState(null)
-  const [cryptoRates, setCryptoRates] = useState({
-  const [moonPayQuote, setMoonPayQuote] = useState(null)
-  const [loadingQuote, setLoadingQuote] = useState(false)
+const [cryptoRates, setCryptoRates] = useState({
+  ETH: 3843.30,
+  BTC: 97000,
+  SOL: 245.50,
+  USDC: 1.00,
+  USDT: 1.00
+})
+const [moonPayQuote, setMoonPayQuote] = useState(null)
+const [loadingQuote, setLoadingQuote] = useState(false)
+
 
     ETH: 3843.30,
     BTC: 97000,
