@@ -157,11 +157,11 @@ const calculateCrypto = () => {
   }, [amount, selectedCrypto, isConnected])
 
 // Add useEffect to fetch quotes when amount or currency changes
-useEffect(() => {
-  if (paymentStep === 'moonpay-widget' && amount) {
-    fetchMoonPayQuote()
-  }
-}, [amount, selectedCrypto, paymentStep])
+// useEffect(() => {
+//   if (paymentStep === 'moonpay-widget' && amount) {
+//     fetchMoonPayQuote()
+//   }
+// }, [amount, selectedCrypto, paymentStep])
 
   const downloadWhitepaper = () => {
     const link = document.createElement('a')
@@ -179,12 +179,9 @@ useEffect(() => {
     setPaymentStep('crypto-details')
   }
 
- const selectFiatPayment = () => {
+const selectFiatPayment = () => {
   setPaymentStep('moonpay-widget')
-  // Fetch initial quote when switching to MoonPay
-  if (amount) {
-    fetchMoonPayQuote()
-  }
+  // Temporarily disabled MoonPay integration
 }
 
 
@@ -197,16 +194,21 @@ useEffect(() => {
   }
 // Add function to fetch MoonPay quote
 const fetchMoonPayQuote = async () => {
+  console.log('fetchMoonPayQuote called with amount:', amount)
+  // Temporarily disabled to prevent crashes
+  return
+  
   if (!amount || parseFloat(amount) <= 0) return
   
   setLoadingQuote(true)
   try {
-    const quote = await moonPayService.getQuote(
-      parseFloat(amount), 
-      'usd', 
-      selectedCrypto.toLowerCase()
-    )
-    setMoonPayQuote(quote)
+    // Commented out to prevent crashes
+    // const quote = await moonPayService.getQuote(
+    //   parseFloat(amount), 
+    //   'usd', 
+    //   selectedCrypto.toLowerCase()
+    // )
+    // setMoonPayQuote(quote)
   } catch (error) {
     console.error('Failed to fetch MoonPay quote:', error)
     setMoonPayQuote(null)
@@ -214,6 +216,7 @@ const fetchMoonPayQuote = async () => {
     setLoadingQuote(false)
   }
 }
+
 
 
   const executePayment = async () => {
