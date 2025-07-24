@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
@@ -157,7 +157,7 @@ useEffect(() => {
   if (paymentStep === 'moonpay-widget' && amount) {
     fetchMoonPayQuote()
   }
-}, [amount, selectedCrypto, paymentStep, fetchMoonPayQuote])
+}, [amount, selectedCrypto, paymentStep])
 
   const downloadWhitepaper = () => {
     const link = document.createElement('a')
@@ -192,7 +192,7 @@ useEffect(() => {
     }
   }
 // Add function to fetch MoonPay quote
-const fetchMoonPayQuote = useCallback(async () => {
+const fetchMoonPayQuote = async () => {
   if (!amount || parseFloat(amount) <= 0) return
   
   setLoadingQuote(true)
@@ -209,7 +209,7 @@ const fetchMoonPayQuote = useCallback(async () => {
   } finally {
     setLoadingQuote(false)
   }
-}, [amount, selectedCrypto])
+}
 
 
   const executePayment = async () => {
