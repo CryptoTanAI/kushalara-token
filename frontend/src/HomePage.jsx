@@ -25,13 +25,6 @@ const [moonPayQuote, setMoonPayQuote] = useState(null)
 const [loadingQuote, setLoadingQuote] = useState(false)
 
 
-    ETH: 3843.30,
-    BTC: 97000,
-    SOL: 245.50,
-    USDC: 1.00,
-    USDT: 1.00
-  })
-
   // Get user's ETH balance
   const { data: balance } = useBalance({
     address: address,
@@ -123,31 +116,6 @@ if (paymentStep === 'crypto-details') {
   }
 }
 
-    // Simple network fees for direct crypto
-    let networkFeeUSD = 0
-    switch(selectedCrypto) {
-      case 'ETH': networkFeeUSD = 15; break
-      case 'BTC': networkFeeUSD = 8; break
-      case 'SOL': networkFeeUSD = 0.5; break
-      case 'USDC':
-      case 'USDT': networkFeeUSD = 12; break
-    }
-    
-    const processingFeeUSD = usdAmount * 0.025
-    const totalUSD = usdAmount + networkFeeUSD + processingFeeUSD
-    const totalCrypto = totalUSD / rate
-    
-    const hasEnoughBalance = balance ? parseFloat(formatEther(balance.value)) >= totalCrypto : false
-    
-    return { 
-      cryptoAmount, 
-      networkFee: networkFeeUSD, 
-      processingFee: processingFeeUSD, 
-      total: totalUSD, 
-      totalCrypto, 
-      hasEnoughBalance 
-    }
-  }
   
   // For MoonPay quotes - use real API data
   if (moonPayQuote) {
