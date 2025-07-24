@@ -260,7 +260,15 @@ const fetchMoonPayQuote = async () => {
     alert('Address copied to clipboard!')
   }
 
-  const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBalance } = calculateCrypto()
+  const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBalance } = (() => {
+  try {
+    return calculateCrypto()
+  } catch (error) {
+    console.error('Error in calculateCrypto:', error)
+    return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, totalCrypto: 0, hasEnoughBalance: false }
+  }
+})()
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
@@ -719,12 +727,20 @@ const fetchMoonPayQuote = async () => {
                       <div>
                         <label className="block text-white mb-2 font-semibold">Amount (USD )</label>
                         <input 
-                          type="number"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          placeholder="Enter amount"
-                          className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-                        />
+  type="number"
+  value={amount}
+  onChange={(e) => {
+    try {
+      const value = e.target.value;
+      console.log('Amount input changed to:', value);
+      setAmount(value);
+    } catch (error) {
+      console.error('Error in amount input:', error);
+    }
+  }}
+  placeholder="Enter amount"
+  className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+/>
                       </div>
                       
                       <div>
