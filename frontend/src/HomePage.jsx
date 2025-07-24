@@ -314,7 +314,28 @@ switch(selectedCrypto) {
     alert('Address copied to clipboard!')
   }
 
-  const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBalance } = calculateCrypto()
+    // Detect installed wallets and show installation modal if needed
+const detectAndConnectWallet = (walletType) => {
+  const walletChecks = {
+    metamask: () => typeof window !== 'undefined' && window.ethereum?.isMetaMask,
+    phantom: () => typeof window !== 'undefined' && window.solana?.isPhantom,
+    binance: () => typeof window !== 'undefined' && window.BinanceChain,
+    exodus: () => typeof window !== 'undefined' && window.exodus,
+  }
+
+  const isInstalled = walletChecks[walletType]?.()
+  
+  if (!isInstalled) {
+    setSelectedWalletType(walletType)
+    setShowWalletInstall(true)
+    return
+  }
+  
+  // If wallet is installed, proceed with connection
+  // The RainbowKit ConnectButton will handle the actual connection
+}
+
+const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBalance } = calculateCrypto()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
@@ -842,10 +863,49 @@ switch(selectedCrypto) {
       </div>
     )}
     {!isConnected && (
-      <div className="mt-2">
-        <ConnectButton />
-      </div>
-    )}
+  <div className="mt-2 space-y-4">
+    <div className="text-center">
+      <ConnectButton />
+    </div>
+    
+    <div className="text-center text-gray-400 text-sm">Or choose a specific wallet:</div>
+    
+    <div className="grid grid-cols-2 gap-2">
+      <button
+        onClick={() => detectAndConnectWallet('metamask')}
+        className="flex items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+      >
+        <span className="text-lg mr-1">🦊</span>
+        <span className="text-white text-xs">MetaMask</span>
+      </button>
+      
+      <button
+        onClick={() => detectAndConnectWallet('phantom')}
+        className="flex items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+      >
+        <span className="text-lg mr-1">👻</span>
+        <span className="text-white text-xs">Phantom</span>
+      </button>
+      
+      <button
+        onClick={() => detectAndConnectWallet('binance')}
+        className="flex items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+      >
+        <span className="text-lg mr-1">🟡</span>
+        <span className="text-white text-xs">Binance</span>
+      </button>
+      
+      <button
+        onClick={() => detectAndConnectWallet('exodus')}
+        className="flex items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
+      >
+        <span className="text-lg mr-1">🚀</span>
+        <span className="text-white text-xs">Exodus</span>
+      </button>
+    </div>
+  </div>
+)}
+
   </div>
 </div>
                   </div>
@@ -1145,7 +1205,14 @@ switch(selectedCrypto) {
             )}
           </div>
         </div>
-      )}
+           )}
+      
+      {/* Wallet Installation Modal */}
+      <WalletInstallationModal 
+        isOpen={showWalletInstall}
+        onClose={() => setShowWalletInstall(false)}
+        walletType={selectedWalletType}
+      />
     </div>
   )
 }
