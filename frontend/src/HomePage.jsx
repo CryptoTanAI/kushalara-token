@@ -1207,12 +1207,59 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
         </div>
            )}
       
-      {/* Wallet Installation Modal */}
+           {/* Wallet Installation Modal */}
       <WalletInstallationModal 
         isOpen={showWalletInstall}
         onClose={() => setShowWalletInstall(false)}
         walletType={selectedWalletType}
       />
+      
+      {/* Onramper Demo Modal */}
+      {paymentStep === 'onramper-demo' && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-700">
+            <div className="flex justify-between items-center p-6 border-b border-gray-700">
+              <h3 className="text-2xl font-bold text-white">
+                Test Onramper Payment Options
+              </h3>
+              <button 
+                onClick={() => setPaymentStep('selection')}
+                className="text-gray-400 hover:text-white text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <div className="mb-4 p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
+                <div className="text-blue-400 text-sm font-medium mb-1">🧪 Demo Mode</div>
+                <div className="text-gray-300 text-xs">
+                  This is a live demo to test rates, payment methods, and user experience. 
+                  No actual transactions will be processed.
+                </div>
+              </div>
+              
+              <iframe
+                src={`https://widget.onramper.com/?defaultCrypto=ETH&defaultFiat=USD&defaultAmount=${amount || 100}&mode=buy&darkMode=true&primaryColor=%23fbbf24`}
+                width="100%"
+                height="600"
+                frameBorder="0"
+                className="rounded-lg"
+                title="Onramper Demo Widget"
+              />
+            </div>
+            
+            <div className="text-center p-4 border-t border-gray-700">
+              <button 
+                onClick={( ) => setPaymentStep('selection')}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                ← Back to Payment Options
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
