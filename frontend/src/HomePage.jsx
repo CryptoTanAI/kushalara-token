@@ -910,13 +910,13 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 </div>
                   </div>
 
-                  {/* MoonPay Card */}
+                                   {/* Onramper Demo Card */}
                   <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600">
                     <h4 className="text-2xl font-bold mb-4 gradient-text text-center">
                       Buy KushAlara with USD
                     </h4>
                     <p className="text-gray-300 text-center mb-6">
-                      Securely purchase crypto with your debit/credit card via MoonPay.
+                      Test our fiat-to-crypto options with live rates and multiple payment methods.
                     </p>
                     
                     <div className="space-y-4 mb-6">
@@ -943,15 +943,15 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                     )}
                     
                     <button 
-                      onClick={selectFiatPayment}
+                      onClick={() => setPaymentStep('onramper-demo')}
                       disabled={!amount || parseFloat(amount) < 20}
                       className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Continue to MoonPay
+                      Test Payment Options
                     </button>
                     
                     <div className="text-center text-sm text-gray-400 mt-4">
-                      Minimum purchase amount is $20 USD.
+                      Demo mode - Test rates and payment methods
                     </div>
                   </div>
                 </div>
