@@ -1239,14 +1239,17 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                 </div>
               </div>
               
-              <iframe
-                src={`https://widget.onramper.com/?defaultCrypto=ETH&defaultFiat=USD&defaultAmount=${amount || 100}&mode=buy&darkMode=true&primaryColor=%23fbbf24`}
+                            <iframe
+                src="https://widget.onramper.com/?apiKey=pk_test_&defaultCrypto=ETH&defaultFiat=USD&defaultAmount=100&mode=buy&isAddressEditable=false"
                 width="100%"
                 height="600"
                 frameBorder="0"
                 className="rounded-lg"
                 title="Onramper Demo Widget"
+                allow="payment; camera; microphone"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"
               />
+
             </div>
             
             <div className="text-center p-4 border-t border-gray-700">
