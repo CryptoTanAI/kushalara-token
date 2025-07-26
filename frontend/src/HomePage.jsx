@@ -1239,8 +1239,8 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                 </div>
               </div>
               
-                         <iframe
-                src="https://widget.onramper.com/?apiKey=pk_test_&defaultCrypto=ETH&defaultFiat=USD&defaultAmount=100&mode=buy&isAddressEditable=false"
+                              <iframe
+                src="https://widget.onramper.com/"
                 width="100%"
                 height="600"
                 frameBorder="0"
