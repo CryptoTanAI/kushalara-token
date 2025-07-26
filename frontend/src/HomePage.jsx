@@ -1240,7 +1240,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
               </div>
               
                               <iframe
-                src="https://widget.onramper.com/"
+                src="https://www.onramper.com/widget"
                 width="100%"
                 height="600"
                 frameBorder="0"
@@ -1249,6 +1249,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                 allow="payment; camera; microphone"
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"
               />
+
 
 
             </div>
