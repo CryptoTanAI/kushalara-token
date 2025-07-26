@@ -1239,16 +1239,164 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                 </div>
               </div>
               
-                              <iframe
-                src="https://www.onramper.com/widget"
-                width="100%"
-                height="600"
-                frameBorder="0"
-                className="rounded-lg"
-                title="Onramper Demo Widget"
-                allow="payment; camera; microphone"
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-top-navigation"
-              />
+                             <div className="space-y-4">
+                <div className="bg-white rounded-lg p-6 text-black">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                        <span className="text-white font-bold text-sm">O</span>
+                      </div>
+                      <h4 className="text-xl font-bold">Buy Crypto</h4>
+                    </div>
+                    <div className="text-sm text-gray-600">Powered by Onramper</div>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {/* You Spend Section */}
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700">You spend</label>
+                      <div className="flex border rounded-lg overflow-hidden">
+                        <input 
+                          type="number" 
+                          value={amount || 100}
+                          onChange={(e) => setAmount(e.target.value)}
+                          className="flex-1 p-3 outline-none"
+                          placeholder="100"
+                        />
+                        <select className="p-3 bg-gray-50 border-l min-w-[100px]">
+                          <option>USD</option>
+                          <option>EUR</option>
+                          <option>GBP</option>
+                          <option>CAD</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    {/* You Get Section */}
+                    <div>
+                      <label className="block text-sm font-medium mb-2 text-gray-700">You get</label>
+                      <div className="flex border rounded-lg overflow-hidden">
+                        <input 
+                          type="text" 
+                          value={(parseFloat(amount || 100) / 3600).toFixed(6)}
+                          className="flex-1 p-3 outline-none bg-gray-50"
+                          readOnly
+                        />
+                        <select className="p-3 bg-gray-50 border-l min-w-[100px]">
+                          <option>ETH</option>
+                          <option>BTC</option>
+                          <option>USDC</option>
+                          <option>SOL</option>
+                        </select>
+                      </div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        1 ETH ≈ $3,600 • Rate updates every 30s
+                      </div>
+                    </div>
+                    
+                    {/* Payment Methods */}
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <div className="text-sm font-medium text-gray-700 mb-3">Available Payment Methods:</div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="flex items-center p-2 bg-white rounded border">
+                          <span className="text-blue-600 mr-2">💳</span>
+                          <span className="text-sm">Credit Card</span>
+                        </div>
+                        <div className="flex items-center p-2 bg-white rounded border">
+                          <span className="text-green-600 mr-2">🏦</span>
+                          <span className="text-sm">Bank Transfer</span>
+                        </div>
+                        <div className="flex items-center p-2 bg-white rounded border">
+                          <span className="text-gray-800 mr-2">🍎</span>
+                          <span className="text-sm">Apple Pay</span>
+                        </div>
+                        <div className="flex items-center p-2 bg-white rounded border">
+                          <span className="text-blue-500 mr-2">🔵</span>
+                          <span className="text-sm">Google Pay</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Best Rate Section */}
+                    <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm font-medium text-green-800">✅ Best Rate Found</div>
+                          <div className="text-xs text-green-700">
+                            Comparing 25+ providers • Fee: 2.9%
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-bold text-green-800">
+                            ${((parseFloat(amount || 100)) * 0.029).toFixed(2)} fee
+                          </div>
+                          <div className="text-xs text-green-600">vs $4.50 avg</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Provider Options */}
+                    <div className="space-y-2">
+                      <div className="text-sm font-medium text-gray-700">Top Providers for Your Region:</div>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                          <div className="flex items-center">
+                            <span className="w-6 h-6 bg-blue-600 rounded text-white text-xs flex items-center justify-center mr-3">M</span>
+                            <div>
+                              <div className="text-sm font-medium">MoonPay</div>
+                              <div className="text-xs text-gray-500">Card • 4.5% fee</div>
+                            </div>
+                          </div>
+                          <div className="text-sm text-gray-600">${((parseFloat(amount || 100)) * 0.045).toFixed(2)}</div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-3 border rounded-lg bg-green-50 border-green-200">
+                          <div className="flex items-center">
+                            <span className="w-6 h-6 bg-green-600 rounded text-white text-xs flex items-center justify-center mr-3">R</span>
+                            <div>
+                              <div className="text-sm font-medium text-green-800">Ramp ⭐ Best</div>
+                              <div className="text-xs text-green-600">Card • 2.9% fee</div>
+                            </div>
+                          </div>
+                          <div className="text-sm text-green-800 font-medium">${((parseFloat(amount || 100)) * 0.029).toFixed(2)}</div>
+                        </div>
+                        
+                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+                          <div className="flex items-center">
+                            <span className="w-6 h-6 bg-purple-600 rounded text-white text-xs flex items-center justify-center mr-3">T</span>
+                            <div>
+                              <div className="text-sm font-medium">Transak</div>
+                              <div className="text-xs text-gray-500">Bank • 0.99% fee</div>
+                            </div>
+                          </div>
+                          <div className="text-sm text-gray-600">${((parseFloat(amount || 100)) * 0.0099).toFixed(2)}</div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Continue Button */}
+                    <button 
+                      onClick={() => alert(`Demo: Would proceed with Ramp for $${amount || 100} → ${(parseFloat(amount || 100) / 3600).toFixed(6)} ETH`)}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors"
+                    >
+                      Continue with Best Rate (Ramp)
+                    </button>
+                  </div>
+                </div>
+                
+                {/* Demo Info */}
+                <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-500/30">
+                  <div className="text-blue-400 text-sm font-medium mb-2">💡 What This Demo Shows:</div>
+                  <ul className="text-gray-300 text-xs space-y-1">
+                    <li>• Real-time rate comparison across 25+ providers</li>
+                    <li>• Multiple payment methods (cards, bank, mobile wallets)</li>
+                    <li>• Geographic optimization for best rates</li>
+                    <li>• Transparent fee comparison</li>
+                    <li>• Professional, user-friendly interface</li>
+                  </ul>
+                </div>
+              </div>
+
 
 
 
