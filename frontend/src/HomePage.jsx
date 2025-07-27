@@ -132,6 +132,12 @@ const WalletInstallationModal = ({ isOpen, onClose, walletType }) => {
   USDC: 1.00,
   USDT: 1.00
 })
+     
+  const [selectedDemoCrypto, setSelectedDemoCrypto] = useState('ETH')
+  const [selectedDemoFiat, setSelectedDemoFiat] = useState('USD')
+  const [selectedDemoPayment, setSelectedDemoPayment] = useState('')
+  const [demoAmount, setDemoAmount] = useState(100)
+
 const [showWalletInstall, setShowWalletInstall] = useState(false)
 const [selectedWalletType, setSelectedWalletType] = useState('')
 
