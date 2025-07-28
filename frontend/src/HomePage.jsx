@@ -143,7 +143,10 @@ const [footerPaymentStep, setFooterPaymentStep] = useState('selection')
 const [footerAmount, setFooterAmount] = useState('')
 const [footerSelectedCrypto, setFooterSelectedCrypto] = useState('ETH')
 const [kushPrice, setKushPrice] = useState(1.00)
-
+const [realTimeFees, setRealTimeFees] = useState({
+  ETH: 0, BTC: 0, SOL: 0, USDC: 0, USDT: 0
+})
+    
 const [showWalletInstall, setShowWalletInstall] = useState(false)
 const [selectedWalletType, setSelectedWalletType] = useState('')
 
@@ -220,15 +223,7 @@ const [selectedWalletType, setSelectedWalletType] = useState('')
     const rate = cryptoRates[selectedCrypto] || 1
     const cryptoAmount = usdAmount / rate
     
-   // Realistic network fees for crypto-to-crypto
-let networkFeeUSD = 0
-switch(selectedCrypto) {
-  case 'ETH': networkFeeUSD = 25; break // Current ETH gas fees
-  case 'BTC': networkFeeUSD = 3; break  // Bitcoin transaction fee
-  case 'SOL': networkFeeUSD = 0.01; break // Solana is very cheap
-  case 'USDC': networkFeeUSD = 15; break // ERC-20 token transfer
-  case 'USDT': networkFeeUSD = 15; break // ERC-20 token transfer
-}
+ const networkFeeUSD = realTimeFees[selectedCrypto] || 0
 
     const processingFeeUSD = 0 // No processing fee for direct crypto transfers
     const totalUSD = usdAmount + networkFeeUSD + processingFeeUSD
@@ -246,6 +241,44 @@ switch(selectedCrypto) {
     }
   }
 
+// Fetch real-time network fees
+useEffect(() => {
+  const fetchNetworkFees = async () => {
+    try {
+      const ethGasResponse = await fetch('https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey=demo' )
+      const ethGasData = await ethGasResponse.json()
+      const ethGasPrice = parseFloat(ethGasData.result.SafeGasPrice)
+      const ethFeeUSD = (ethGasPrice * 21000 * 0.000000001) * cryptoRates.ETH
+      
+      const btcFeeResponse = await fetch('https://mempool.space/api/v1/fees/recommended' )
+      const btcFeeData = await btcFeeResponse.json()
+      const btcFeeUSD = (btcFeeData.fastestFee * 250 * 0.00000001) * cryptoRates.BTC
+      
+      const solFeeUSD = 0.000005 * cryptoRates.SOL
+      const erc20FeeUSD = (ethGasPrice * 65000 * 0.000000001) * cryptoRates.ETH
+      
+      setRealTimeFees({
+        ETH: ethFeeUSD,
+        BTC: btcFeeUSD,
+        SOL: solFeeUSD,
+        USDC: erc20FeeUSD,
+        USDT: erc20FeeUSD
+      })
+    } catch (error) {
+      setRealTimeFees({
+        ETH: 5, BTC: 2, SOL: 0.01, USDC: 8, USDT: 8
+      })
+    }
+  }
+  fetchNetworkFees()
+  const interval = setInterval(fetchNetworkFees, 30000)
+  return () => clearInterval(interval)
+}, [cryptoRates])
+
+useEffect(() => {
+  const estimateGas = async () => {
+
+    
   // Estimate gas for transaction
   useEffect(() => {
     const estimateGas = async () => {
