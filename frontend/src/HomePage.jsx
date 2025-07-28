@@ -196,34 +196,21 @@ const [selectedWalletType, setSelectedWalletType] = useState('')
   }, [])
 
   // Simple, safe calculate crypto function
-  const calculateCrypto = () => {
+   const calculateCrypto = () => {
     if (!amount || amount === '') {
-      return { 
-        cryptoAmount: 0, 
-        networkFee: 0, 
-        processingFee: 0, 
-        total: 0, 
-        totalCrypto: 0, 
-        hasEnoughBalance: false 
-      }
+      return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, totalCrypto: 0, hasEnoughBalance: false }
     }
     
     const usdAmount = parseFloat(amount)
     if (isNaN(usdAmount) || usdAmount <= 0) {
-      return { 
-        cryptoAmount: 0, 
-        networkFee: 0, 
-        processingFee: 0, 
-        total: 0, 
-        totalCrypto: 0, 
-        hasEnoughBalance: false 
-      }
+      return { cryptoAmount: 0, networkFee: 0, processingFee: 0, total: 0, totalCrypto: 0, hasEnoughBalance: false }
     }
     
     const rate = cryptoRates[selectedCrypto] || 1
     const cryptoAmount = usdAmount / rate
     
- const networkFeeUSD = realTimeFees[selectedCrypto] || 0
+    // Use REAL network fees from APIs
+    const networkFeeUSD = realTimeFees[selectedCrypto] || 0
 
     const processingFeeUSD = 0 // No processing fee for direct crypto transfers
     const totalUSD = usdAmount + networkFeeUSD + processingFeeUSD
@@ -240,6 +227,7 @@ const [selectedWalletType, setSelectedWalletType] = useState('')
       hasEnoughBalance 
     }
   }
+
 
 // Fetch real-time network fees
 useEffect(() => {
@@ -274,9 +262,6 @@ useEffect(() => {
   const interval = setInterval(fetchNetworkFees, 30000)
   return () => clearInterval(interval)
 }, [cryptoRates])
-
-useEffect(() => {
-  const estimateGas = async () => {
 
     
   // Estimate gas for transaction
