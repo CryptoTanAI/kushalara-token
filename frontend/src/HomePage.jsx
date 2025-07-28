@@ -1264,12 +1264,16 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                       <div className="flex border rounded-lg overflow-hidden">
                         <input 
                           type="number" 
-                          value={amount || 100}
-                          onChange={(e) => setAmount(e.target.value)}
+                          value={demoAmount}
+                          onChange={(e) => setDemoAmount(parseFloat(e.target.value) || 0)}
                           className="flex-1 p-3 outline-none"
                           placeholder="100"
                         />
-                        <select className="p-3 bg-gray-50 border-l min-w-[100px]">
+                        <select 
+  value={selectedDemoFiat}
+  onChange={(e) => setSelectedDemoFiat(e.target.value)}
+  className="p-3 bg-gray-50 border-l min-w-[100px]"
+>
                           <option>USD</option>
                           <option>EUR</option>
                           <option>GBP</option>
@@ -1284,7 +1288,10 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                       <div className="flex border rounded-lg overflow-hidden">
                         <input 
                           type="text" 
-                          value={(parseFloat(amount || 100) / 3600).toFixed(6)}
+                          value={(() => {
+  const rates = { ETH: 3600, BTC: 97000, SOL: 245, USDC: 1, USDT: 1 };
+  return (demoAmount / rates[selectedDemoCrypto]).toFixed(6);
+})()}
                           className="flex-1 p-3 outline-none bg-gray-50"
                           readOnly
                         />
