@@ -712,6 +712,14 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                 <li><a href="#tokenomics" className="hover:text-white transition-colors">Tokenomics</a></li>
                 <li><a href="#roadmap" className="hover:text-white transition-colors">Roadmap</a></li>
                 <li><Link to="/citizenship" className="hover:text-white transition-colors">Citizenship</Link></li>
+                <li>
+  <button 
+    onClick={() => setShowFooterBuyModal(true)}
+    className="hover:text-white transition-colors text-yellow-400 font-medium"
+  >
+    Buy KushAlara
+  </button>
+</li>
               </ul>
             </div>
             <div>
@@ -1472,6 +1480,244 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
           </div>
         </div>
       )}
+      {/* Footer Buy KushAlara Modal */}
+{showFooterBuyModal && (
+  <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="bg-gray-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-700">
+      <div className="flex justify-between items-center p-6 border-b border-gray-700">
+        <h3 className="text-2xl font-bold text-white">
+          Buy KushAlara Token
+        </h3>
+        <button 
+          onClick={() => {
+            setShowFooterBuyModal(false)
+            setFooterPaymentStep('selection')
+          }}
+          className="text-gray-400 hover:text-white text-2xl"
+        >
+          ×
+        </button>
+      </div>
+      
+      <div className="p-6">
+        {footerPaymentStep === 'selection' && (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <div className="text-yellow-400 text-4xl mb-2">👑</div>
+              <h4 className="text-xl font-bold text-white mb-2">Choose Your Payment Method</h4>
+              <p className="text-gray-300">Purchase KushAlara tokens using crypto or fiat currency</p>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Crypto Payment Option */}
+              <div className="bg-gray-700/50 rounded-2xl p-6 border border-gray-600 hover:border-blue-500 transition-colors cursor-pointer"
+                   onClick={() => setFooterPaymentStep('crypto-details')}>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-white text-2xl">₿</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Pay with Crypto</h3>
+                  <p className="text-gray-300 text-sm mb-4">
+                    Direct wallet transfers with ETH, BTC, SOL, USDC, or USDT
+                  </p>
+                  <div className="bg-blue-900/30 p-3 rounded-lg">
+                    <div className="text-blue-400 text-sm font-medium">✅ Benefits</div>
+                    <ul className="text-gray-300 text-xs mt-1 space-y-1">
+                      <li>• Lower fees</li>
+                      <li>• Instant transfers</li>
+                      <li>• No KYC required</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Fiat Payment Option */}
+              <div className="bg-gray-700/50 rounded-2xl p-6 border border-gray-600 hover:border-purple-500 transition-colors cursor-pointer"
+                   onClick={() => setFooterPaymentStep('stripe-link')}>
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <span className="text-white text-2xl">💳</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2">Pay with USD</h3>
+                  <p className="text-gray-300 text-sm mb-4">
+                    Credit card, debit card, or bank account via Stripe Link
+                  </p>
+                  <div className="bg-purple-900/30 p-3 rounded-lg">
+                    <div className="text-purple-400 text-sm font-medium">✅ Benefits</div>
+                    <ul className="text-gray-300 text-xs mt-1 space-y-1">
+                      <li>• Easy for beginners</li>
+                      <li>• Familiar checkout</li>
+                      <li>• Secure payments</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {footerPaymentStep === 'crypto-details' && (
+          <div className="space-y-6">
+            <div className="flex items-center mb-6">
+              <button 
+                onClick={() => setFooterPaymentStep('selection')}
+                className="text-gray-400 hover:text-white mr-4"
+              >
+                ← Back
+              </button>
+              <h4 className="text-xl font-bold text-white">Pay with Crypto</h4>
+            </div>
+            
+            <div className="bg-white rounded-lg p-6 text-black">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700">Amount (USD)</label>
+                  <input 
+                    type="number" 
+                    value={footerAmount}
+                    onChange={(e) => setFooterAmount(e.target.value)}
+                    className="w-full p-3 border rounded-lg outline-none focus:border-blue-500"
+                    placeholder="100"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700">Pay with</label>
+                  <select 
+                    value={footerSelectedCrypto}
+                    onChange={(e) => setFooterSelectedCrypto(e.target.value)}
+                    className="w-full p-3 border rounded-lg outline-none focus:border-blue-500"
+                  >
+                    <option value="ETH">ETH - Ethereum</option>
+                    <option value="BTC">BTC - Bitcoin</option>
+                    <option value="SOL">SOL - Solana</option>
+                    <option value="USDC">USDC - USD Coin</option>
+                    <option value="USDT">USDT - Tether</option>
+                  </select>
+                </div>
+                
+                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                  <div className="text-sm font-medium text-yellow-800 mb-2">You will receive:</div>
+                  <div className="text-2xl font-bold text-yellow-900">
+                    {footerAmount ? (parseFloat(footerAmount) / kushPrice).toLocaleString(undefined, {maximumFractionDigits: 0}) : '0'} KUSH
+                  </div>
+                  <div className="text-xs text-yellow-700 mt-1">
+                    Rate: 1 USD = {(1/kushPrice).toFixed(2)} KUSH tokens
+                  </div>
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="text-sm font-medium text-gray-700 mb-2">Send {footerSelectedCrypto} to:</div>
+                  <div className="bg-white p-3 rounded border font-mono text-sm break-all">
+                    {walletAddresses[footerSelectedCrypto]}
+                  </div>
+                  <button 
+                    onClick={() => copyAddress(walletAddresses[footerSelectedCrypto])}
+                    className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  >
+                    📋 Copy Address
+                  </button>
+                </div>
+                
+                <button 
+                  onClick={() => alert(`Please send ${(() => {
+                    const rates = { ETH: 3600, BTC: 97000, SOL: 245, USDC: 1, USDT: 1 };
+                    return ((parseFloat(footerAmount) || 0) / rates[footerSelectedCrypto]).toFixed(6);
+                  })()} ${footerSelectedCrypto} to the address above. You will receive ${footerAmount ? (parseFloat(footerAmount) / kushPrice).toLocaleString(undefined, {maximumFractionDigits: 0}) : '0'} KUSH tokens.`)}
+                  disabled={!footerAmount}
+                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 rounded-lg font-semibold transition-colors"
+                >
+                  Continue with {footerSelectedCrypto} Payment
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {footerPaymentStep === 'stripe-link' && (
+          <div className="space-y-6">
+            <div className="flex items-center mb-6">
+              <button 
+                onClick={() => setFooterPaymentStep('selection')}
+                className="text-gray-400 hover:text-white mr-4"
+              >
+                ← Back
+              </button>
+              <h4 className="text-xl font-bold text-white">Pay with USD</h4>
+            </div>
+            
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-600 max-w-md mx-auto">
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                  <span className="text-white font-bold text-sm">K</span>
+                </div>
+                <div>
+                  <div className="text-white font-medium">KushAlara Token</div>
+                  <div className="text-gray-400 text-sm">Buy crypto with credit, debit, or bank account</div>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Pay</label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white text-lg">$</span>
+                    <input 
+                      type="number" 
+                      value={footerAmount}
+                      onChange={(e) => setFooterAmount(e.target.value)}
+                      className="w-full pl-8 pr-16 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none text-lg"
+                      placeholder="10"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
+                      <span className="w-4 h-3 bg-red-500 rounded-sm mr-1"></span>
+                      <span className="text-gray-300 text-sm">USD</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">Receive</label>
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      value={`${footerAmount ? (parseFloat(footerAmount) / kushPrice).toLocaleString(undefined, {maximumFractionDigits: 0}) : '0'} KUSH`}
+                      readOnly
+                      className="w-full pr-16 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white text-lg"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center">
+                      <span className="w-4 h-4 bg-yellow-400 rounded-full mr-1"></span>
+                      <span className="text-gray-300 text-sm">KUSH</span>
+                    </div>
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    Price updating ⏳ • Rate: ${kushPrice.toFixed(4)} per KUSH
+                  </div>
+                </div>
+                
+                <button 
+                  onClick={() => alert(`Stripe Link integration would process $${footerAmount || '0'} payment for ${footerAmount ? (parseFloat(footerAmount) / kushPrice).toLocaleString(undefined, {maximumFractionDigits: 0}) : '0'} KUSH tokens. This is a demo - real Stripe Link integration coming soon!`)}
+                  disabled={!footerAmount}
+                  className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 text-white py-3 rounded-lg font-semibold transition-colors"
+                >
+                  Continue
+                </button>
+                
+                <div className="flex items-center justify-center text-gray-400 text-sm">
+                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  link by Stripe
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+)}
+
     </div>
   )
 }
