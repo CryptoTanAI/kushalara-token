@@ -133,10 +133,16 @@ const WalletInstallationModal = ({ isOpen, onClose, walletType }) => {
   USDT: 1.00
 })
      
-  const [selectedDemoCrypto, setSelectedDemoCrypto] = useState('ETH')
-  const [selectedDemoFiat, setSelectedDemoFiat] = useState('USD')
-  const [selectedDemoPayment, setSelectedDemoPayment] = useState('')
-  const [demoAmount, setDemoAmount] = useState(100)
+const [selectedDemoCrypto, setSelectedDemoCrypto] = useState('ETH')
+const [selectedDemoFiat, setSelectedDemoFiat] = useState('USD')  
+const [selectedDemoPayment, setSelectedDemoPayment] = useState('')
+const [demoAmount, setDemoAmount] = useState(100)
+
+const [showFooterBuyModal, setShowFooterBuyModal] = useState(false)
+const [footerPaymentStep, setFooterPaymentStep] = useState('selection')
+const [footerAmount, setFooterAmount] = useState('')
+const [footerSelectedCrypto, setFooterSelectedCrypto] = useState('ETH')
+const [kushPrice, setKushPrice] = useState(0.036)
 
 const [showWalletInstall, setShowWalletInstall] = useState(false)
 const [selectedWalletType, setSelectedWalletType] = useState('')
