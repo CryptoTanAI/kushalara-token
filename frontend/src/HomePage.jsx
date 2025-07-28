@@ -1295,7 +1295,12 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                           className="flex-1 p-3 outline-none bg-gray-50"
                           readOnly
                         />
-                        <select className="p-3 bg-gray-50 border-l min-w-[100px]">
+                        <select 
+  value={selectedDemoCrypto}
+  onChange={(e) => setSelectedDemoCrypto(e.target.value)}
+  className="p-3 bg-gray-50 border-l min-w-[100px]"
+>
+
                           <option>ETH</option>
                           <option>BTC</option>
                           <option>USDC</option>
@@ -1303,7 +1308,11 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                         </select>
                       </div>
                       <div className="text-xs text-gray-500 mt-1">
-                        1 ETH ≈ $3,600 • Rate updates every 30s
+                        1 {selectedDemoCrypto} ≈ ${(() => {
+  const rates = { ETH: 3600, BTC: 97000, SOL: 245, USDC: 1, USDT: 1 };
+  return rates[selectedDemoCrypto].toLocaleString();
+})()} • Rate updates every 30s
+
                       </div>
                     </div>
                     
@@ -1311,25 +1320,57 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                     <div className="bg-gray-50 p-4 rounded-lg">
                       <div className="text-sm font-medium text-gray-700 mb-3">Available Payment Methods:</div>
                       <div className="grid grid-cols-2 gap-2">
-                        <div className="flex items-center p-2 bg-white rounded border">
-                          <span className="text-blue-600 mr-2">💳</span>
-                          <span className="text-sm">Credit Card</span>
-                        </div>
-                        <div className="flex items-center p-2 bg-white rounded border">
-                          <span className="text-green-600 mr-2">🏦</span>
-                          <span className="text-sm">Bank Transfer</span>
-                        </div>
-                        <div className="flex items-center p-2 bg-white rounded border">
-                          <span className="text-gray-800 mr-2">🍎</span>
-                          <span className="text-sm">Apple Pay</span>
-                        </div>
-                        <div className="flex items-center p-2 bg-white rounded border">
-                          <span className="text-blue-500 mr-2">🔵</span>
-                          <span className="text-sm">Google Pay</span>
-                        </div>
+                        <div 
+  onClick={() => setSelectedDemoPayment('card')}
+  className={`flex items-center p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 transition-colors ${
+    selectedDemoPayment === 'card' ? 'border-blue-500 bg-blue-50' : ''
+  }`}
+>
+  <span className="text-blue-600 mr-2">💳</span>
+  <span className="text-sm">Credit Card</span>
+</div>
+
+                       <div 
+  onClick={() => setSelectedDemoPayment('bank')}
+  className={`flex items-center p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 transition-colors ${
+    selectedDemoPayment === 'bank' ? 'border-blue-500 bg-blue-50' : ''
+  }`}
+>
+  <span className="text-blue-600 mr-2">💳</span>
+  <span className="text-sm">Bank Transfer</span>
+</div>
+
+                        <div 
+  onClick={() => setSelectedDemoPayment('apple')}
+  className={`flex items-center p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 transition-colors ${
+    selectedDemoPayment === 'apple' ? 'border-blue-500 bg-blue-50' : ''
+  }`}
+>
+  <span className="text-blue-600 mr-2">💳</span>
+  <span className="text-sm">Apple Pay</span>
+</div>
+
+                        <div 
+  onClick={() => setSelectedDemoPayment('google')}
+  className={`flex items-center p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 transition-colors ${
+    selectedDemoPayment === 'google' ? 'border-blue-500 bg-blue-50' : ''
+  }`}
+>
+  <span className="text-blue-600 mr-2">💳</span>
+  <span className="text-sm">Google Pay</span>
+</div>
+
                       </div>
                     </div>
-                    
+                   {selectedDemoPayment && (
+  <div className="mt-2 p-2 bg-blue-50 rounded text-sm text-blue-800">
+    ✅ Selected: {(() => {
+      const methods = { card: 'Credit Card', bank: 'Bank Transfer', apple: 'Apple Pay', google: 'Google Pay' };
+      return methods[selectedDemoPayment];
+    })()}
+  </div>
+)}
+ 
                     {/* Best Rate Section */}
                     <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
                       <div className="flex items-center justify-between">
@@ -1341,7 +1382,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                         </div>
                         <div className="text-right">
                           <div className="text-sm font-bold text-green-800">
-                            ${((parseFloat(amount || 100)) * 0.029).toFixed(2)} fee
+                            ${(demoAmount * 0.029).toFixed(2)} fee
                           </div>
                           <div className="text-xs text-green-600">vs $4.50 avg</div>
                         </div>
@@ -1389,7 +1430,12 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                     
                     {/* Continue Button */}
                     <button 
-                      onClick={() => alert(`Demo: Would proceed with Ramp for $${amount || 100} → ${(parseFloat(amount || 100) / 3600).toFixed(6)} ETH`)}
+                      onClick={() => {
+  const rates = { ETH: 3600, BTC: 97000, SOL: 245, USDC: 1, USDT: 1 };
+  const cryptoAmount = (demoAmount / rates[selectedDemoCrypto]).toFixed(6);
+  alert(`Demo: Would proceed with Ramp\n${demoAmount} ${selectedDemoFiat} → ${cryptoAmount} ${selectedDemoCrypto}\nPayment: ${selectedDemoPayment || 'Not selected'}\nFee: $${(demoAmount * 0.029).toFixed(2)}`);
+}}
+
                       className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors"
                     >
                       Continue with Best Rate (Ramp)
