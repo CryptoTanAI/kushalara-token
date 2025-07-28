@@ -142,7 +142,7 @@ const [showFooterBuyModal, setShowFooterBuyModal] = useState(false)
 const [footerPaymentStep, setFooterPaymentStep] = useState('selection')
 const [footerAmount, setFooterAmount] = useState('')
 const [footerSelectedCrypto, setFooterSelectedCrypto] = useState('ETH')
-const [kushPrice, setKushPrice] = useState(0.036)
+const [kushPrice, setKushPrice] = useState(1.00)
 
 const [showWalletInstall, setShowWalletInstall] = useState(false)
 const [selectedWalletType, setSelectedWalletType] = useState('')
