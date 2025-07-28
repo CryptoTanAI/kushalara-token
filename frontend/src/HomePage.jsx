@@ -882,47 +882,9 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
         Balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
       </div>
     )}
-    {!isConnected && (
-  <div className="mt-2 space-y-4">
-    <div className="text-center">
-      <ConnectButton />
-    </div>
-    
-    <div className="text-center text-gray-400 text-sm">Or choose a specific wallet:</div>
-    
-    <div className="grid grid-cols-2 gap-2">
-      <button
-        onClick={() => detectAndConnectWallet('metamask')}
-        className="flex items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-      >
-        <span className="text-lg mr-1">🦊</span>
-        <span className="text-white text-xs">MetaMask</span>
-      </button>
-      
-      <button
-        onClick={() => detectAndConnectWallet('phantom')}
-        className="flex items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-      >
-        <span className="text-lg mr-1">👻</span>
-        <span className="text-white text-xs">Phantom</span>
-      </button>
-      
-      <button
-        onClick={() => detectAndConnectWallet('binance')}
-        className="flex items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-      >
-        <span className="text-lg mr-1">🟡</span>
-        <span className="text-white text-xs">Binance</span>
-      </button>
-      
-      <button
-        onClick={() => detectAndConnectWallet('exodus')}
-        className="flex items-center justify-center p-2 bg-gray-700 hover:bg-gray-600 rounded-lg transition-colors"
-      >
-        <span className="text-lg mr-1">🚀</span>
-        <span className="text-white text-xs">Exodus</span>
-      </button>
-    </div>
+   {!isConnected && (
+  <div className="mt-2 text-center">
+    <ConnectButton />
   </div>
 )}
 
