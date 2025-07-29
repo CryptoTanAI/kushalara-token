@@ -374,9 +374,10 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
             {/* Navigation */}
       <nav className="relative bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto flex justify-between items-center p-6">
-          <div className="text-2xl font-bold gradient-text flex items-center">
-            👑  <span className="text-white">Token</span>
-          </div>
+<a href="#home" className="flex items-center space-x-3">
+  <img src={KushCrestLogo} alt="KushAlara Logo" className="h-10 w-auto" />
+  <span className="text-2xl font-bold gradient-text">KushAlara</span>
+</a>
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-6">
