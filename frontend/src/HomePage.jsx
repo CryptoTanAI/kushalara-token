@@ -436,7 +436,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
       {/* Hero Section */}
       <section className="text-center py-20 px-6">
         <h1 className="text-5xl md:text-7xl font-bold mb-6">
-          <span className="gradient-text">KushAlara</span> <span className="text-white">Token</span>
+          <span className="gradient-text">Kingdom of</span> <span className="text-white">Kush</span>
         </h1>
         <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
           The world's first Web3-native sovereign state, pioneering digital governance and economic innovation through blockchain technology.
