@@ -149,6 +149,7 @@ const [realTimeFees, setRealTimeFees] = useState({
     
 const [showWalletInstall, setShowWalletInstall] = useState(false)
 const [selectedWalletType, setSelectedWalletType] = useState('')
+const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   // Get user's ETH balance
   const { data: balance } = useBalance({
@@ -386,6 +387,15 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
             <Link to="/eresidency" className="text-gray-300 hover:text-white transition-colors">e-Residency</Link>
           </div>
 
+        {/* Mobile Menu Button */}
+        <div className="md:hidden">
+          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white focus:outline-none">
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+          </button>
+        </div>
+          
           {/* Right-side buttons - visible on desktop */}
           <div className="hidden md:flex items-center space-x-4">
             <button 
