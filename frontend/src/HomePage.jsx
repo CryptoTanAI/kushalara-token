@@ -372,7 +372,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
             {/* Navigation */}
-      <nav className="relative bg-black/20 backdrop-blur-sm">
+      <nav className="sticky top-0 z-50 bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto flex justify-between items-center p-6">
 <a href="#home" className="flex items-center space-x-3">
   <img src={KushCrestLogo} alt="KushAlara Logo" className="h-10 w-auto" />
