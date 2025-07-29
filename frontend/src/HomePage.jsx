@@ -4,6 +4,7 @@ import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, us
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { parseEther, formatEther, parseUnits } from 'viem'
 import CountdownTimer from './CountdownTimer.jsx'
+import KushCrestLogo from './assets/kush-crest.png';
 
 // Wallet Detection and Installation Helper
 const WalletInstallationModal = ({ isOpen, onClose, walletType }) => {
@@ -285,7 +286,7 @@ useEffect(() => {
   const downloadWhitepaper = () => {
     const link = document.createElement('a')
     link.href = '/whitepaper.pdf'
-    link.download = 'KushAlara-Whitepaper.pdf'
+    link.download = '-Whitepaper.pdf'
     link.click()
   }
 
@@ -374,7 +375,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
       <nav className="relative bg-black/20 backdrop-blur-sm">
         <div className="container mx-auto flex justify-between items-center p-6">
           <div className="text-2xl font-bold gradient-text flex items-center">
-            👑 KushAlara <span className="text-white">Token</span>
+            👑  <span className="text-white">Token</span>
           </div>
 
           {/* Desktop Menu */}
