@@ -1494,11 +1494,14 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
           </div>
         </div>
       )}
-      {/* Footer Buy KushAlara Modal */}
+{/* Footer Buy KushAlara Modal */}
 {showFooterBuyModal && (
   <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-gray-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-700">
-      <div className="flex justify-between items-center p-6 border-b border-gray-700">
+    {/* --- CHANGE 1: Removed overflow-hidden, added flex flex-col --- */}
+    <div className="bg-gray-800 rounded-3xl max-w-4xl w-full max-h-[90vh] flex flex-col border border-gray-700">
+      
+      {/* --- CHANGE 2: Added flex-shrink-0 to the header --- */}
+      <div className="flex-shrink-0 flex justify-between items-center p-6 border-b border-gray-700">
         <h3 className="text-2xl font-bold text-white">
           Buy KushAlara Token
         </h3>
@@ -1513,7 +1516,8 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
         </button>
       </div>
       
-      <div className="p-6">
+      {/* --- CHANGE 3: Added overflow-y-auto to this content wrapper --- */}
+      <div className="p-6 overflow-y-auto">
         {footerPaymentStep === 'selection' && (
           <div className="space-y-6">
             <div className="text-center mb-6">
@@ -1569,6 +1573,13 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
             </div>
           </div>
         )}
+        
+        {/* The rest of your payment steps ('crypto-details', 'stripe-link') would go here, inside this scrollable div */}
+
+      </div>
+    </div>
+  </div>
+)}
         
        {footerPaymentStep === 'crypto-details' && (
   <div className="space-y-6">
