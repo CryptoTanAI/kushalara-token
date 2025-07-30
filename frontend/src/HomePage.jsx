@@ -1754,6 +1754,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
            !hasEnoughBalance ? 'Insufficient Balance' :
            `Send ${footerSelectedCrypto} Payment`}
         </button>
+        )}
       </div>
     </div>
   </div>
