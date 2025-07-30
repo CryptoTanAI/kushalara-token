@@ -73,6 +73,13 @@
   .mobile-hidden {
     display: none;
   }
+  // Add this to your CSS or tailwind config:
+@media (max-width: 640px) {
+  .modal-content {
+    max-height: 85vh !important;
+    overflow-y: auto;
+  }
+}
 }
 
 /* Print styles */
