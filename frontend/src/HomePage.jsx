@@ -1726,6 +1726,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
             )}
           </div>
         </div>
+        )}
         
         {/* Transaction Status */}
         {hash && (
