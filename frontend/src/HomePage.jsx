@@ -780,6 +780,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
             {/* Column 4: Follow Us - CORRECTED AND ALIGNED */}
             <div>
               <h4 className="text-lg font-semibold mb-4 text-white">Follow us</h4>
+              <div className="space-y-2">
               <div className="flex space-x-4">
                 <a 
                   href="https://www.instagram.com/royalkingdomofkush/" 
@@ -804,7 +805,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
               </div>
             </div>
           </div>
-          
+          </div>
           {/* Copyright Section */}
           <div className="border-t border-gray-700 pt-8 text-center">
             <p className="text-gray-400 text-sm">
