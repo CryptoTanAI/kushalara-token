@@ -1494,20 +1494,17 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
           </div>
         </div>
       )}
-{/* Footer Buy KushAlara Modal */}
 {showFooterBuyModal && (
   <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-    <div className="bg-gray-800 rounded-3xl max-w-4xl w-full flex flex-col border border-gray-700" style={{ maxHeight: '90vh' }}>
-      
-      {/* Modal Header (Stays Fixed) */}
-      <div className="flex-shrink-0 flex justify-between items-center p-6 border-b border-gray-700">
+    <div className="bg-gray-800 rounded-3xl max-w-4xl w-full max-h-[90dvh] overflow-y-auto border border-gray-700">
+      <div className="flex justify-between items-center p-6 border-b border-gray-700 sticky top-0 bg-gray-800 z-10">
         <h3 className="text-2xl font-bold text-white">
           Buy KushAlara Token
         </h3>
         <button 
           onClick={() => {
-            setShowFooterBuyModal(false);
-            setFooterPaymentStep('selection');
+            setShowFooterBuyModal(false)
+            setFooterPaymentStep('selection')
           }}
           className="text-gray-400 hover:text-white text-2xl"
         >
@@ -1515,8 +1512,8 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
         </button>
       </div>
       
-      {/* Modal Body (This part will scroll) */}
-      <div className="p-6 overflow-y-auto">
+      <div className="p-6 overflow-y-auto max-h-[calc(90dvh-120px)]">
+        {/* Payment options content remains the same */}
         {footerPaymentStep === 'selection' && (
           <div className="space-y-6">
             <div className="text-center mb-6">
