@@ -1576,12 +1576,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
     </div>
   </div>
 )}
-
-      </div>
-    </div>
-  </div>
-)}
-        
+    
        {footerPaymentStep === 'crypto-details' && (
   <div className="space-y-6">
     <div className="flex items-center mb-6">
