@@ -1494,6 +1494,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
           </div>
         </div>
       )}
+{/* Footer Buy Modal - COMPLETE CORRECTED VERSION */}
 {showFooterBuyModal && (
   <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
     <div className="bg-gray-800 rounded-3xl max-w-4xl w-full max-h-[90dvh] overflow-y-auto border border-gray-700">
@@ -1513,7 +1514,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
       </div>
       
       <div className="p-6 overflow-y-auto max-h-[calc(90dvh-120px)]">
-        {/* Payment options content remains the same */}
+        {/* Payment Selection Step */}
         {footerPaymentStep === 'selection' && (
           <div className="space-y-6">
             <div className="text-center mb-6">
@@ -1570,196 +1571,189 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
           </div>
         )}
         
-        {/* The rest of your payment steps ('crypto-details', 'stripe-link') will also be inside this scrollable div */}
-
-      </div>
-    </div>
-  </div>
-)}
-    
-       {footerPaymentStep === 'crypto-details' && (
-  <div className="space-y-6">
-    <div className="flex items-center mb-6">
-      <button 
-        onClick={() => setFooterPaymentStep('selection')}
-        className="text-gray-400 hover:text-white mr-4"
-      >
-        ← Back
-      </button>
-      <h4 className="text-xl font-bold text-white">Pay with Crypto</h4>
-    </div>
-    
-    <div className="bg-white rounded-lg p-6 text-black">
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">Amount (USD)</label>
-          <input 
-            type="number" 
-            value={footerAmount}
-            onChange={(e) => {
-              setFooterAmount(e.target.value);
-              setAmount(e.target.value); // Sync with main modal
-            }}
-            className="w-full p-3 border rounded-lg outline-none focus:border-blue-500"
-            placeholder="100"
-          />
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">Pay with</label>
-          <select 
-            value={footerSelectedCrypto}
-            onChange={(e) => {
-              setFooterSelectedCrypto(e.target.value);
-              setSelectedCrypto(e.target.value); // Sync with main modal
-            }}
-            className="w-full p-3 border rounded-lg outline-none focus:border-blue-500"
-          >
-            <option value="ETH">ETH - Ethereum</option>
-            <option value="BTC">BTC - Bitcoin</option>
-            <option value="SOL">SOL - Solana</option>
-            <option value="USDC">USDC - USD Coin</option>
-            <option value="USDT">USDT - Tether</option>
-          </select>
-        </div>
-        
-        {footerAmount && (
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <div className="text-gray-700 text-sm mb-2">You will send:</div>
-            <div className="text-2xl font-bold text-blue-600">
-              {totalCrypto.toFixed(8)} {footerSelectedCrypto}
-            </div>
-            <div className="text-gray-600 text-sm">
-              Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
-            </div>
-            {!hasEnoughBalance && balance && (
-              <div className="text-red-600 text-sm mt-2">
-                ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {footerSelectedCrypto}
-              </div>
-            )}
-          </div>
-        )}
-        
-        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-          <div className="text-sm font-medium text-yellow-800 mb-2">You will receive:</div>
-          <div className="text-2xl font-bold text-yellow-900">
-            {footerAmount ? (parseFloat(footerAmount) / kushPrice).toLocaleString(undefined, {maximumFractionDigits: 0}) : '0'} KUSH
-          </div>
-          <div className="text-xs text-yellow-700 mt-1">
-            Rate: 1 USD = {(1/kushPrice).toFixed(2)} KUSH tokens
-          </div>
-        </div>
-        
-        {/* Wallet Status */}
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <div className="flex items-center justify-between text-gray-700 text-sm mb-2">
-            <div className="flex items-center">
-              <span className="mr-2">🔗</span>
-              Wallet Status:
-            </div>
-            {isConnected && (
+        {/* Crypto Details Step */}
+        {footerPaymentStep === 'crypto-details' && (
+          <div className="space-y-6">
+            <div className="flex items-center mb-6">
               <button 
-                onClick={disconnect}
-                className="text-red-600 hover:text-red-500 text-xs underline"
+                onClick={() => setFooterPaymentStep('selection')}
+                className="text-gray-400 hover:text-white mr-4"
               >
-                Disconnect
+                ← Back
               </button>
-            )}
-          </div>
-          <div className="space-y-1 text-sm">
-            <div className={`flex items-center ${isConnected ? 'text-green-600' : 'text-red-600'}`}>
-              <span className={`w-2 h-2 ${isConnected ? 'bg-green-600' : 'bg-red-600'} rounded-full mr-2`}></span>
-              {isConnected ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Not connected'}
+              <h4 className="text-xl font-bold text-white">Pay with Crypto</h4>
             </div>
-            {balance && (
-              <div className="text-green-600 text-sm">
-                Balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
-              </div>
-            )}
-            {!isConnected && (
-              <div className="mt-2 space-y-4">
-                <div className="text-center">
-                  <ConnectButton />
+            
+            <div className="bg-white rounded-lg p-6 text-black">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700">Amount (USD)</label>
+                  <input 
+                    type="number" 
+                    value={footerAmount}
+                    onChange={(e) => {
+                      setFooterAmount(e.target.value);
+                      setAmount(e.target.value); // Sync with main modal
+                    }}
+                    className="w-full p-3 border rounded-lg outline-none focus:border-blue-500"
+                    placeholder="100"
+                  />
                 </div>
                 
-                <div className="text-center text-gray-600 text-sm">Or choose a specific wallet:</div>
-                
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => detectAndConnectWallet('metamask')}
-                    className="flex items-center justify-center p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700">Pay with</label>
+                  <select 
+                    value={footerSelectedCrypto}
+                    onChange={(e) => {
+                      setFooterSelectedCrypto(e.target.value);
+                      setSelectedCrypto(e.target.value); // Sync with main modal
+                    }}
+                    className="w-full p-3 border rounded-lg outline-none focus:border-blue-500"
                   >
-                    <span className="text-lg mr-1">🦊</span>
-                    <span className="text-gray-800 text-xs">MetaMask</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => detectAndConnectWallet('phantom')}
-                    className="flex items-center justify-center p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-                  >
-                    <span className="text-lg mr-1">👻</span>
-                    <span className="text-gray-800 text-xs">Phantom</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => detectAndConnectWallet('binance')}
-                    className="flex items-center justify-center p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-                  >
-                    <span className="text-lg mr-1">🟡</span>
-                    <span className="text-gray-800 text-xs">Binance</span>
-                  </button>
-                  
-                  <button
-                    onClick={() => detectAndConnectWallet('exodus')}
-                    className="flex items-center justify-center p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
-                  >
-                    <span className="text-lg mr-1">🚀</span>
-                    <span className="text-gray-800 text-xs">Exodus</span>
-                  </button>
+                    <option value="ETH">ETH - Ethereum</option>
+                    <option value="BTC">BTC - Bitcoin</option>
+                    <option value="SOL">SOL - Solana</option>
+                    <option value="USDC">USDC - USD Coin</option>
+                    <option value="USDT">USDT - Tether</option>
+                  </select>
                 </div>
+                
+                {footerAmount && (
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <div className="text-gray-700 text-sm mb-2">You will send:</div>
+                    <div className="text-2xl font-bold text-blue-600">
+                      {totalCrypto.toFixed(8)} {footerSelectedCrypto}
+                    </div>
+                    <div className="text-gray-600 text-sm">
+                      Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
+                    </div>
+                    {!hasEnoughBalance && balance && (
+                      <div className="text-red-600 text-sm mt-2">
+                        ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {footerSelectedCrypto}
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+                  <div className="text-sm font-medium text-yellow-800 mb-2">You will receive:</div>
+                  <div className="text-2xl font-bold text-yellow-900">
+                    {footerAmount ? (parseFloat(footerAmount) / kushPrice).toLocaleString(undefined, {maximumFractionDigits: 0}) : '0'} KUSH
+                  </div>
+                  <div className="text-xs text-yellow-700 mt-1">
+                    Rate: 1 USD = {(1/kushPrice).toFixed(2)} KUSH tokens
+                  </div>
+                </div>
+                
+                {/* Wallet Status */}
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex items-center justify-between text-gray-700 text-sm mb-2">
+                    <div className="flex items-center">
+                      <span className="mr-2">🔗</span>
+                      Wallet Status:
+                    </div>
+                    {isConnected && (
+                      <button 
+                        onClick={disconnect}
+                        className="text-red-600 hover:text-red-500 text-xs underline"
+                      >
+                        Disconnect
+                      </button>
+                    )}
+                  </div>
+                  <div className="space-y-1 text-sm">
+                    <div className={`flex items-center ${isConnected ? 'text-green-600' : 'text-red-600'}`}>
+                      <span className={`w-2 h-2 ${isConnected ? 'bg-green-600' : 'bg-red-600'} rounded-full mr-2`}></span>
+                      {isConnected ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Not connected'}
+                    </div>
+                    {balance && (
+                      <div className="text-green-600 text-sm">
+                        Balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
+                      </div>
+                    )}
+                    {!isConnected && (
+                      <div className="mt-2 space-y-4">
+                        <div className="text-center">
+                          <ConnectButton />
+                        </div>
+                        
+                        <div className="text-center text-gray-600 text-sm">Or choose a specific wallet:</div>
+                        
+                        <div className="grid grid-cols-2 gap-2">
+                          <button
+                            onClick={() => detectAndConnectWallet('metamask')}
+                            className="flex items-center justify-center p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                          >
+                            <span className="text-lg mr-1">🦊</span>
+                            <span className="text-gray-800 text-xs">MetaMask</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => detectAndConnectWallet('phantom')}
+                            className="flex items-center justify-center p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                          >
+                            <span className="text-lg mr-1">👻</span>
+                            <span className="text-gray-800 text-xs">Phantom</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => detectAndConnectWallet('binance')}
+                            className="flex items-center justify-center p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                          >
+                            <span className="text-lg mr-1">🟡</span>
+                            <span className="text-gray-800 text-xs">Binance</span>
+                          </button>
+                          
+                          <button
+                            onClick={() => detectAndConnectWallet('exodus')}
+                            className="flex items-center justify-center p-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
+                          >
+                            <span className="text-lg mr-1">🚀</span>
+                            <span className="text-gray-800 text-xs">Exodus</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Transaction Status */}
+                {hash && (
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="text-blue-600 font-semibold mb-2">Transaction Submitted</div>
+                    <div className="text-sm text-gray-600 break-all">Hash: {hash}</div>
+                    {isConfirming && <div className="text-yellow-600 text-sm mt-2">Waiting for confirmation...</div>}
+                    {isConfirmed && <div className="text-green-600 text-sm mt-2">✅ Transaction confirmed!</div>}
+                  </div>
+                )}
+                
+                {error && (
+                  <div className="bg-red-50 p-4 rounded-lg">
+                    <div className="text-red-600 font-semibold mb-2">Transaction Error</div>
+                    <div className="text-sm text-gray-600">{error.message}</div>
+                  </div>
+                )}
+                
+                <button 
+                  onClick={executePayment}
+                  disabled={!footerAmount || !isConnected || isPending || !hasEnoughBalance}
+                  className={`w-full py-3 rounded-lg font-semibold transition-colors ${
+                    footerAmount && isConnected && !isPending && hasEnoughBalance
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                      : 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  }`}
+                >
+                  {isPending ? 'Processing...' : 
+                   !isConnected ? 'Connect Wallet First' :
+                   !hasEnoughBalance ? 'Insufficient Balance' :
+                   `Send ${footerSelectedCrypto} Payment`}
+                </button>
               </div>
-            )}
-          </div>
-        </div>
-        )}
-        
-        {/* Transaction Status */}
-        {hash && (
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-blue-600 font-semibold mb-2">Transaction Submitted</div>
-            <div className="text-sm text-gray-600 break-all">Hash: {hash}</div>
-            {isConfirming && <div className="text-yellow-600 text-sm mt-2">Waiting for confirmation...</div>}
-            {isConfirmed && <div className="text-green-600 text-sm mt-2">✅ Transaction confirmed!</div>}
+            </div>
           </div>
         )}
         
-        {error && (
-          <div className="bg-red-50 p-4 rounded-lg">
-            <div className="text-red-600 font-semibold mb-2">Transaction Error</div>
-            <div className="text-sm text-gray-600">{error.message}</div>
-          </div>
-        )}
-        
-        <button 
-          onClick={executePayment}
-          disabled={!footerAmount || !isConnected || isPending || !hasEnoughBalance}
-          className={`w-full py-3 rounded-lg font-semibold transition-colors ${
-            footerAmount && isConnected && !isPending && hasEnoughBalance
-              ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-              : 'bg-gray-400 text-gray-600 cursor-not-allowed'
-          }`}
-        >
-          {isPending ? 'Processing...' : 
-           !isConnected ? 'Connect Wallet First' :
-           !hasEnoughBalance ? 'Insufficient Balance' :
-           `Send ${footerSelectedCrypto} Payment`}
-        </button>
-        )}
-      </div>
-    </div>
-  </div>
-)}
-        
+        {/* Stripe Link Step */}
         {footerPaymentStep === 'stripe-link' && (
           <div className="space-y-6">
             <div className="flex items-center mb-6">
@@ -1839,15 +1833,9 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
             </div>
           </div>
         )}
-     </div>
-     </div>
+      </div>
     </div>
-    
-    )}
-    
- </div>
-
-  )
-}
+  </div>
+)}
 
 export default HomePage
