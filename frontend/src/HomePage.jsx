@@ -311,79 +311,47 @@ useEffect(() => {
     }
   }
 
-// PASTE THIS NEW, UPGRADED FUNCTION IN PLACE OF THE OLD ONE
-
 const executePayment = async () => {
-    // --- 1. Initial Checks ---
-    // Make sure we have all the necessary info before starting.
     if (!amount || !selectedCrypto) {
         alert("Please enter an amount and select a cryptocurrency.");
         return;
     }
 
-    // --- 2. Handle ETH and other EVM tokens (USDC, USDT on Ethereum) ---
-    if (selectedCrypto === 'ETH' || selectedCrypto === 'USDC' || selectedCrypto === 'USDT') {
-        // Check for wallet connection
+    if (selectedCrypto === 'ETH') {
         if (!isConnected || !address) {
-            alert("Please connect your Ethereum wallet (like MetaMask) to make this payment.");
-            // You could also trigger the connect modal here
+            alert("Please connect your wallet first.");
             return;
         }
 
-        // Calculate the amount to send
         const { totalCrypto } = calculateCrypto();
         if (totalCrypto <= 0) {
-            alert("The amount to send must be greater than zero.");
+            alert("Amount must be greater than zero.");
             return;
         }
 
-        // Use the wagmi hook to send the transaction
-        console.log(`Initiating ${selectedCrypto} payment...`);
+        console.log("Initiating ETH payment...");
         
-        if (selectedCrypto === 'ETH') {
-            // This is a simple, direct ETH transfer
-            writeContract({
-                to: walletAddresses.ETH,
-                value: parseEther(totalCrypto.toString()),
+        try {
+            // Use MetaMask directly instead of wagmi
+            const txHash = await window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [{
+                    from: address,
+                    to: walletAddresses.ETH,
+                    value: '0x' + (totalCrypto * Math.pow(10, 18)).toString(16), // Convert to wei in hex
+                }],
             });
-        } else {
-            // Logic for sending ERC-20 tokens like USDC/USDT is more complex
-            // and requires a separate contract interaction.
-            alert(`Sending ${selectedCrypto} is a feature coming soon!`);
-            // For a real implementation, you would use wagmi's writeContract
-            // with the token's ABI and the 'transfer' function.
+            
+            console.log('Transaction sent:', txHash);
+            alert('Transaction sent successfully! Hash: ' + txHash);
+            
+        } catch (error) {
+            console.error('Transaction failed:', error);
+            alert('Transaction failed: ' + (error.message || 'Unknown error'));
         }
-
-    // --- 3. Handle Solana (SOL) Payments ---
-    } else if (selectedCrypto === 'SOL') {
-        // This requires a Solana-specific wallet like Phantom to be connected.
-        // The logic is completely different from wagmi.
-        alert("Solana payments are coming soon! This will require connecting a Phantom wallet.");
-        console.log("User attempted a Solana payment. Integration with @solana/web3.js is needed.");
-        //
-        // FUTURE IMPLEMENTATION LOGIC:
-        // 1. Check if `window.solana` or `window.phantom` exists.
-        // 2. Connect to the Solana wallet.
-        // 3. Create a new Transaction with a SystemProgram.transfer instruction.
-        // 4. Sign and send the transaction using the Solana wallet's provider.
-        //
-
-    // --- 4. Handle Bitcoin (BTC) Payments ---
-    } else if (selectedCrypto === 'BTC') {
-        // Bitcoin transactions cannot be handled directly from a browser script
-        // in the same way as ETH or SOL. This is a fundamental architectural difference.
-        // The standard approach is to show the user the address and amount to send.
-        const { totalCrypto } = calculateCrypto();
-        alert(
-            `Bitcoin payments must be made manually.\n\nPlease send:\n\n` +
-            `${totalCrypto.toFixed(8)} BTC\n\n` +
-            `To the following address:\n\n` +
-            `${walletAddresses.BTC}`
-        );
         
-    // --- 5. Handle any other cases ---
     } else {
-        alert("The selected cryptocurrency is not supported for payment at this time.");
+        alert(`${selectedCrypto} payments coming soon!`);
     }
 };
 
