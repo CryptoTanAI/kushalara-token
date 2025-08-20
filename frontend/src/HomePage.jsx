@@ -330,19 +330,34 @@ const executePayment = async () => {
         }
 
         console.log("Initiating ETH payment...");
+        console.log("Amount to send:", totalCrypto, "ETH");
         
         try {
-            // Use MetaMask directly instead of wagmi
+            // Check if MetaMask is available
+            if (!window.ethereum) {
+                alert("MetaMask is not installed. Please install MetaMask to continue.");
+                return;
+            }
+
+            // Convert ETH to Wei (1 ETH = 10^18 Wei)
+            const weiAmount = Math.floor(totalCrypto * Math.pow(10, 18));
+            const hexAmount = '0x' + weiAmount.toString(16);
+            
+            console.log("Wei amount:", weiAmount);
+            console.log("Hex amount:", hexAmount);
+            console.log("Sending to address:", walletAddresses.ETH);
+            
+            // Send the transaction
             const txHash = await window.ethereum.request({
                 method: 'eth_sendTransaction',
                 params: [{
                     from: address,
                     to: walletAddresses.ETH,
-                    value: '0x' + (totalCrypto * Math.pow(10, 18)).toString(16), // Convert to wei in hex
+                    value: hexAmount,
                 }],
             });
             
-            console.log('Transaction sent:', txHash);
+            console.log('Transaction sent successfully:', txHash);
             alert('Transaction sent successfully! Hash: ' + txHash);
             
         } catch (error) {
@@ -354,6 +369,7 @@ const executePayment = async () => {
         alert(`${selectedCrypto} payments coming soon!`);
     }
 };
+
 
 
   const closeModal = () => {
