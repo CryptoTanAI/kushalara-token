@@ -170,7 +170,7 @@ const { data: hash, sendTransaction } = useSendTransaction()
 
   // Wait for transaction confirmation
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
+    WriteHash,
   })
 
   // Wallet addresses for receiving payments
