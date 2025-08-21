@@ -332,59 +332,23 @@ const executePayment = async () => {
 
         console.log("Initiating ETH payment...");
         console.log("Amount to send:", totalCrypto, "ETH");
-        console.log("Current connected address:", address);
         
         try {
-            // Check if MetaMask/Ethereum provider is available
-            if (!window.ethereum) {
-                alert("No Ethereum wallet detected. Please install MetaMask or another Ethereum wallet.");
-                return;
-            }
-
-            // Request account access
-            await window.ethereum.request({ 
-                method: 'eth_requestAccounts' 
-            });
-
-            // Convert ETH to Wei (1 ETH = 10^18 Wei)
-            const weiAmount = Math.floor(totalCrypto * Math.pow(10, 18));
-            const hexAmount = '0x' + weiAmount.toString(16);
-            
-            console.log("Wei amount:", weiAmount);
-            console.log("Hex amount:", hexAmount);
-            console.log("Sending to address:", walletAddresses.ETH);
-            console.log("From address:", address);
-            
-            // Send the transaction using direct Ethereum API
-            const txHash = await window.ethereum.request({
-                method: 'eth_sendTransaction',
-                params: [{
-                    from: address,
-                    to: walletAddresses.ETH,
-                    value: hexAmount,
-                }],
+            // Use the existing writeContract hook from wagmi
+            await writeContract({
+                to: walletAddresses.ETH,
+                value: parseEther(totalCrypto.toString()),
             });
             
-            console.log('Transaction sent successfully:', txHash);
-            alert('Transaction sent successfully! Hash: ' + txHash);
+            console.log('Transaction initiated successfully');
             
         } catch (error) {
             console.error('Transaction failed:', error);
-            
-            // Enhanced error handling
-            if (error.code === 4001) {
-                alert('Transaction was rejected by the user.');
-            } else if (error.code === 4100) {
-                alert('The requested account and/or method has not been authorized by the user.');
-            } else if (error.message && error.message.includes('insufficient funds')) {
-                alert('Insufficient funds in your wallet to complete this transaction.');
-            } else {
-                alert('Transaction failed: ' + (error.message || 'Unknown error. Please try again.'));
-            }
+            alert('Transaction failed: ' + (error.message || 'Unknown error'));
         }
         
     } else {
-        alert(`${selectedCrypto} payments coming soon! Currently supporting ETH with all major wallets.`);
+        alert(`${selectedCrypto} payments coming soon!`);
     }
 };
 
