@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt, useSendTransaction } from 'wagmi'
+import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt, useSendTransaction, useWaitForTransaction } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { parseEther, formatEther, parseUnits } from 'viem'
 import CountdownTimer from './CountdownTimer.jsx'
@@ -158,7 +158,12 @@ const [isMenuOpen, setIsMenuOpen] = useState(false)
   })
 
 // Add this with your other hook declarations
-const { sendTransaction, isPending: isSending } = useSendTransaction()
+const { data: hash, sendTransaction } = useSendTransaction()
+
+    const { isLoading, isSuccess } = useWaitForTransaction({
+  hash,
+})
+
     
   // Contract write hook for sending ETH
   const { data: hash, writeContract, isPending, error } = useWriteContract()
@@ -314,6 +319,7 @@ useEffect(() => {
     }
   }
 
+// 3. CORRECT PAYMENT FUNCTION (replace your executePayment function)
 const executePayment = async () => {
     if (!amount || !selectedCrypto) {
         alert("Please enter an amount and select a cryptocurrency.");
@@ -336,13 +342,13 @@ const executePayment = async () => {
         console.log("Amount to send:", totalCrypto, "ETH");
         
         try {
-            // Use the CORRECT wagmi hook for ETH transfers
+            // This is the CORRECT way according to wagmi documentation
             sendTransaction({
                 to: walletAddresses.ETH,
                 value: parseEther(totalCrypto.toString()),
             });
             
-            console.log('Transaction sent successfully');
+            console.log('Transaction initiated successfully');
             
         } catch (error) {
             console.error('Transaction failed:', error);
@@ -353,10 +359,18 @@ const executePayment = async () => {
         alert(`${selectedCrypto} payments coming soon!`);
     }
 };
-    // executePayment function ends here. Below is the wallet detection
+
+// 4. TRANSACTION STATUS HANDLING (add this useEffect)
+useEffect(() => {
+    if (isSuccess) {
+        alert('Transaction confirmed! Hash: ' + hash);
+    }
+}, [isSuccess, hash]);
+   
+// executePayment function ends here. Below is the wallet detection
     
 // Wallet Detection Function
-// Coinbase-Optimized Wallet Detection Function
+
 const detectWallet = async () => {
     const currentAddress = address;
     
