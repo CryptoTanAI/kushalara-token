@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt, useSendTransaction, useWaitForTransaction } from 'wagmi'
+import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt, useSendTransaction } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { parseEther, formatEther, parseUnits } from 'viem'
 import CountdownTimer from './CountdownTimer.jsx'
@@ -160,9 +160,10 @@ const [isMenuOpen, setIsMenuOpen] = useState(false)
 // Add this with your other hook declarations
 const { data: hash, sendTransaction } = useSendTransaction()
 
-    const { isLoading, isSuccess } = useWaitForTransaction({
+    const { isLoading: isWaiting, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
   hash,
 })
+
 
     
   // Contract write hook for sending ETH
@@ -367,11 +368,11 @@ const executePayment = async () => {
 
 // 4. TRANSACTION STATUS HANDLING (add this useEffect)
 useEffect(() => {
-    if (isSuccess) {
+    if (isTransactionSuccess) {
         alert('Transaction confirmed! Hash: ' + hash);
     }
-}, [isSuccess, hash]);
-   
+}, [isTransactionSuccess, hash]);
+
 // executePayment function ends here. Below is the wallet detection
     
 // Wallet Detection Function
