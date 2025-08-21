@@ -6,6 +6,8 @@ import { parseEther, formatEther, parseUnits } from 'viem'
 import CountdownTimer from './CountdownTimer.jsx'
 import KushCrestLogo from './assets/kush-crest.png';
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
+import QRCode from 'qrcode'
+
 
 // Wallet Detection and Installation Helper
 const WalletInstallationModal = ({ isOpen, onClose, walletType }) => {
@@ -118,6 +120,122 @@ const WalletInstallationModal = ({ isOpen, onClose, walletType }) => {
     </div>
   )
 }
+
+//QR code generator
+
+const generateQRCode = async (address, amount, crypto) => {
+    try {
+        let qrContent = address;
+        
+        if (crypto === 'BTC') {
+            qrContent = `bitcoin:${address}?amount=${amount}`;
+        } else if (crypto === 'ETH') {
+            qrContent = `ethereum:${address}@1?value=${amount}e18`;
+        } else if (crypto === 'SOL') {
+            qrContent = address;
+        } else if (crypto === 'USDC' || crypto === 'USDT') {
+            qrContent = `ethereum:${address}@1`;
+        }
+        
+        const qrCodeDataURL = await QRCode.toDataURL(qrContent, {
+            width: 200,
+            margin: 2,
+            color: {
+                dark: '#000000',
+                light: '#FFFFFF'
+            },
+            errorCorrectionLevel: 'M'
+        });
+        
+        return qrCodeDataURL;
+    } catch (error) {
+        console.error('QR code generation failed:', error);
+        return null;
+    }
+};
+
+const PaymentAddressDisplay = ({ selectedCrypto, walletAddresses, amount }) => {
+    const [qrCode, setQrCode] = useState(null);
+    const [copied, setCopied] = useState(false);
+
+    useEffect(() => {
+        if (selectedCrypto && walletAddresses[selectedCrypto] && amount) {
+            generateQRCode(walletAddresses[selectedCrypto], amount, selectedCrypto)
+                .then(setQrCode);
+        }
+    }, [selectedCrypto, walletAddresses, amount]);
+
+    const copyToClipboard = (text) => {
+        navigator.clipboard.writeText(text).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        });
+    };
+
+    if (!selectedCrypto || !walletAddresses[selectedCrypto]) return null;
+
+    const address = walletAddresses[selectedCrypto];
+    const cryptoIcons = {
+        BTC: '₿',
+        ETH: 'Ξ',
+        SOL: '◎',
+        USDC: '$',
+        USDT: '₮'
+    };
+
+    return (
+        <div className="mt-6 p-6 bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl border border-gray-700">
+            <div className="text-center mb-4">
+                <h3 className="text-xl font-bold text-white flex items-center justify-center gap-2">
+                    <span className="text-2xl">{cryptoIcons[selectedCrypto]}</span>
+                    {selectedCrypto} Payment Details
+                </h3>
+                <p className="text-gray-300 mt-2">Send exactly {amount} {selectedCrypto}</p>
+            </div>
+
+            <div className="space-y-4">
+                <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                        📍 Recipient Address:
+                    </label>
+                    <div className="flex items-center gap-2">
+                        <input
+                            type="text"
+                            value={address}
+                            readOnly
+                            className="flex-1 p-3 bg-gray-700 border border-gray-600 rounded-lg text-white text-sm font-mono"
+                        />
+                        <button
+                            onClick={() => copyToClipboard(address)}
+                            className="px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+                        >
+                            {copied ? '✓' : '📋'} {copied ? 'Copied!' : 'Copy'}
+                        </button>
+                    </div>
+                </div>
+
+                {qrCode && (
+                    <div className="text-center">
+                        <label className="block text-sm font-medium text-gray-300 mb-2">
+                            📱 QR Code for Mobile Wallets:
+                        </label>
+                        <div className="inline-block p-4 bg-white rounded-lg">
+                            <img src={qrCode} alt="Payment QR Code" className="w-48 h-48" />
+                        </div>
+                    </div>
+                )}
+
+                <div className="p-4 bg-yellow-900/30 border border-yellow-600 rounded-lg">
+                    <p className="text-yellow-200 text-sm">
+                        ⚠️ <strong>Important:</strong> Only send {selectedCrypto} to this address. 
+                        Sending other cryptocurrencies may result in permanent loss of funds.
+                    </p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
   const HomePage = () => {
   const { address, isConnected } = useAccount()
@@ -325,6 +443,67 @@ useEffect(() => {
       setPaymentStep('payment-confirm')
     }
   }
+
+    //handlesolpayment is below
+
+const handleSOLPayment = async (amount) => {
+    console.log('🟣 SOL Payment Handler - Starting...');
+    
+    try {
+        let solanaWallet = null;
+        
+        // Check for Phantom wallet first (most popular)
+        if (window.solana && window.solana.isPhantom) {
+            console.log('✅ Phantom wallet detected');
+            solanaWallet = window.solana;
+        }
+        // Check for MetaMask Solana support
+        else if (window.ethereum && window.ethereum.solana) {
+            console.log('✅ MetaMask Solana detected');
+            solanaWallet = window.ethereum.solana;
+        }
+        // Check for Solflare wallet
+        else if (window.solflare && window.solflare.isSolflare) {
+            console.log('✅ Solflare wallet detected');
+            solanaWallet = window.solflare;
+        }
+        else {
+            throw new Error('No Solana wallet found. Please install Phantom, enable Solana in MetaMask, or install Solflare.');
+        }
+
+        // Connect to the wallet
+        const response = await solanaWallet.connect();
+        console.log('🔗 Connected to Solana wallet:', response.publicKey.toString());
+
+        // Create connection to Solana network
+        const connection = new Connection('https://api.mainnet-beta.solana.com' );
+        
+        // Create transaction
+        const transaction = new Transaction().add(
+            SystemProgram.transfer({
+                fromPubkey: response.publicKey,
+                toPubkey: new PublicKey(walletAddresses.SOL),
+                lamports: amount * LAMPORTS_PER_SOL,
+            })
+        );
+
+        // Get recent blockhash
+        const { blockhash } = await connection.getRecentBlockhash();
+        transaction.recentBlockhash = blockhash;
+        transaction.feePayer = response.publicKey;
+
+        // Sign and send transaction
+        const signedTransaction = await solanaWallet.signTransaction(transaction);
+        const signature = await connection.sendRawTransaction(signedTransaction.serialize());
+        
+        console.log('✅ SOL transaction sent:', signature);
+        alert(`SOL payment successful! Transaction: ${signature}`);
+        
+    } catch (error) {
+        console.error('❌ SOL payment failed:', error);
+        alert(`SOL payment failed: ${error.message}`);
+    }
+};
 
 // 3. CORRECT PAYMENT FUNCTION (replace your executePayment function)
 const executePayment = async () => {
@@ -1033,6 +1212,15 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                     >
                       Continue to Payment
                     </button>
+
+                    
+                        {selectedCrypto && amount && (
+                            <PaymentAddressDisplay 
+                                selectedCrypto={selectedCrypto}
+                                walletAddresses={walletAddresses}
+                                amount={calculateCrypto().totalCrypto}
+                            />
+                        )} 
                     
                     <div className="text-center text-sm text-gray-400 mt-4">
                       Secure wallet integration • Multiple payment options
