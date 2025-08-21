@@ -711,7 +711,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
           {/* Right-side buttons - visible on desktop */}
           <div className="hidden md:flex items-center space-x-4">
             <button 
-              onClick={downloadWhitepaper}
+              onClick={viewWhitepaper}
               className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-4 py-2 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 text-sm"
             >
               Download Whitepaper
