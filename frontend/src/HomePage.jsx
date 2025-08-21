@@ -186,8 +186,12 @@ const { data: hash, sendTransaction } = useSendTransaction()
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin,solana,usd-coin,tether&vs_currencies=usd' )
-        const data = await response.json()
+        const apiUrl = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin,solana,usd-coin,tether&vs_currencies=usd';
+const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(apiUrl )}`;
+const response = await fetch(proxyUrl);
+const proxyData = await response.json();
+const data = JSON.parse(proxyData.contents);
+
         setCryptoRates({
           ETH: data.ethereum?.usd || 3843.30,
           BTC: data.bitcoin?.usd || 97000,
