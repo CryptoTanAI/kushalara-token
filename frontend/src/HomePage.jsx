@@ -311,6 +311,7 @@ useEffect(() => {
     }
   }
 
+// Enhanced Multi-Wallet Payment Function
 const executePayment = async () => {
     if (!amount || !selectedCrypto) {
         alert("Please enter an amount and select a cryptocurrency.");
@@ -333,11 +334,12 @@ const executePayment = async () => {
         console.log("Amount to send:", totalCrypto, "ETH");
         
         try {
-            // Check if MetaMask is available
-            if (!window.ethereum) {
-                alert("MetaMask is not installed. Please install MetaMask to continue.");
-                return;
-            }
+            // Detect and handle different wallet types
+            const walletInfo = await detectWallet();
+            console.log("Detected wallet:", walletInfo.name);
+
+            // Request account access for all wallet types
+            await requestAccountAccess(walletInfo);
 
             // Convert ETH to Wei (1 ETH = 10^18 Wei)
             const weiAmount = Math.floor(totalCrypto * Math.pow(10, 18));
@@ -346,15 +348,13 @@ const executePayment = async () => {
             console.log("Wei amount:", weiAmount);
             console.log("Hex amount:", hexAmount);
             console.log("Sending to address:", walletAddresses.ETH);
+            console.log("From address:", address);
             
-            // Send the transaction
-            const txHash = await window.ethereum.request({
-                method: 'eth_sendTransaction',
-                params: [{
-                    from: address,
-                    to: walletAddresses.ETH,
-                    value: hexAmount,
-                }],
+            // Send transaction using the appropriate method for the detected wallet
+            const txHash = await sendTransaction(walletInfo, {
+                from: address,
+                to: walletAddresses.ETH,
+                value: hexAmount,
             });
             
             console.log('Transaction sent successfully:', txHash);
@@ -362,14 +362,114 @@ const executePayment = async () => {
             
         } catch (error) {
             console.error('Transaction failed:', error);
-            alert('Transaction failed: ' + (error.message || 'Unknown error'));
+            handleTransactionError(error);
         }
         
     } else {
-        alert(`${selectedCrypto} payments coming soon!`);
+        alert(`${selectedCrypto} payments coming soon! Currently supporting ETH with all major wallets.`);
     }
 };
 
+    // executePayment function ends here. Below is the wallet detection
+    
+// Wallet Detection Function
+const detectWallet = async () => {
+    const wallets = [
+        {
+            name: 'MetaMask',
+            check: () => window.ethereum && window.ethereum.isMetaMask,
+            provider: () => window.ethereum
+        },
+        {
+            name: 'Coinbase Wallet',
+            check: () => window.ethereum && (window.ethereum.isCoinbaseWallet || window.ethereum.selectedProvider?.isCoinbaseWallet),
+            provider: () => window.ethereum
+        },
+        {
+            name: 'Trust Wallet',
+            check: () => window.ethereum && window.ethereum.isTrust,
+            provider: () => window.ethereum
+        },
+        {
+            name: 'Rainbow',
+            check: () => window.ethereum && window.ethereum.isRainbow,
+            provider: () => window.ethereum
+        },
+        {
+            name: 'Brave Wallet',
+            check: () => window.ethereum && window.ethereum.isBraveWallet,
+            provider: () => window.ethereum
+        },
+        {
+            name: 'Opera Wallet',
+            check: () => window.ethereum && window.ethereum.isOpera,
+            provider: () => window.ethereum
+        },
+        {
+            name: 'Generic Ethereum Wallet',
+            check: () => window.ethereum,
+            provider: () => window.ethereum
+        }
+    ];
+
+    for (const wallet of wallets) {
+        if (wallet.check()) {
+            return wallet;
+        }
+    }
+
+    throw new Error('No compatible wallet detected. Please install MetaMask, Coinbase Wallet, or another supported wallet.');
+};
+
+// Request Account Access for Different Wallets
+const requestAccountAccess = async (walletInfo) => {
+    try {
+        await walletInfo.provider().request({ 
+            method: 'eth_requestAccounts' 
+        });
+    } catch (error) {
+        if (error.code === 4001) {
+            throw new Error('User rejected the connection request.');
+        }
+        throw error;
+    }
+};
+
+// Send Transaction Based on Wallet Type
+const sendTransaction = async (walletInfo, transactionParams) => {
+    return await walletInfo.provider().request({
+        method: 'eth_sendTransaction',
+        params: [transactionParams],
+    });
+};
+
+// Enhanced Error Handling
+const handleTransactionError = (error) => {
+    console.error('Full error details:', error);
+    
+    if (error.code === 4001) {
+        alert('Transaction was rejected by the user.');
+    } else if (error.code === 4100) {
+        alert('The requested account and/or method has not been authorized by the user.');
+    } else if (error.code === 4200) {
+        alert('The requested method is not supported by this Ethereum provider.');
+    } else if (error.code === 4900) {
+        alert('The provider is disconnected from all chains.');
+    } else if (error.code === 4901) {
+        alert('The provider is disconnected from the specified chain.');
+    } else if (error.code === -32602) {
+        alert('Invalid transaction parameters.');
+    } else if (error.code === -32603) {
+        alert('Internal JSON-RPC error.');
+    } else if (error.message && error.message.includes('insufficient funds')) {
+        alert('Insufficient funds in your wallet to complete this transaction.');
+    } else if (error.message && error.message.includes('gas')) {
+        alert('Transaction failed due to gas estimation error. Please try again.');
+    } else {
+        alert('Transaction failed: ' + (error.message || 'Unknown error. Please try again.'));
+    }
+};
+//ends here
 
 
   const closeModal = () => {
