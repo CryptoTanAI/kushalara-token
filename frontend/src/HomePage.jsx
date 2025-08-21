@@ -373,102 +373,72 @@ const executePayment = async () => {
     // executePayment function ends here. Below is the wallet detection
     
 // Wallet Detection Function
+// Enhanced Wallet Detection Function - Handles Multiple Wallets
 const detectWallet = async () => {
-    const wallets = [
-        {
-            name: 'MetaMask',
-            check: () => window.ethereum && window.ethereum.isMetaMask,
-            provider: () => window.ethereum
-        },
-        {
-            name: 'Coinbase Wallet',
-            check: () => window.ethereum && (window.ethereum.isCoinbaseWallet || window.ethereum.selectedProvider?.isCoinbaseWallet),
-            provider: () => window.ethereum
-        },
-        {
-            name: 'Trust Wallet',
-            check: () => window.ethereum && window.ethereum.isTrust,
-            provider: () => window.ethereum
-        },
-        {
-            name: 'Rainbow',
-            check: () => window.ethereum && window.ethereum.isRainbow,
-            provider: () => window.ethereum
-        },
-        {
-            name: 'Brave Wallet',
-            check: () => window.ethereum && window.ethereum.isBraveWallet,
-            provider: () => window.ethereum
-        },
-        {
-            name: 'Opera Wallet',
-            check: () => window.ethereum && window.ethereum.isOpera,
-            provider: () => window.ethereum
-        },
-        {
-            name: 'Generic Ethereum Wallet',
-            check: () => window.ethereum,
-            provider: () => window.ethereum
-        }
-    ];
-
-    for (const wallet of wallets) {
-        if (wallet.check()) {
-            return wallet;
-        }
-    }
-
-    throw new Error('No compatible wallet detected. Please install MetaMask, Coinbase Wallet, or another supported wallet.');
-};
-
-// Request Account Access for Different Wallets
-const requestAccountAccess = async (walletInfo) => {
-    try {
-        await walletInfo.provider().request({ 
-            method: 'eth_requestAccounts' 
-        });
-    } catch (error) {
-        if (error.code === 4001) {
-            throw new Error('User rejected the connection request.');
-        }
-        throw error;
-    }
-};
-
-// Send Transaction Based on Wallet Type
-const sendTransaction = async (walletInfo, transactionParams) => {
-    return await walletInfo.provider().request({
-        method: 'eth_sendTransaction',
-        params: [transactionParams],
-    });
-};
-
-// Enhanced Error Handling
-const handleTransactionError = (error) => {
-    console.error('Full error details:', error);
+    // First, check which wallet is actually connected by looking at the current address
+    const currentAddress = address; // This comes from your wallet connection state
     
-    if (error.code === 4001) {
-        alert('Transaction was rejected by the user.');
-    } else if (error.code === 4100) {
-        alert('The requested account and/or method has not been authorized by the user.');
-    } else if (error.code === 4200) {
-        alert('The requested method is not supported by this Ethereum provider.');
-    } else if (error.code === 4900) {
-        alert('The provider is disconnected from all chains.');
-    } else if (error.code === 4901) {
-        alert('The provider is disconnected from the specified chain.');
-    } else if (error.code === -32602) {
-        alert('Invalid transaction parameters.');
-    } else if (error.code === -32603) {
-        alert('Internal JSON-RPC error.');
-    } else if (error.message && error.message.includes('insufficient funds')) {
-        alert('Insufficient funds in your wallet to complete this transaction.');
-    } else if (error.message && error.message.includes('gas')) {
-        alert('Transaction failed due to gas estimation error. Please try again.');
-    } else {
-        alert('Transaction failed: ' + (error.message || 'Unknown error. Please try again.'));
+    console.log("Current connected address:", currentAddress);
+    console.log("Available providers:", {
+        ethereum: !!window.ethereum,
+        metamask: !!(window.ethereum && window.ethereum.isMetaMask),
+        coinbase: !!(window.ethereum && window.ethereum.isCoinbaseWallet),
+        trust: !!(window.ethereum && window.ethereum.isTrust)
+    });
+
+    // If multiple wallets are installed, we need to find the active one
+    if (window.ethereum && window.ethereum.providers) {
+        // Multiple providers detected
+        console.log("Multiple providers detected:", window.ethereum.providers.length);
+        
+        for (const provider of window.ethereum.providers) {
+            try {
+                const accounts = await provider.request({ method: 'eth_accounts' });
+                if (accounts.length > 0 && accounts[0].toLowerCase() === currentAddress.toLowerCase()) {
+                    // Found the active provider
+                    if (provider.isMetaMask) {
+                        return { name: 'MetaMask', provider: () => provider };
+                    } else if (provider.isCoinbaseWallet) {
+                        return { name: 'Coinbase Wallet', provider: () => provider };
+                    } else if (provider.isTrust) {
+                        return { name: 'Trust Wallet', provider: () => provider };
+                    } else if (provider.isRainbow) {
+                        return { name: 'Rainbow', provider: () => provider };
+                    }
+                }
+            } catch (error) {
+                console.log("Error checking provider:", error);
+                continue;
+            }
+        }
     }
+
+    // Single provider or fallback detection
+    if (window.ethereum) {
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+            if (accounts.length > 0 && accounts[0].toLowerCase() === currentAddress.toLowerCase()) {
+                // Determine which wallet this is
+                if (window.ethereum.isMetaMask && !window.ethereum.isCoinbaseWallet) {
+                    return { name: 'MetaMask', provider: () => window.ethereum };
+                } else if (window.ethereum.isCoinbaseWallet) {
+                    return { name: 'Coinbase Wallet', provider: () => window.ethereum };
+                } else if (window.ethereum.isTrust) {
+                    return { name: 'Trust Wallet', provider: () => window.ethereum };
+                } else if (window.ethereum.isRainbow) {
+                    return { name: 'Rainbow', provider: () => window.ethereum };
+                } else {
+                    return { name: 'Generic Ethereum Wallet', provider: () => window.ethereum };
+                }
+            }
+        } catch (error) {
+            console.error("Error detecting wallet:", error);
+        }
+    }
+
+    throw new Error('No compatible wallet detected or wallet not properly connected.');
 };
+
 //ends here
 
 
