@@ -166,7 +166,7 @@ const { data: hash, sendTransaction } = useSendTransaction()
 
     
   // Contract write hook for sending ETH
-  const { data: hash, writeContract, isPending, error } = useWriteContract()
+  const { data: WriteHash, writeContract, isPending, error } = useWriteContract()
 
   // Wait for transaction confirmation
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
