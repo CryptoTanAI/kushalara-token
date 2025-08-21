@@ -333,46 +333,39 @@ const executePayment = async () => {
         return;
     }
 
-    if (selectedCrypto === 'ETH') {
-        if (!isConnected || !address) {
-            alert("Please connect your wallet first.");
-            return;
-        }
+    const { totalCrypto } = calculateCrypto();
+    if (totalCrypto <= 0) {
+        alert("Amount must be greater than zero.");
+        return;
+    }
 
-        const { totalCrypto } = calculateCrypto();
-        if (totalCrypto <= 0) {
-            alert("Amount must be greater than zero.");
-            return;
-        }
+    console.log(`=== PAYMENT INITIATED ===`);
+    console.log(`Selected Crypto: ${selectedCrypto}`);
+    console.log(`Amount: ${totalCrypto} ${selectedCrypto}`);
 
-        console.log("Initiating ETH payment...");
-        console.log("Amount to send:", totalCrypto, "ETH");
-        
-        try {
-            // This is the CORRECT way according to wagmi documentation
-            sendTransaction({
-                to: walletAddresses.ETH,
-                value: parseEther(totalCrypto.toString()),
-            });
-            
-            console.log('Transaction initiated successfully');
-            
-        } catch (error) {
-            console.error('Transaction failed:', error);
-            alert('Transaction failed: ' + (error.message || 'Unknown error'));
+    try {
+        // SMART ROUTING: Prevents wallet conflicts
+        if (selectedCrypto === 'ETH') {
+            console.log('🔷 ETH Payment - Using existing wagmi system');
+            await handleETHPayment(totalCrypto);
+        } else if (selectedCrypto === 'SOL') {
+            console.log('🟣 SOL Payment - Using Solana wallets ONLY');
+            await handleSOLPayment(totalCrypto);
+        } else if (selectedCrypto === 'BTC') {
+            console.log('🟠 BTC Payment - Manual instructions');
+            await handleBTCPayment(totalCrypto);
+        } else if (selectedCrypto === 'USDC' || selectedCrypto === 'USDT') {
+            console.log(`🟢 ${selectedCrypto} Payment - ERC-20 tokens`);
+            await handleTokenPayment(selectedCrypto, totalCrypto);
+        } else {
+            alert(`${selectedCrypto} payments are not supported yet.`);
         }
-        
-    } else {
-        alert(`${selectedCrypto} payments coming soon!`);
+    } catch (error) {
+        console.error(`${selectedCrypto} payment failed:`, error);
+        alert(`${selectedCrypto} payment failed: ` + (error.message || 'Unknown error'));
     }
 };
 
-// 4. TRANSACTION STATUS HANDLING (add this useEffect)
-useEffect(() => {
-    if (isTransactionSuccess) {
-        alert('Transaction confirmed! Hash: ' + hash);
-    }
-}, [isTransactionSuccess, hash]);
 
 // executePayment function ends here. Below is the wallet detection
     
