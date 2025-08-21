@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
+import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt, useSendTransaction } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { parseEther, formatEther, parseUnits } from 'viem'
 import CountdownTimer from './CountdownTimer.jsx'
@@ -157,6 +157,9 @@ const [isMenuOpen, setIsMenuOpen] = useState(false)
     address: address,
   })
 
+// Add this with your other hook declarations
+const { sendTransaction, isPending: isSending } = useSendTransaction()
+    
   // Contract write hook for sending ETH
   const { data: hash, writeContract, isPending, error } = useWriteContract()
 
@@ -311,7 +314,6 @@ useEffect(() => {
     }
   }
 
-// Enhanced Multi-Wallet Payment Function
 const executePayment = async () => {
     if (!amount || !selectedCrypto) {
         alert("Please enter an amount and select a cryptocurrency.");
@@ -334,49 +336,23 @@ const executePayment = async () => {
         console.log("Amount to send:", totalCrypto, "ETH");
         
         try {
-            // Use writeContract with proper wagmi format for ETH transfer
-            await writeContract({
-                address: walletAddresses.ETH,
-                abi: [], // Empty ABI for simple ETH transfer
-                functionName: 'transfer', // This won't be used for ETH transfer
+            // Use the CORRECT wagmi hook for ETH transfers
+            sendTransaction({
+                to: walletAddresses.ETH,
                 value: parseEther(totalCrypto.toString()),
             });
             
-            console.log('Transaction initiated successfully');
+            console.log('Transaction sent successfully');
             
         } catch (error) {
             console.error('Transaction failed:', error);
-            
-            // For simple ETH transfers, we might need to use a different approach
-            // Let's try the direct transfer method
-            try {
-                console.log('Trying direct ETH transfer...');
-                
-                // Use the sendTransaction method instead
-                const txHash = await window.ethereum.request({
-                    method: 'eth_sendTransaction',
-                    params: [{
-                        from: address,
-                        to: walletAddresses.ETH,
-                        value: '0x' + Math.floor(totalCrypto * Math.pow(10, 18)).toString(16),
-                    }],
-                });
-                
-                console.log('Direct transfer successful:', txHash);
-                alert('Transaction sent successfully! Hash: ' + txHash);
-                
-            } catch (directError) {
-                console.error('Direct transfer also failed:', directError);
-                alert('Transaction failed: ' + (directError.message || 'Unknown error'));
-            }
+            alert('Transaction failed: ' + (error.message || 'Unknown error'));
         }
         
     } else {
         alert(`${selectedCrypto} payments coming soon!`);
     }
 };
-
-
     // executePayment function ends here. Below is the wallet detection
     
 // Wallet Detection Function
