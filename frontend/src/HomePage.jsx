@@ -332,14 +332,19 @@ const executePayment = async () => {
 
         console.log("Initiating ETH payment...");
         console.log("Amount to send:", totalCrypto, "ETH");
+        console.log("Current connected address:", address);
         
         try {
-            // Detect and handle different wallet types
-            const walletInfo = await detectWallet();
-            console.log("Detected wallet:", walletInfo.name);
+            // Check if MetaMask/Ethereum provider is available
+            if (!window.ethereum) {
+                alert("No Ethereum wallet detected. Please install MetaMask or another Ethereum wallet.");
+                return;
+            }
 
-            // Request account access for all wallet types
-            await requestAccountAccess(walletInfo);
+            // Request account access
+            await window.ethereum.request({ 
+                method: 'eth_requestAccounts' 
+            });
 
             // Convert ETH to Wei (1 ETH = 10^18 Wei)
             const weiAmount = Math.floor(totalCrypto * Math.pow(10, 18));
@@ -350,11 +355,14 @@ const executePayment = async () => {
             console.log("Sending to address:", walletAddresses.ETH);
             console.log("From address:", address);
             
-            // Send transaction using the appropriate method for the detected wallet
-            const txHash = await sendTransaction(walletInfo, {
-                from: address,
-                to: walletAddresses.ETH,
-                value: hexAmount,
+            // Send the transaction using direct Ethereum API
+            const txHash = await window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [{
+                    from: address,
+                    to: walletAddresses.ETH,
+                    value: hexAmount,
+                }],
             });
             
             console.log('Transaction sent successfully:', txHash);
@@ -362,7 +370,17 @@ const executePayment = async () => {
             
         } catch (error) {
             console.error('Transaction failed:', error);
-            handleTransactionError(error);
+            
+            // Enhanced error handling
+            if (error.code === 4001) {
+                alert('Transaction was rejected by the user.');
+            } else if (error.code === 4100) {
+                alert('The requested account and/or method has not been authorized by the user.');
+            } else if (error.message && error.message.includes('insufficient funds')) {
+                alert('Insufficient funds in your wallet to complete this transaction.');
+            } else {
+                alert('Transaction failed: ' + (error.message || 'Unknown error. Please try again.'));
+            }
         }
         
     } else {
