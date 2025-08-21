@@ -7,6 +7,7 @@ import CountdownTimer from './CountdownTimer.jsx'
 import KushCrestLogo from './assets/kush-crest.png';
 import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import QRCode from 'qrcode'
+import WhitepaperPDF from './assets/Whitepaper.pdf';
 
 
 // Wallet Detection and Installation Helper
@@ -416,12 +417,17 @@ useEffect(() => {
     estimateGas()
   }, [amount, selectedCrypto, isConnected])
 
-  const downloadWhitepaper = () => {
-    const link = document.createElement('a')
-    link.href = '/whitepaper.pdf'
-    link.download = '-Whitepaper.pdf'
-    link.click()
-  }
+const viewWhitepaper = () => {
+    window.open(WhitepaperPDF, "_blank");
+};
+
+const downloadWhitepaper = () => {
+    const link = document.createElement('a');
+    link.href = WhitepaperPDF;
+    link.download = 'KingdomofKushNewWhitePaper.pdf';
+    link.click();
+};
+
 
   const buyTokens = () => {
     setShowPaymentModal(true)
