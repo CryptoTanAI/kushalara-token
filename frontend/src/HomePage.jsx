@@ -334,9 +334,11 @@ const executePayment = async () => {
         console.log("Amount to send:", totalCrypto, "ETH");
         
         try {
-            // Use the existing writeContract hook from wagmi
+            // Use writeContract with proper wagmi format for ETH transfer
             await writeContract({
-                to: walletAddresses.ETH,
+                address: walletAddresses.ETH,
+                abi: [], // Empty ABI for simple ETH transfer
+                functionName: 'transfer', // This won't be used for ETH transfer
                 value: parseEther(totalCrypto.toString()),
             });
             
@@ -344,13 +346,36 @@ const executePayment = async () => {
             
         } catch (error) {
             console.error('Transaction failed:', error);
-            alert('Transaction failed: ' + (error.message || 'Unknown error'));
+            
+            // For simple ETH transfers, we might need to use a different approach
+            // Let's try the direct transfer method
+            try {
+                console.log('Trying direct ETH transfer...');
+                
+                // Use the sendTransaction method instead
+                const txHash = await window.ethereum.request({
+                    method: 'eth_sendTransaction',
+                    params: [{
+                        from: address,
+                        to: walletAddresses.ETH,
+                        value: '0x' + Math.floor(totalCrypto * Math.pow(10, 18)).toString(16),
+                    }],
+                });
+                
+                console.log('Direct transfer successful:', txHash);
+                alert('Transaction sent successfully! Hash: ' + txHash);
+                
+            } catch (directError) {
+                console.error('Direct transfer also failed:', directError);
+                alert('Transaction failed: ' + (directError.message || 'Unknown error'));
+            }
         }
         
     } else {
         alert(`${selectedCrypto} payments coming soon!`);
     }
 };
+
 
     // executePayment function ends here. Below is the wallet detection
     
