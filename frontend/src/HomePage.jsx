@@ -418,6 +418,41 @@ const data = JSON.parse(proxyData.contents);
     }
   }
 
+// User form validation functions
+const validateUserInfo = () => {
+    if (!userInfo.firstName.trim()) return false;
+    if (!userInfo.lastName.trim()) return false;
+    if (!userInfo.email.trim()) return false;
+    if (!userInfo.country) return false;
+    
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(userInfo.email)) return false;
+    
+    return true;
+};
+
+const handleUserFormSubmit = () => {
+    if (!validateUserInfo()) {
+        alert('Please fill in all fields with valid information.');
+        return;
+    }
+    
+    setUserFormCompleted(true);
+    setShowUserForm(false);
+};
+
+const resetUserForm = () => {
+    setUserInfo({
+        firstName: '',
+        lastName: '',
+        email: '',
+        country: ''
+    });
+    setUserFormCompleted(false);
+    setShowUserForm(true);
+};
+
 
 // Fetch real-time network fees
 useEffect(() => {
