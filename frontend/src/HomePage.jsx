@@ -1272,692 +1272,194 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 
 
       {/* Payment Modal */}
-      {showPaymentModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-3xl max-w-6xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto">
+{showPaymentModal && (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="bg-gray-800 rounded-3xl max-w-6xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto">
             
-            {/* Payment Selection Screen */}
-            {paymentStep === 'selection' && (
-              <div className="p-8">
-                <div className="flex justify-between items-center mb-8">
-                  <h3 className="text-3xl font-bold gradient-text">Buy KushAlara Tokens</h3>
-                  <button 
-                    onClick={closeModal}
-                    className="text-gray-400 hover:text-white text-3xl"
-                  >
-                    ×
-                  </button>
-                </div>
-                <p className="text-xl text-gray-300 text-center mb-8">
-                  Join the world's first Web3-native sovereign state
-                </p>
-                
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* Crypto Payment Card */}
-                  <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600">
-                    <h4 className="text-2xl font-bold mb-4 gradient-text text-center">Buy KushAlara Tokens</h4>
-                    <p className="text-gray-300 text-center mb-6">
-                      Connect your wallet or use direct cryptocurrency payment
-                    </p>
-                    
-                    <div className="space-y-4 mb-6">
-                      <div>
-                        <label className="block text-white mb-2 font-semibold">Amount (USD  )</label>
-                        <input 
-                          type="number"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          placeholder="Enter amount"
-                          className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-white mb-2 font-semibold">Payment Method</label>
-                        <select 
-                          value={selectedCrypto}
-                          onChange={(e) => setSelectedCrypto(e.target.value)}
-                          className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white focus:outline-none focus:border-yellow-400"
-                        >
-                          <option value="ETH">Ethereum (ETH)</option>
-                          <option value="BTC">Bitcoin (BTC)</option>
-                          <option value="SOL">Solana (SOL)</option>
-                          <option value="USDC">USD Coin (USDC)</option>
-                          <option value="USDT">Tether (USDT)</option>
-                        </select>
-                      </div>
-                    </div>
-                    
-                    {amount && (
-                      <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
-                        <div className="text-gray-300 text-sm">You will send:</div>
-                        <div className="text-2xl font-bold text-yellow-400">
-                          {totalCrypto.toFixed(8)} {selectedCrypto}
-                        </div>
-                        <div className="text-gray-400 text-sm">
-                          Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
-                        </div>
-                        {!hasEnoughBalance && balance && (
-           <div className="text-red-400 text-sm mt-2">
-            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
-           </div>
-                )}
-                      </div>
-                    )}
-                    
-                    <button 
-                      onClick={selectCryptoPayment}
-                      disabled={!amount}
-                      className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Continue to Payment
-                    </button>
-
-                    
-                        {selectedCrypto && amount && (
-                            <PaymentAddressDisplay 
-                                selectedCrypto={selectedCrypto}
-                                walletAddresses={walletAddresses}
-                                amount={calculateCrypto().totalCrypto}
-                            />
-                        )} 
-                    
-                    <div className="text-center text-sm text-gray-400 mt-4">
-                      Secure wallet integration • Multiple payment options
-                    </div>
-                    
-                   {/* Wallet Status */}
-<div className="mt-6 p-4 bg-gray-600/30 rounded-lg">
-  <div className="flex items-center justify-between text-gray-300 text-sm mb-2">
-    <div className="flex items-center">
-      <span className="mr-2">🔗</span>
-      Wallet Status:
-    </div>
-    {isConnected && (
-      <button 
-        onClick={disconnect}
-        className="text-red-400 hover:text-red-300 text-xs underline"
-      >
-        Disconnect
-      </button>
-    )}
-  </div>
-  <div className="space-y-1 text-sm">
-    <div className={`flex items-center ${isConnected ? 'text-green-400' : 'text-red-400'}`}>
-      <span className={`w-2 h-2 ${isConnected ? 'bg-green-400' : 'bg-red-400'} rounded-full mr-2`}></span>
-      {isConnected ? `Connected: ${address?.slice(0, 6)}...${address?.slice(-4)}` : 'Not connected'}
-    </div>
-    {balance && (
-      <div className="text-green-400 text-sm">
-        Balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
-      </div>
-    )}
-   {!isConnected && (
-  <div className="mt-2 text-center">
-    <ConnectButton />
-  </div>
-)}
-
-  </div>
-</div>
-                  </div>
-
-                                   {/* Onramper Demo Card */}
-                  <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600">
-                    <h4 className="text-2xl font-bold mb-4 gradient-text text-center">
-                      Buy KushAlara with USD
-                    </h4>
-                    <p className="text-gray-300 text-center mb-6">
-                      Test our fiat-to-crypto options with live rates and multiple payment methods.
-                    </p>
-                    
-                    <div className="space-y-4 mb-6">
-                      <div>
-                        <label className="block text-white mb-2 font-semibold">Amount (USD)</label>
-                        <input 
-                          type="number"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          placeholder="Enter amount in USD (min $20)"
-                          className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-                        />
-                      </div>
-                    </div>
-                    
-                    {amount && (
-                      <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
-                        <div className="text-gray-300 text-sm">You will receive:</div>
-                        <div className="text-2xl font-bold text-yellow-400">
-                          {parseFloat(amount).toLocaleString()} KUSH
-                        </div>
-                        <div className="text-gray-400 text-sm">Rate: 1 USD = 1 KUSH</div>
-                      </div>
-                    )}
-                    
-                    <button 
-                      onClick={() => setPaymentStep('onramper-demo')}
-                      disabled={!amount || parseFloat(amount) < 20}
-                      className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      Test Payment Options
-                    </button>
-                    
-                    <div className="text-center text-sm text-gray-400 mt-4">
-                      Demo mode - Test rates and payment methods
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Crypto Payment Details Screen */}
-            {paymentStep === 'crypto-details' && (
-              <div className="p-8">
-                <div className="flex justify-between items-center mb-8">
-                  <h3 className="text-3xl font-bold gradient-text">Complete Your Payment</h3>
-                  <button 
-                    onClick={closeModal}
-                    className="text-gray-400 hover:text-white text-3xl"
-                  >
-                    ×
-                  </button>
-                </div>
-                <p className="text-xl text-gray-300 text-center mb-8">
-                  Connect your wallet and send payment
-                </p>
-                
-                {/* Amount to Send */}
-                <div className="max-w-md mx-auto mb-8">
-                  <div className="bg-gray-700/50 backdrop-blur-sm rounded-2xl p-6 border border-gray-600 text-center">
-                    <h4 className="text-xl font-bold mb-3 gradient-text">Amount to Send</h4>
-                    <div className="text-3xl font-bold text-white mb-2">
-                      {totalCrypto.toFixed(8)} {selectedCrypto}
-                    </div>
-                    <div className="text-gray-400">≈ ${total.toFixed(2)} USD (including fees)</div>
-                    <div className="text-sm text-gray-500 mt-2">
-                      Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="text-center mb-8">
-                  <p className="text-gray-300 mb-4">
-                    Connect your {selectedCrypto === 'BTC' ? 'Bitcoin' : selectedCrypto === 'SOL' ? 'Solana' : 'Ethereum'} wallet to continue
-                  </p>
-                  
-                  {!isConnected ? (
-                    <div className="flex justify-center">
-                      <ConnectButton />
-                    </div>
-                  ) : (
-                    <div>
-                      <div className="text-green-400 mb-4">
-                        ✅ Wallet Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
-                      </div>
-                      {balance && (
-                        <div className="text-gray-300 mb-4">
-                          Balance: {parseFloat(formatEther(balance.value)).toFixed(4)} ETH
-                        </div>
-                      )}
-                      <button 
-                        onClick={executePayment}
-                        disabled={!hasEnoughBalance || isPending}
-                        className={`px-8 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                          hasEnoughBalance && !isPending
-                            ? 'bg-blue-500 hover:bg-blue-600 text-white' 
-                            : 'bg-gray-600 text-gray-400 cursor-not-allowed'
-                        }`}
-                      >
-                        {isPending ? 'Processing...' : hasEnoughBalance ? `Send ${selectedCrypto}` : 'Insufficient Balance'}
-                      </button>
-                    </div>
-                  )}
-                  
-                  <div className="mt-4">
-                    <span className="text-yellow-400 font-semibold">
-                      {selectedCrypto === 'BTC' ? 'Bitcoin' : selectedCrypto === 'SOL' ? 'Solana' : 'Ethereum'} Network
-                    </span>
-                  </div>
-                </div>
-                
-                {/* Transaction Status */}
-                {hash && (
-                  <div className="max-w-md mx-auto mb-6 p-4 bg-blue-900/30 rounded-lg">
-                    <div className="text-blue-400 font-semibold mb-2">Transaction Submitted</div>
-                    <div className="text-sm text-gray-300 break-all">Hash: {hash}</div>
-                    {isConfirming && <div className="text-yellow-400 text-sm mt-2">Waiting for confirmation...</div>}
-                    {isConfirmed && <div className="text-green-400 text-sm mt-2">✅ Transaction confirmed!</div>}
-                  </div>
-                )}
-                
-                {error && (
-                  <div className="max-w-md mx-auto mb-6 p-4 bg-red-900/30 rounded-lg">
-                    <div className="text-red-400 font-semibold mb-2">Transaction Error</div>
-                    <div className="text-sm text-gray-300">{error.message}</div>
-                  </div>
-                )}
-                
-                <div className="text-center">
-                  <button 
-                    onClick={backToSelection}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    ← Back to Payment Form
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Wallet Connection Screen */}
-            {paymentStep === 'wallet-connect' && (
-              <div className="p-8">
-                <div className="flex justify-between items-center mb-8">
-                  <h3 className="text-3xl font-bold gradient-text">Connect a Wallet</h3>
-                  <button 
-                    onClick={closeModal}
-                    className="text-gray-400 hover:text-white text-3xl"
-                  >
-                    ×
-                  </button>
-                </div>
-                
-                <div className="max-w-md mx-auto text-center">
-                  <div className="mb-8">
-                    <ConnectButton />
-                  </div>
-                  
-                  <div className="text-center">
-                    <div className="text-gray-400 text-sm mb-4">New to Ethereum wallets?</div>
-                    <button className="text-blue-400 hover:text-blue-300 text-sm">Learn More</button>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* MoonPay Widget Screen */}
-            {paymentStep === 'moonpay-widget' && (
-              <div className="p-8">
-                <div className="flex justify-between items-center mb-8">
-                  <h3 className="text-3xl font-bold gradient-text">Buy KushAlara with USD</h3>
-                  <button 
-                    onClick={closeModal}
-                    className="text-gray-400 hover:text-white text-3xl"
-                  >
-                    ×
-                  </button>
-                </div>
-                <p className="text-xl text-gray-300 text-center mb-8">
-                  Securely purchase crypto with your debit/credit card via MoonPay.
-                </p>
-                
-                <div className="max-w-md mx-auto">
-                  <div className="bg-white rounded-2xl p-6">
-                    <div className="flex justify-between items-center mb-6">
-                      <h4 className="text-xl font-bold text-gray-800">Buy</h4>
-                      <button className="text-gray-600">☰</button>
-                    </div>
-                    
-                    <div className="mb-4">
-                      <div className="flex items-center bg-gray-100 rounded-lg p-4">
-                        <input 
-                          type="number"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          className="flex-1 text-2xl font-bold text-gray-800 bg-transparent outline-none"
-                          placeholder="100"
-                        />
-                        <div className="flex items-center text-gray-600">
-                          <span className="mr-2">🇺🇸</span>
-                          <span className="font-semibold">USD</span>
-                          <span className="ml-2">▼</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="mb-6">
-                      <div className="flex items-center bg-gray-100 rounded-lg p-4">
-                        <div className="flex-1 text-2xl font-bold text-gray-800">
-                          {amount ? parseFloat(amount).toLocaleString() : '100'}
-                        </div>
-                        <div className="flex items-center text-gray-600">
-                          <span className="mr-2">👑</span>
-                          <span className="font-semibold">KUSH</span>
-                          <span className="ml-2">▼</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-4 gap-2 mb-6">
-                      {['$200', '$300', '$500', '$1,000'].map((amt) => (
+            {/* Step 1: User Information Form */}
+            {paymentStep === 'userInfo' && (
+                <div className="p-8">
+                    <div className="flex justify-between items-center mb-8">
+                        <h3 className="text-3xl font-bold gradient-text">Your Information</h3>
                         <button 
-                          key={amt}
-                          onClick={() => setAmount(amt.replace('$', '').replace(',', ''))}
-                          className="py-2 px-3 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 font-semibold text-sm transition-colors"
+                            onClick={() => setShowPaymentModal(false)}
+                            className="text-gray-400 hover:text-white text-3xl"
                         >
-                          {amt}
+                            ×
                         </button>
-                      ))}
                     </div>
                     
-                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-gray-600">You get {amount ? parseFloat(amount).toLocaleString() : '100'} KUSH for ${amount || '100'}</span>
-                        <span className="text-gray-400">▲</span>
-                      </div>
-                      
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">{amount ? parseFloat(amount).toLocaleString() : '100'} KUSH @ $1.00</span>
-                          <span className="text-gray-800 font-semibold">${amount || '100'}</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 flex items-center">
-                            Network fee
-                            <span className="ml-1 text-gray-400">ⓘ</span>
-                          </span>
-                          <span className="text-gray-800">$0.00</span>
-                        </div>
-                        <div className="flex justify-between">
-                          <span className="text-gray-600 flex items-center">
-                            MoonPay fee
-                            <span className="ml-1 text-gray-400">ⓘ</span>
-                          </span>
-                          <span className="text-gray-800">as low as $2.50</span>
-                        </div>
-                      </div>
-                    </div>
+                    <p className="text-xl text-gray-300 text-center mb-8">
+                        Please provide your information to continue with your KushAlara token purchase
+                    </p>
                     
-                    <div className="text-center text-xs text-gray-500 mb-6">
-                      ⏱ Quote updates in 5s
-                    </div>
-                    
-                    <button 
-                      onClick={() => alert(`Processing $${amount || '100'} USD purchase for ${amount ? parseFloat(amount).toLocaleString() : '100'} KUSH tokens`)}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 rounded-lg font-semibold text-lg transition-all duration-300 flex items-center justify-center"
-                    >
-                      Continue
-                      <span className="ml-2">→</span>
-                    </button>
-                    
-                    <div className="text-center text-xs text-gray-500 mt-4">
-                      Cryptocurrency services in NY powered by Zero Hash. Zero Hash
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="text-center mt-6">
-                  <button 
-                    onClick={backToSelection}
-                    className="text-gray-400 hover:text-white transition-colors"
-                  >
-                    ← Back to Payment Options
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-           )}
-      
-           {/* Wallet Installation Modal */}
-      <WalletInstallationModal 
-        isOpen={showWalletInstall}
-        onClose={() => setShowWalletInstall(false)}
-        walletType={selectedWalletType}
-      />
-      
-      {/* Onramper Demo Modal */}
-      {paymentStep === 'onramper-demo' && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-800 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-gray-700">
-            <div className="flex justify-between items-center p-6 border-b border-gray-700">
-              <h3 className="text-2xl font-bold text-white">
-                Test Onramper Payment Options
-              </h3>
-              <button 
-                onClick={() => setPaymentStep('selection')}
-                className="text-gray-400 hover:text-white text-2xl"
-              >
-                ×
-              </button>
-            </div>
-            
-            <div className="p-6">
-              <div className="mb-4 p-3 bg-blue-900/30 rounded-lg border border-blue-500/30">
-                <div className="text-blue-400 text-sm font-medium mb-1">🧪 Demo Mode</div>
-                <div className="text-gray-300 text-xs">
-                  This is a live demo to test rates, payment methods, and user experience. 
-                  No actual transactions will be processed.
-                </div>
-              </div>
-              
-                             <div className="space-y-4">
-                <div className="bg-white rounded-lg p-6 text-black">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
-                        <span className="text-white font-bold text-sm">O</span>
-                      </div>
-                      <h4 className="text-xl font-bold">Buy Crypto</h4>
-                    </div>
-                    <div className="text-sm text-gray-600">Powered by Onramper</div>
-                  </div>
-                  
-                  <div className="space-y-4">
-                    {/* You Spend Section */}
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-700">You spend</label>
-                      <div className="flex border rounded-lg overflow-hidden">
-                        <input 
-                          type="number" 
-                          value={demoAmount}
-                          onChange={(e) => setDemoAmount(parseFloat(e.target.value) || 0)}
-                          className="flex-1 p-3 outline-none"
-                          placeholder="100"
-                        />
-                        <select 
-  value={selectedDemoFiat}
-  onChange={(e) => setSelectedDemoFiat(e.target.value)}
-  className="p-3 bg-gray-50 border-l min-w-[100px]"
->
-                          <option>USD</option>
-                          <option>EUR</option>
-                          <option>GBP</option>
-                          <option>CAD</option>
-                        </select>
-                      </div>
-                    </div>
-                    
-                    {/* You Get Section */}
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-gray-700">You get</label>
-                      <div className="flex border rounded-lg overflow-hidden">
-                        <input 
-                          type="text" 
-                          value={(() => {
-  const rates = { ETH: 3600, BTC: 97000, SOL: 245, USDC: 1, USDT: 1 };
-  return (demoAmount / rates[selectedDemoCrypto]).toFixed(6);
-})()}
-                          className="flex-1 p-3 outline-none bg-gray-50"
-                          readOnly
-                        />
-                        <select 
-  value={selectedDemoCrypto}
-  onChange={(e) => setSelectedDemoCrypto(e.target.value)}
-  className="p-3 bg-gray-50 border-l min-w-[100px]"
->
-
-                          <option>ETH</option>
-                          <option>BTC</option>
-                          <option>USDC</option>
-                          <option>SOL</option>
-                        </select>
-                      </div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        1 {selectedDemoCrypto} ≈ ${(() => {
-  const rates = { ETH: 3600, BTC: 97000, SOL: 245, USDC: 1, USDT: 1 };
-  return rates[selectedDemoCrypto].toLocaleString();
-})()} • Rate updates every 30s
-
-                      </div>
-                    </div>
-                    
-                    {/* Payment Methods */}
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <div className="text-sm font-medium text-gray-700 mb-3">Available Payment Methods:</div>
-                      <div className="grid grid-cols-2 gap-2">
-                        <div 
-  onClick={() => setSelectedDemoPayment('card')}
-  className={`flex items-center p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 transition-colors ${
-    selectedDemoPayment === 'card' ? 'border-blue-500 bg-blue-50' : ''
-  }`}
->
-  <span className="text-blue-600 mr-2">💳</span>
-  <span className="text-sm">Credit Card</span>
-</div>
-
-                       <div 
-  onClick={() => setSelectedDemoPayment('bank')}
-  className={`flex items-center p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 transition-colors ${
-    selectedDemoPayment === 'bank' ? 'border-blue-500 bg-blue-50' : ''
-  }`}
->
-  <span className="text-blue-600 mr-2">💳</span>
-  <span className="text-sm">Bank Transfer</span>
-</div>
-
-                        <div 
-  onClick={() => setSelectedDemoPayment('apple')}
-  className={`flex items-center p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 transition-colors ${
-    selectedDemoPayment === 'apple' ? 'border-blue-500 bg-blue-50' : ''
-  }`}
->
-  <span className="text-blue-600 mr-2">💳</span>
-  <span className="text-sm">Apple Pay</span>
-</div>
-
-                        <div 
-  onClick={() => setSelectedDemoPayment('google')}
-  className={`flex items-center p-2 bg-white rounded border cursor-pointer hover:bg-blue-50 transition-colors ${
-    selectedDemoPayment === 'google' ? 'border-blue-500 bg-blue-50' : ''
-  }`}
->
-  <span className="text-blue-600 mr-2">💳</span>
-  <span className="text-sm">Google Pay</span>
-</div>
-
-                      </div>
-                    </div>
-                   {selectedDemoPayment && (
-  <div className="mt-2 p-2 bg-blue-50 rounded text-sm text-blue-800">
-    ✅ Selected: {(() => {
-      const methods = { card: 'Credit Card', bank: 'Bank Transfer', apple: 'Apple Pay', google: 'Google Pay' };
-      return methods[selectedDemoPayment];
-    })()}
-  </div>
-)}
- 
-                    {/* Best Rate Section */}
-                    <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
-                      <div className="flex items-center justify-between">
+                    <div className="max-w-md mx-auto space-y-6">
                         <div>
-                          <div className="text-sm font-medium text-green-800">✅ Best Rate Found</div>
-                          <div className="text-xs text-green-700">
-                            Comparing 25+ providers • Fee: 2.9%
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-bold text-green-800">
-                            ${(demoAmount * 0.029).toFixed(2)} fee
-                          </div>
-                          <div className="text-xs text-green-600">vs $4.50 avg</div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Provider Options */}
-                    <div className="space-y-2">
-                      <div className="text-sm font-medium text-gray-700">Top Providers for Your Region:</div>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                          <div className="flex items-center">
-                            <span className="w-6 h-6 bg-blue-600 rounded text-white text-xs flex items-center justify-center mr-3">M</span>
-                            <div>
-                              <div className="text-sm font-medium">MoonPay</div>
-                              <div className="text-xs text-gray-500">Card • 4.5% fee</div>
-                            </div>
-                          </div>
-                          <div className="text-sm text-gray-600">${((parseFloat(amount || 100)) * 0.045).toFixed(2)}</div>
+                            <label className="block text-white mb-2 font-semibold">First Name *</label>
+                            <input 
+                                type="text"
+                                value={userInfo.firstName}
+                                onChange={(e) => setUserInfo({...userInfo, firstName: e.target.value})}
+                                placeholder="Enter your first name"
+                                className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                            />
                         </div>
                         
-                        <div className="flex items-center justify-between p-3 border rounded-lg bg-green-50 border-green-200">
-                          <div className="flex items-center">
-                            <span className="w-6 h-6 bg-green-600 rounded text-white text-xs flex items-center justify-center mr-3">R</span>
-                            <div>
-                              <div className="text-sm font-medium text-green-800">Ramp ⭐ Best</div>
-                              <div className="text-xs text-green-600">Card • 2.9% fee</div>
-                            </div>
-                          </div>
-                          <div className="text-sm text-green-800 font-medium">${((parseFloat(amount || 100)) * 0.029).toFixed(2)}</div>
+                        <div>
+                            <label className="block text-white mb-2 font-semibold">Last Name *</label>
+                            <input 
+                                type="text"
+                                value={userInfo.lastName}
+                                onChange={(e) => setUserInfo({...userInfo, lastName: e.target.value})}
+                                placeholder="Enter your last name"
+                                className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                            />
                         </div>
                         
-                        <div className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                          <div className="flex items-center">
-                            <span className="w-6 h-6 bg-purple-600 rounded text-white text-xs flex items-center justify-center mr-3">T</span>
-                            <div>
-                              <div className="text-sm font-medium">Transak</div>
-                              <div className="text-xs text-gray-500">Bank • 0.99% fee</div>
-                            </div>
-                          </div>
-                          <div className="text-sm text-gray-600">${((parseFloat(amount || 100)) * 0.0099).toFixed(2)}</div>
+                        <div>
+                            <label className="block text-white mb-2 font-semibold">Email Address *</label>
+                            <input 
+                                type="email"
+                                value={userInfo.email}
+                                onChange={(e) => setUserInfo({...userInfo, email: e.target.value})}
+                                placeholder="Enter your email address"
+                                className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                            />
                         </div>
-                      </div>
+                        
+                        <div>
+                            <label className="block text-white mb-2 font-semibold">Country *</label>
+                            <select 
+                                value={userInfo.country}
+                                onChange={(e) => setUserInfo({...userInfo, country: e.target.value})}
+                                className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+                            >
+                                <option value="">Select your country</option>
+                                {getCountries().map((country) => (
+                                    <option key={country.code} value={country.code}>
+                                        {country.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        
+                        <button
+                            onClick={handleUserFormSubmit}
+                            className="w-full mt-8 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-4 rounded-lg font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300"
+                        >
+                            Continue to Payment
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {/* Step 2: Payment Selection */}
+            {paymentStep === 'selection' && (
+                <div className="p-8">
+                    {/* User Summary */}
+                    <div className="mb-6 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <p className="text-sm text-gray-400">Purchasing for:</p>
+                                <p className="text-white font-semibold">{userInfo.firstName} {userInfo.lastName}</p>
+                                <p className="text-sm text-gray-400">{userInfo.email}</p>
+                                <p className="text-sm text-gray-400">{getCountries().find(c => c.code === userInfo.country)?.name}</p>
+                            </div>
+                            <button
+                                onClick={() => setPaymentStep('userInfo')}
+                                className="text-yellow-400 hover:text-yellow-300 text-sm underline"
+                            >
+                                Edit Info
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mb-8">
+                        <h3 className="text-3xl font-bold gradient-text">Buy KushAlara Tokens</h3>
+                        <button 
+                            onClick={() => setShowPaymentModal(false)}
+                            className="text-gray-400 hover:text-white text-3xl"
+                        >
+                            ×
+                        </button>
                     </div>
                     
-                    {/* Continue Button */}
-                    <button 
-                      onClick={() => {
-  const rates = { ETH: 3600, BTC: 97000, SOL: 245, USDC: 1, USDT: 1 };
-  const cryptoAmount = (demoAmount / rates[selectedDemoCrypto]).toFixed(6);
-  alert(`Demo: Would proceed with Ramp\n${demoAmount} ${selectedDemoFiat} → ${cryptoAmount} ${selectedDemoCrypto}\nPayment: ${selectedDemoPayment || 'Not selected'}\nFee: $${(demoAmount * 0.029).toFixed(2)}`);
-}}
+                    <p className="text-xl text-gray-300 text-center mb-8">
+                        Join the world's first Web3-native sovereign state
+                    </p>
+                    
+                    <div className="grid md:grid-cols-2 gap-8">
+                        {/* Crypto Payment Card */}
+                        <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600">
+                            <h4 className="text-2xl font-bold mb-4 gradient-text text-center">Buy KushAlara Tokens</h4>
+                            <p className="text-gray-300 text-center mb-6">
+                                Connect your wallet or use direct cryptocurrency payment
+                            </p>
+                            
+                            <div className="space-y-4 mb-6">
+                                <div>
+                                    <label className="block text-white mb-2 font-semibold">Amount (USD $)</label>
+                                    <input 
+                                        type="number"
+                                        value={amount}
+                                        onChange={(e) => setAmount(e.target.value)}
+                                        placeholder="Enter amount"
+                                        className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <label className="block text-white mb-2 font-semibold">Payment Method</label>
+                                    <select 
+                                        value={selectedCrypto}
+                                        onChange={(e) => setSelectedCrypto(e.target.value)}
+                                        className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+                                    >
+                                        <option value="">Choose cryptocurrency</option>
+                                        <option value="ETH">Ethereum (ETH)</option>
+                                        <option value="BTC">Bitcoin (BTC)</option>
+                                        <option value="SOL">Solana (SOL)</option>
+                                        <option value="USDC">USD Coin (USDC)</option>
+                                        <option value="USDT">Tether (USDT)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            {amount && (
+                                <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
+                                    <div className="text-gray-300 text-sm">You will send:</div>
+                                    <div className="text-2xl font-bold text-yellow-400">
+                                        {calculateCrypto().totalCrypto.toFixed(8)} {selectedCrypto}
+                                    </div>
+                                    <div className="text-gray-400 text-sm">
+                                        Network fee: ${calculateCrypto().networkFee.toFixed(2)} • Processing fee: ${calculateCrypto().processingFee.toFixed(2)}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            <button 
+                                onClick={executePayment}
+                                disabled={!amount || !selectedCrypto}
+                                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                Continue to Payment
+                            </button>
 
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition-colors"
-                    >
-                      Continue with Best Rate (Ramp)
-                    </button>
-                  </div>
+                            {selectedCrypto && amount && (
+                                <PaymentAddressDisplay 
+                                    selectedCrypto={selectedCrypto}
+                                    walletAddresses={walletAddresses}
+                                    amount={calculateCrypto().totalCrypto}
+                                />
+                            )}
+                        </div>
+                    </div>
                 </div>
-                
-                {/* Demo Info */}
-                <div className="bg-blue-900/30 p-4 rounded-lg border border-blue-500/30">
-                  <div className="text-blue-400 text-sm font-medium mb-2">💡 What This Demo Shows:</div>
-                  <ul className="text-gray-300 text-xs space-y-1">
-                    <li>• Real-time rate comparison across 25+ providers</li>
-                    <li>• Multiple payment methods (cards, bank, mobile wallets)</li>
-                    <li>• Geographic optimization for best rates</li>
-                    <li>• Transparent fee comparison</li>
-                    <li>• Professional, user-friendly interface</li>
-                  </ul>
-                </div>
-              </div>
-
-
-
-
-            </div>
-            
-            <div className="text-center p-4 border-t border-gray-700">
-              <button 
-                onClick={( ) => setPaymentStep('selection')}
-                className="text-gray-400 hover:text-white transition-colors"
-              >
-                ← Back to Payment Options
-              </button>
-            </div>
-          </div>
+            )}
         </div>
-      )}
+    </div>
+)}
+
 {/* Footer Buy Modal - COMPLETE CORRECTED VERSION */}
 {showFooterBuyModal && (
   <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
