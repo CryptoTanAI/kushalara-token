@@ -418,28 +418,42 @@ const data = JSON.parse(proxyData.contents);
     }
   }
 
-// User form validation functions
-const validateUserInfo = () => {
-    if (!userInfo.firstName.trim()) return false;
-    if (!userInfo.lastName.trim()) return false;
-    if (!userInfo.email.trim()) return false;
-    if (!userInfo.country) return false;
-    
-    // Basic email validation
+// User Information Validation Functions
+const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(userInfo.email)) return false;
-    
+    return emailRegex.test(email);
+};
+
+const validateUserInfo = () => {
+    if (!userInfo.firstName.trim()) {
+        alert('Please enter your first name');
+        return false;
+    }
+    if (!userInfo.lastName.trim()) {
+        alert('Please enter your last name');
+        return false;
+    }
+    if (!userInfo.email.trim()) {
+        alert('Please enter your email address');
+        return false;
+    }
+    if (!validateEmail(userInfo.email)) {
+        alert('Please enter a valid email address');
+        return false;
+    }
+    if (!userInfo.country) {
+        alert('Please select your country');
+        return false;
+    }
     return true;
 };
 
 const handleUserFormSubmit = () => {
-    if (!validateUserInfo()) {
-        alert('Please fill in all fields with valid information.');
-        return;
+    if (validateUserInfo()) {
+        setUserFormCompleted(true);
+        setPaymentStep('selection');
+        setShowUserForm(false);
     }
-    
-    setUserFormCompleted(true);
-    setShowUserForm(false);
 };
 
 const resetUserForm = () => {
@@ -450,6 +464,7 @@ const resetUserForm = () => {
         country: ''
     });
     setUserFormCompleted(false);
+    setPaymentStep('userInfo');
     setShowUserForm(true);
 };
 
