@@ -1466,7 +1466,9 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 </div>
                   </div>
 
-                                   {/* Onramper Demo Card */}
+    // commenting out Onramper Demo card for now
+    
+       /*                            {/* Onramper Demo Card */}
                   <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600">
                     <h4 className="text-2xl font-bold mb-4 gradient-text text-center">
                       Buy KushAlara with USD
@@ -1510,7 +1512,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                       Demo mode - Test rates and payment methods
                     </div>
                   </div>
-                </div>
+                </div>          */
               </div>
             )}
 
