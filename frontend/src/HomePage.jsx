@@ -617,43 +617,73 @@ const handleSOLPayment = async (amount) => {
 
 // 3. CORRECT PAYMENT FUNCTION (replace your executePayment function)
 const executePayment = async () => {
+    // Validate user information first
+    if (!userFormCompleted || !validateUserInfo()) {
+        alert('Please complete your information first.');
+        setUserFormCompleted(false);
+        setPaymentStep('userInfo');
+        setShowUserForm(true);
+        return;
+    }
+    
+    // Validate payment information
     if (!amount || !selectedCrypto) {
-        alert("Please enter an amount and select a cryptocurrency.");
+        alert('Please enter an amount and select a cryptocurrency.');
         return;
     }
 
     const { totalCrypto } = calculateCrypto();
     if (totalCrypto <= 0) {
-        alert("Amount must be greater than zero.");
+        alert('Amount must be greater than zero.');
         return;
     }
 
-    console.log(`=== PAYMENT INITIATED ===`);
-    console.log(`Selected Crypto: ${selectedCrypto}`);
-    console.log(`Amount: ${totalCrypto} ${selectedCrypto}`);
+    // Log complete user and payment data for admin system
+    const paymentData = {
+        user: userInfo,
+        payment: {
+            amount_usd: parseFloat(amount),
+            cryptocurrency: selectedCrypto,
+            crypto_amount: totalCrypto,
+            kush_tokens_owed: parseFloat(amount), // 1 USD = 1 KUSH
+            timestamp: new Date().toISOString()
+        }
+    };
+    
+    console.log('=== PAYMENT DATA FOR ADMIN SYSTEM ===');
+    console.log(JSON.stringify(paymentData, null, 2));
+
+    console.log('=== PAYMENT INITIATED ===');
+    console.log('User Info:', userInfo);
+    console.log('Amount (USD):', amount);
+    console.log('Selected Crypto:', selectedCrypto);
+    console.log('Total Crypto Amount:', totalCrypto);
 
     try {
-        // SMART ROUTING: Prevents wallet conflicts
         if (selectedCrypto === 'ETH') {
-            console.log('🔷 ETH Payment - Using existing wagmi system');
+            console.log('🟠 ETH Payment - Using Web3 wallets');
             await handleETHPayment(totalCrypto);
+        } else if (selectedCrypto === 'BTC') {
+            console.log('🟡 BTC Payment - Using Bitcoin wallets');
+            await handleBTCPayment(totalCrypto);
         } else if (selectedCrypto === 'SOL') {
             console.log('🟣 SOL Payment - Using Solana wallets ONLY');
             await handleSOLPayment(totalCrypto);
-        } else if (selectedCrypto === 'BTC') {
-            console.log('🟠 BTC Payment - Manual instructions');
-            await handleBTCPayment(totalCrypto);
-        } else if (selectedCrypto === 'USDC' || selectedCrypto === 'USDT') {
-            console.log(`🟢 ${selectedCrypto} Payment - ERC-20 tokens`);
-            await handleTokenPayment(selectedCrypto, totalCrypto);
+        } else if (selectedCrypto === 'USDC') {
+            console.log('🔵 USDC Payment - Using Web3 wallets');
+            await handleUSDCPayment(totalCrypto);
+        } else if (selectedCrypto === 'USDT') {
+            console.log('🟢 USDT Payment - Using Web3 wallets');
+            await handleUSDTPayment(totalCrypto);
         } else {
-            alert(`${selectedCrypto} payments are not supported yet.`);
+            throw new Error(`Unsupported cryptocurrency: ${selectedCrypto}`);
         }
     } catch (error) {
-        console.error(`${selectedCrypto} payment failed:`, error);
-        alert(`${selectedCrypto} payment failed: ` + (error.message || 'Unknown error'));
+        console.error('Payment processing failed:', error);
+        alert(`Payment failed: ${error.message}`);
     }
 };
+
 
 
 // executePayment function ends here. Below is the wallet detection
