@@ -1416,6 +1416,9 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                                     amount={calculateCrypto().totalCrypto}
                                 />
                             )}
+                          <div className="text-center text-sm text-gray-400 mt-4">
+                      Secure wallet integration • Multiple payment options
+                    </div>
                         </div>
                     </div>
                 </div>
@@ -1425,9 +1428,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 )}
 
                     
-                    <div className="text-center text-sm text-gray-400 mt-4">
-                      Secure wallet integration • Multiple payment options
-                    </div>
+                    
                     
                    {/* Wallet Status */}
 <div className="mt-6 p-4 bg-gray-600/30 rounded-lg">
