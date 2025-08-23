@@ -69,7 +69,7 @@ const WalletInstallationModal = ({ isOpen, onClose, walletType }) => {
 
   const wallet = walletInfo[walletType] || walletInfo.metamask
 
-  if (!isOpen) return null
+  if (!isOpen ) return null
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
@@ -253,24 +253,7 @@ const PaymentAddressDisplay = ({ selectedCrypto, walletAddresses, amount }) => {
   USDC: 1.00,
   USDT: 1.00
 })
-
-// Smart countries function using browser's built-in country names
-const getCountries = () => {
-    const countryCodes = [
-        'US', 'CA', 'GB', 'AU', 'DE', 'FR', 'IT', 'ES', 'NL', 'BE', 'CH', 'AT', 'SE', 'NO', 'DK', 'FI', 'IE', 'PT', 'GR', 'PL', 'CZ', 'HU', 'RO', 'BG', 'HR', 'SI', 'SK', 'LT', 'LV', 'EE', 'JP', 'KR', 'CN', 'SG', 'HK', 'TW', 'TH', 'MY', 'ID', 'PH', 'VN', 'IN', 'BR', 'MX', 'AR', 'CL', 'CO', 'PE', 'ZA', 'NG', 'KE', 'EG', 'AE', 'SA', 'IL', 'TR', 'RU', 'NZ'
-    ];
-    
-    const formatter = new Intl.DisplayNames(['en'], { type: 'region' });
-    
-    return countryCodes.map(code => ({
-        code,
-        name: formatter.of(code)
-    })).sort((a, b) => a.name.localeCompare(b.name));
-};
-
-const countries = getCountries();
-
-
+     
 const [selectedDemoCrypto, setSelectedDemoCrypto] = useState('ETH')
 const [selectedDemoFiat, setSelectedDemoFiat] = useState('USD')  
 const [selectedDemoPayment, setSelectedDemoPayment] = useState('')
@@ -288,16 +271,6 @@ const [realTimeFees, setRealTimeFees] = useState({
 const [showWalletInstall, setShowWalletInstall] = useState(false)
 const [selectedWalletType, setSelectedWalletType] = useState('')
 const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-const [userInfo, setUserInfo] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    country: ''
-});
-const [showUserForm, setShowUserForm] = useState(false);
-const [userFormCompleted, setUserFormCompleted] = useState(false);
-
 
   // Get user's ETH balance
   const { data: balance } = useBalance({
@@ -477,56 +450,6 @@ const downloadWhitepaper = () => {
     }
   }
 
-  
-    const validateUserInfo = () => {
-    if (!userInfo.firstName.trim()) {
-        alert('Please enter your first name');
-        return false;
-    }
-    if (!userInfo.lastName.trim()) {
-        alert('Please enter your last name');
-        return false;
-    }
-    if (!userInfo.email.trim()) {
-        alert('Please enter your email address');
-        return false;
-    }
-    
-    // Email validation with regex
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(userInfo.email)) {
-        alert('Please enter a valid email address');
-        return false;
-    }
-    
-    if (!userInfo.country) {
-        alert('Please select your country');
-        return false;
-    }
-    
-    return true;
-};
-
-const handleUserFormSubmit = () => {
-    if (validateUserInfo()) {
-        setUserFormCompleted(true);
-        setShowUserForm(false);
-        console.log('User information collected:', userInfo);
-    }
-};
-
-const resetUserForm = () => {
-    setUserInfo({
-        firstName: '',
-        lastName: '',
-        email: '',
-        country: ''
-    });
-    setShowUserForm(false);
-    setUserFormCompleted(false);
-};
-
-    
     //handlesolpayment is below
 
 const handleSOLPayment = async (amount) => {
@@ -590,18 +513,10 @@ const handleSOLPayment = async (amount) => {
 
 // 3. CORRECT PAYMENT FUNCTION (replace your executePayment function)
 const executePayment = async () => {
-    // Validate user information first
-if (!userFormCompleted || !validateUserInfo()) {
-    alert("Please complete your information first.");
-    setUserFormCompleted(false);
-    setShowUserForm(true);
-    return;
-}
-
-if (!amount || !selectedCrypto) {
-    alert("Please enter an amount and select a cryptocurrency.");
-    return;
-}
+    if (!amount || !selectedCrypto) {
+        alert("Please enter an amount and select a cryptocurrency.");
+        return;
+    }
 
     const { totalCrypto } = calculateCrypto();
     if (totalCrypto <= 0) {
@@ -609,22 +524,6 @@ if (!amount || !selectedCrypto) {
         return;
     }
 
-
-// Log complete user and payment data for admin system
-const paymentData = {
-    user: userInfo,
-    payment: {
-        amount_usd: parseFloat(amount),
-        cryptocurrency: selectedCrypto,
-        crypto_amount: totalCrypto,
-        kush_tokens_owed: parseFloat(amount), // 1 USD = 1 KUSH
-        timestamp: new Date().toISOString()
-    }
-};
-
-console.log('=== PAYMENT DATA FOR ADMIN SYSTEM ===');
-console.log(JSON.stringify(paymentData, null, 2));
-  
     console.log(`=== PAYMENT INITIATED ===`);
     console.log(`Selected Crypto: ${selectedCrypto}`);
     console.log(`Amount: ${totalCrypto} ${selectedCrypto}`);
@@ -1238,197 +1137,100 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 
 
 
-     {showPaymentModal && (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-800 rounded-3xl max-w-6xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto">
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-800 rounded-3xl max-w-6xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto">
             
-            {/* Step 1: User Information Form */}
-            {!userFormCompleted && (
-                <div className="p-8">
-                    <div className="flex justify-between items-center mb-8">
-                        <h3 className="text-3xl font-bold gradient-text">User Information</h3>
-                        <button
-                            onClick={closeModal}
-                            className="text-gray-400 hover:text-white text-3xl"
-                        >
-                            ×
-                        </button>
-                    </div>
-                    
-                    <p className="text-xl text-gray-300 text-center mb-8">
-                        Please provide your information to continue with the token purchase
-                    </p>
-                    
-                    <div className="space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
-                            <input
-                                type="text"
-                                placeholder="First Name"
-                                value={userInfo.firstName}
-                                onChange={(e) => setUserInfo({...userInfo, firstName: e.target.value})}
-                                className="w-full p-4 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none"
-                                required
-                            />
-                            <input
-                                type="text"
-                                placeholder="Last Name"
-                                value={userInfo.lastName}
-                                onChange={(e) => setUserInfo({...userInfo, lastName: e.target.value})}
-                                className="w-full p-4 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none"
-                                required
-                            />
-                        </div>
-                        
-                        <input
-                            type="email"
-                            placeholder="Email Address"
-                            value={userInfo.email}
-                            onChange={(e) => setUserInfo({...userInfo, email: e.target.value})}
-                            className="w-full p-4 bg-gray-700/50 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:border-yellow-400 focus:outline-none"
-                            required
-                        />
-                        
-                        <select
-                            value={userInfo.country}
-                            onChange={(e) => setUserInfo({...userInfo, country: e.target.value})}
-                            className="w-full p-4 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:border-yellow-400 focus:outline-none"
-                            required
-                        >
-                            <option value="">Select Your Country</option>
-                            {countries.map((country) => (
-                                <option key={country.code} value={country.code}>
-                                    {country.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    
-                    <button
-                        onClick={handleUserFormSubmit}
-                        className="w-full mt-8 bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-4 rounded-lg font-semibold text-lg hover:shadow-lg transform hover:scale-105 transition-all duration-300"
-                    >
-                        Continue to Payment
-                    </button>
+            {/* Payment Selection Screen */}
+            {paymentStep === 'selection' && (
+              <div className="p-8">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="text-3xl font-bold gradient-text">Buy KushAlara Tokens</h3>
+                  <button 
+                    onClick={closeModal}
+                    className="text-gray-400 hover:text-white text-3xl"
+                  >
+                    ×
+                  </button>
                 </div>
-            )}
-
-            {/* Step 2: Payment Selection (preserving your existing functionality) */}
-            {userFormCompleted && paymentStep === 'selection' && (
-                <div className="p-8">
-                    {/* User Summary */}
-                    <div className="mb-6 p-4 bg-gray-700/30 rounded-lg border border-gray-600">
-                        <div className="flex justify-between items-start">
-                            <div>
-                                <p className="text-sm text-gray-400">Purchasing for:</p>
-                                <p className="text-white font-semibold">{userInfo.firstName} {userInfo.lastName}</p>
-                                <p className="text-sm text-gray-400">{userInfo.email}</p>
-                                <p className="text-sm text-gray-400">{countries.find(c => c.code === userInfo.country)?.name}</p>
-                            </div>
-                            <button
-                                onClick={() => setUserFormCompleted(false)}
-                                className="text-yellow-400 hover:text-yellow-300 text-sm underline"
-                            >
-                                Edit Info
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="flex justify-between items-center mb-8">
-                        <h3 className="text-3xl font-bold gradient-text">Buy KushAlara Tokens</h3>
-                        <button 
-                            onClick={closeModal}
-                            className="text-gray-400 hover:text-white text-3xl"
-                        >
-                            ×
-                        </button>
-                    </div>
-                    
-                    <p className="text-xl text-gray-300 text-center mb-8">
-                        Join the world's first Web3-native sovereign state
+                <p className="text-xl text-gray-300 text-center mb-8">
+                  Join the world's first Web3-native sovereign state
+                </p>
+                
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Crypto Payment Card */}
+                  <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600">
+                    <h4 className="text-2xl font-bold mb-4 gradient-text text-center">Buy KushAlara Tokens</h4>
+                    <p className="text-gray-300 text-center mb-6">
+                      Connect your wallet or use direct cryptocurrency payment
                     </p>
                     
-                    <div className="grid md:grid-cols-2 gap-8">
-                        {/* Crypto Payment Card */}
-                        <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600">
-                            <h4 className="text-2xl font-bold mb-4 gradient-text text-center">Buy KushAlara Tokens</h4>
-                            <p className="text-gray-300 text-center mb-6">
-                                Connect your wallet or use direct cryptocurrency payment
-                            </p>
-                            
-                            <div className="space-y-4 mb-6">
-                                <div>
-                                    <label className="block text-white mb-2 font-semibold">Amount (USD $)</label>
-                                    <input 
-                                        type="number"
-                                        value={amount}
-                                        onChange={(e) => setAmount(e.target.value)}
-                                        placeholder="Enter amount"
-                                        className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
-                                    />
-                                </div>
-                                
-                                <div>
-                                    <label className="block text-white mb-2 font-semibold">Payment Method</label>
-                                    <select 
-                                        value={selectedCrypto}
-                                        onChange={(e) => setSelectedCrypto(e.target.value)}
-                                        className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white focus:outline-none focus:border-yellow-400"
-                                    >
-                                        <option value="">Choose cryptocurrency</option>
-                                        <option value="ETH">Ethereum (ETH)</option>
-                                        <option value="BTC">Bitcoin (BTC)</option>
-                                        <option value="SOL">Solana (SOL)</option>
-                                        <option value="USDC">USD Coin (USDC)</option>
-                                        <option value="USDT">Tether (USDT)</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            {amount && (
-                                <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
-                                    <div className="text-gray-300 text-sm">You will send:</div>
-                                    <div className="text-2xl font-bold text-yellow-400">
-                                        {totalCrypto.toFixed(8)} {selectedCrypto}
-                                    </div>
-                                    <div className="text-gray-400 text-sm">
-                                        Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
-                                    </div>
-                                    {!hasEnoughBalance && balance && (
-                                        <div className="text-red-400 text-sm mt-2">
-                                            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                            
-                            <button 
-                                onClick={selectCryptoPayment}
-                                disabled={!amount}
-                                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Continue to Payment
-                            </button>
+                    <div className="space-y-4 mb-6">
+                      <div>
+                        <label className="block text-white mb-2 font-semibold">Amount (USD  )</label>
+                        <input 
+                          type="number"
+                          value={amount}
+                          onChange={(e) => setAmount(e.target.value)}
+                          placeholder="Enter amount"
+                          className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-yellow-400"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-white mb-2 font-semibold">Payment Method</label>
+                        <select 
+                          value={selectedCrypto}
+                          onChange={(e) => setSelectedCrypto(e.target.value)}
+                          className="w-full p-3 bg-gray-600/50 border border-gray-500 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+                        >
+                          <option value="ETH">Ethereum (ETH)</option>
+                          <option value="BTC">Bitcoin (BTC)</option>
+                          <option value="SOL">Solana (SOL)</option>
+                          <option value="USDC">USD Coin (USDC)</option>
+                          <option value="USDT">Tether (USDT)</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    {amount && (
+                      <div className="bg-gray-600/30 rounded-lg p-4 mb-4">
+                        <div className="text-gray-300 text-sm">You will send:</div>
+                        <div className="text-2xl font-bold text-yellow-400">
+                          {totalCrypto.toFixed(8)} {selectedCrypto}
+                        </div>
+                        <div className="text-gray-400 text-sm">
+                          Network fee: ${networkFee.toFixed(2)} • Processing fee: ${processingFee.toFixed(2)}
+                        </div>
+                        {!hasEnoughBalance && balance && (
+           <div className="text-red-400 text-sm mt-2">
+            ⚠️ Insufficient balance. You have {parseFloat(formatEther(balance.value)).toFixed(4)} {selectedCrypto}
+           </div>
+                )}
+                      </div>
+                    )}
+                    
+                    <button 
+                      onClick={selectCryptoPayment}
+                      disabled={!amount}
+                      className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Continue to Payment
+                    </button>
 
-                            {selectedCrypto && amount && (
-                                <PaymentAddressDisplay 
-                                    selectedCrypto={selectedCrypto}
-                                    walletAddresses={walletAddresses}
-                                    amount={calculateCrypto().totalCrypto}
-                                />
-                            )}
-                          <div className="text-center text-sm text-gray-400 mt-4">
+                    
+                        {selectedCrypto && amount && (
+                            <PaymentAddressDisplay 
+                                selectedCrypto={selectedCrypto}
+                                walletAddresses={walletAddresses}
+                                amount={calculateCrypto().totalCrypto}
+                            />
+                        )} 
+                    
+                    <div className="text-center text-sm text-gray-400 mt-4">
                       Secure wallet integration • Multiple payment options
                     </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    </div>
-)}
-
-                    
-                    
                     
                    {/* Wallet Status */}
 <div className="mt-6 p-4 bg-gray-600/30 rounded-lg">
@@ -1466,9 +1268,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 </div>
                   </div>
 
-    // commenting out Onramper Demo card for now
-    
-       /*                            {/* Onramper Demo Card */}
+                                   {/* Onramper Demo Card */}
                   <div className="bg-gray-700/50 backdrop-blur-sm rounded-3xl p-8 border border-gray-600">
                     <h4 className="text-2xl font-bold mb-4 gradient-text text-center">
                       Buy KushAlara with USD
@@ -1512,7 +1312,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                       Demo mode - Test rates and payment methods
                     </div>
                   </div>
-                </div>          */
+                </div>
               </div>
             )}
 
