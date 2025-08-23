@@ -272,6 +272,17 @@ const [showWalletInstall, setShowWalletInstall] = useState(false)
 const [selectedWalletType, setSelectedWalletType] = useState('')
 const [isMenuOpen, setIsMenuOpen] = useState(false)
 
+// User information state
+const [userInfo, setUserInfo] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    country: ''
+});
+const [userFormCompleted, setUserFormCompleted] = useState(false);
+const [showUserForm, setShowUserForm] = useState(true);
+
+
   // Get user's ETH balance
   const { data: balance } = useBalance({
     address: address,
