@@ -445,6 +445,8 @@ const validateEmail = (email) => {
 
 
 const validateUserInfo = () => {
+    console.log('🔍 Validating user info...', userInfo);
+    
     if (!userInfo.firstName.trim()) {
         alert('Please enter your first name');
         return false;
@@ -457,16 +459,26 @@ const validateUserInfo = () => {
         alert('Please enter your email address');
         return false;
     }
-    if (!validateEmail(userInfo.email)) {
-        alert('Please enter a valid email address');
+    
+    // Debug email validation
+    console.log('🔍 Checking email:', userInfo.email);
+    const isEmailValid = validateEmail(userInfo.email);
+    console.log('🔍 Email validation result:', isEmailValid);
+    
+    if (!isEmailValid) {
+        alert('Please enter a valid email address. Check for typos in common domains like gmail.com');
         return false;
     }
+    
     if (!userInfo.country) {
         alert('Please select your country');
         return false;
     }
+    
+    console.log('✅ All validation passed');
     return true;
 };
+
 
 const handleUserFormSubmit = () => {
     if (validateUserInfo()) {
