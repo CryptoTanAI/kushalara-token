@@ -1533,46 +1533,83 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                             )}
 
 
-                            {/* Wallet Connection Buttons */}
-                            <div className="mt-6 space-y-4">
-                                <div className="text-center">
-                                    <p className="text-gray-300 mb-4">Choose your payment method:</p>
-                                </div>
-                                
-                                {/* Wallet Connection Buttons */}
-                                <div className="grid grid-cols-1 gap-3">
-                                    {/* MetaMask Button */}
-                                    <button
-                                        onClick={() => connectWallet('metamask')}
-                                        className="flex items-center justify-center space-x-3 w-full bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg transition-colors"
-                                    >
-                                        <span>🦊</span>
-                                        <span>Connect MetaMask</span>
-                                    </button>
-                                    
-                                    {/* Phantom Button */}
-                                    <button
-                                        onClick={() => connectWallet('phantom')}
-                                        className="flex items-center justify-center space-x-3 w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg transition-colors"
-                                    >
-                                        <span>👻</span>
-                                        <span>Connect Phantom</span>
-                                    </button>
-                                    
-                                    {/* WalletConnect Button */}
-                                    <button
-                                        onClick={() => connectWallet('walletconnect')}
-                                        className="flex items-center justify-center space-x-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors"
-                                    >
-                                        <span>🔗</span>
-                                        <span>WalletConnect</span>
-                                    </button>
-                                </div>
-                                
-                                <div className="text-center mt-4">
-                                    <p className="text-gray-400 text-sm">Or use manual payment with QR code below</p>
-                                </div>
-                            </div>
+{/* Wallet Connection Section */}
+{!walletConnected ? (
+    <div className="mt-6 space-y-4">
+        <div className="text-center">
+            <p className="text-gray-300 mb-4">Connect your wallet to continue</p>
+        </div>
+        
+        {/* Clean Wallet Buttons */}
+        <div className="space-y-3">
+            {/* MetaMask Button */}
+            <button
+                onClick={() => connectWallet('metamask')}
+                className="flex items-center justify-between w-full bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600 text-white py-4 px-6 rounded-xl transition-all duration-200 hover:border-orange-500"
+            >
+                <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold">🦊</span>
+                    </div>
+                    <span className="font-medium">MetaMask</span>
+                </div>
+                <span className="text-gray-400">→</span>
+            </button>
+            
+            {/* Phantom Button */}
+            <button
+                onClick={() => connectWallet('phantom')}
+                className="flex items-center justify-between w-full bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600 text-white py-4 px-6 rounded-xl transition-all duration-200 hover:border-purple-500"
+            >
+                <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold">👻</span>
+                    </div>
+                    <span className="font-medium">Phantom</span>
+                </div>
+                <span className="text-gray-400">→</span>
+            </button>
+            
+            {/* WalletConnect Button */}
+            <button
+                onClick={() => connectWallet('walletconnect')}
+                className="flex items-center justify-between w-full bg-gray-700/50 hover:bg-gray-600/50 border border-gray-600 text-white py-4 px-6 rounded-xl transition-all duration-200 hover:border-blue-500"
+            >
+                <div className="flex items-center space-x-4">
+                    <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
+                        <span className="text-white font-bold">🔗</span>
+                    </div>
+                    <span className="font-medium">WalletConnect</span>
+                </div>
+                <span className="text-gray-400">→</span>
+            </button>
+        </div>
+    </div>
+) : (
+    /* Connected Wallet Display */
+    <div className="mt-6 p-4 bg-green-900/20 border border-green-500/30 rounded-xl">
+        <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <span className="text-green-400 font-medium">{connectedWallet} Connected</span>
+            </div>
+            <button
+                onClick={() => {
+                    setWalletConnected(false);
+                    setConnectedWallet('');
+                    setConnectedAddress('');
+                }}
+                className="text-gray-400 hover:text-white text-sm"
+            >
+                Disconnect
+            </button>
+        </div>
+        <p className="text-gray-400 text-sm mt-2 truncate">
+            {connectedAddress}
+        </p>
+    </div>
+)}
+
 
 
                           
