@@ -254,6 +254,54 @@ const PaymentAddressDisplay = ({ selectedCrypto, walletAddresses, amount }) => {
   USDT: 1.00
 })
 
+// NEW Wallet Connection Function
+const connectWallet = async (walletType) => {
+    console.log(`🔗 Connecting to ${walletType}...`);
+    
+    try {
+        switch (walletType) {
+            case 'metamask':
+                if (typeof window.ethereum !== 'undefined') {
+                    const accounts = await window.ethereum.request({
+                        method: 'eth_requestAccounts'
+                    });
+                    console.log('✅ MetaMask connected:', accounts[0]);
+                    alert(`MetaMask connected: ${accounts[0]}`);
+                    // Proceed with payment
+                    await executePayment();
+                } else {
+                    alert('MetaMask not detected. Please install MetaMask.');
+                }
+                break;
+                
+            case 'phantom':
+                if (window.solana && window.solana.isPhantom) {
+                    const response = await window.solana.connect();
+                    console.log('✅ Phantom connected:', response.publicKey.toString());
+                    alert(`Phantom connected: ${response.publicKey.toString()}`);
+                    // Proceed with payment
+                    await executePayment();
+                } else {
+                    alert('Phantom wallet not detected. Please install Phantom.');
+                }
+                break;
+                
+            case 'walletconnect':
+                alert('WalletConnect integration coming soon!');
+                break;
+                
+            default:
+                alert('Wallet type not supported yet.');
+        }
+    } catch (error) {
+        console.error('❌ Wallet connection failed:', error);
+        alert(`Wallet connection failed: ${error.message}`);
+    }
+};
+
+
+
+    
 // Comprehensive countries function using all ISO 3166-1 alpha-2 codes
 const getCountries = () => {
     const countries = [];
