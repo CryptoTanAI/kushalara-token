@@ -253,6 +253,10 @@ const PaymentAddressDisplay = ({ selectedCrypto, walletAddresses, amount }) => {
   USDC: 1.00,
   USDT: 1.00
 })
+// Wallet Connection States
+const [walletConnected, setWalletConnected] = useState(false);
+const [connectedWallet, setConnectedWallet] = useState('');
+const [connectedAddress, setConnectedAddress] = useState('');
 
 // NEW Wallet Connection Function
 const connectWallet = async (walletType) => {
@@ -266,9 +270,10 @@ const connectWallet = async (walletType) => {
                         method: 'eth_requestAccounts'
                     });
                     console.log('✅ MetaMask connected:', accounts[0]);
-                    alert(`MetaMask connected: ${accounts[0]}`);
-                    // Proceed with payment
-                    await executePayment();
+                    setWalletConnected(true);
+                    setConnectedWallet('MetaMask');
+                    setConnectedAddress(accounts[0]);
+                    // Don't call executePayment here - let user click Continue to Payment
                 } else {
                     alert('MetaMask not detected. Please install MetaMask.');
                 }
@@ -278,9 +283,10 @@ const connectWallet = async (walletType) => {
                 if (window.solana && window.solana.isPhantom) {
                     const response = await window.solana.connect();
                     console.log('✅ Phantom connected:', response.publicKey.toString());
-                    alert(`Phantom connected: ${response.publicKey.toString()}`);
-                    // Proceed with payment
-                    await executePayment();
+                    setWalletConnected(true);
+                    setConnectedWallet('Phantom');
+                    setConnectedAddress(response.publicKey.toString());
+                    // Don't call executePayment here - let user click Continue to Payment
                 } else {
                     alert('Phantom wallet not detected. Please install Phantom.');
                 }
@@ -298,6 +304,7 @@ const connectWallet = async (walletType) => {
         alert(`Wallet connection failed: ${error.message}`);
     }
 };
+
 
 
 
