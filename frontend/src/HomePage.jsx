@@ -420,9 +420,29 @@ const data = JSON.parse(proxyData.contents);
 
 // User Information Validation Functions
 const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    // More strict email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    
+    if (!emailRegex.test(email)) {
+        return false;
+    }
+    
+    // Check for common typos in popular domains
+    const domain = email.split('@')[1]?.toLowerCase();
+    const commonTypos = [
+        'gmai.com', 'gmial.com', 'gnal.com', 'gmail.co', // Gmail typos
+        'yahooo.com', 'yaho.com', 'yahoo.co', // Yahoo typos
+        'hotmial.com', 'hotmai.com', 'hotmail.co', // Hotmail typos
+        'outlok.com', 'outlook.co' // Outlook typos
+    ];
+    
+    if (commonTypos.includes(domain)) {
+        return false;
+    }
+    
+    return true;
 };
+
 
 const validateUserInfo = () => {
     if (!userInfo.firstName.trim()) {
