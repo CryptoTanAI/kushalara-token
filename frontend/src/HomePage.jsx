@@ -1524,7 +1524,51 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                                     </div>
                                 </div>
                             )}
-                            
+
+
+                            {/* Wallet Connection Buttons */}
+                            <div className="mt-6 space-y-4">
+                                <div className="text-center">
+                                    <p className="text-gray-300 mb-4">Choose your payment method:</p>
+                                </div>
+                                
+                                {/* Wallet Connection Buttons */}
+                                <div className="grid grid-cols-1 gap-3">
+                                    {/* MetaMask Button */}
+                                    <button
+                                        onClick={() => connectWallet('metamask')}
+                                        className="flex items-center justify-center space-x-3 w-full bg-orange-600 hover:bg-orange-700 text-white py-3 px-4 rounded-lg transition-colors"
+                                    >
+                                        <span>🦊</span>
+                                        <span>Connect MetaMask</span>
+                                    </button>
+                                    
+                                    {/* Phantom Button */}
+                                    <button
+                                        onClick={() => connectWallet('phantom')}
+                                        className="flex items-center justify-center space-x-3 w-full bg-purple-600 hover:bg-purple-700 text-white py-3 px-4 rounded-lg transition-colors"
+                                    >
+                                        <span>👻</span>
+                                        <span>Connect Phantom</span>
+                                    </button>
+                                    
+                                    {/* WalletConnect Button */}
+                                    <button
+                                        onClick={() => connectWallet('walletconnect')}
+                                        className="flex items-center justify-center space-x-3 w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg transition-colors"
+                                    >
+                                        <span>🔗</span>
+                                        <span>WalletConnect</span>
+                                    </button>
+                                </div>
+                                
+                                <div className="text-center mt-4">
+                                    <p className="text-gray-400 text-sm">Or use manual payment with QR code below</p>
+                                </div>
+                            </div>
+
+
+                          
                             <button 
                                 onClick={executePayment}
                                 disabled={!amount || !selectedCrypto}
