@@ -710,6 +710,100 @@ const handleSOLPayment = async (amount) => {
     }
 };
 
+// Add these new handlers starting on line 711
+
+const handleETHPayment = async (cryptoAmount) => {
+    console.log('🟠 ETH Payment Handler - Starting...');
+    try {
+        if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
+            throw new Error('MetaMask not found. Please install MetaMask to proceed with ETH payment.');
+        }
+        
+        console.log('✅ MetaMask wallet detected');
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const fromAddress = accounts[0];
+        const toAddress = walletAddresses['ETH'];
+
+        // Ethers.js is required for this conversion
+        const amountInWei = ethers.utils.parseEther(cryptoAmount.toString());
+
+        const txParams = {
+            from: fromAddress,
+            to: toAddress,
+            value: amountInWei.toHexString(),
+        };
+
+        console.log('Sending ETH transaction:', txParams);
+        const txHash = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [txParams],
+        });
+        
+        console.log('✅ ETH transaction sent! Hash:', txHash);
+        alert(`ETH payment successful! Transaction: ${txHash}`);
+
+    } catch (error) {
+        console.error('❌ ETH payment failed:', error);
+        alert(`ETH payment failed: ${error.message}`);
+        throw error; // Re-throw the error to be caught by the calling function
+    }
+};
+
+const handleTokenPayment = async (cryptoAmount, tokenType) => {
+    console.log(`🔵 ${tokenType} Payment Handler - Starting...`);
+    const tokenDetails = {
+        USDC: {
+            address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+            decimals: 6,
+            abi: ["function transfer(address to, uint256 amount) returns (bool)"]
+        },
+        USDT: {
+            address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+            decimals: 6,
+            abi: ["function transfer(address to, uint256 amount) returns (bool)"]
+        }
+    };
+
+    const details = tokenDetails[tokenType];
+    if (!details) throw new Error(`Unsupported token: ${tokenType}`);
+
+    try {
+        if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
+            throw new Error('MetaMask not found. Please install MetaMask to proceed.');
+        }
+
+        console.log('✅ MetaMask wallet detected for token payment');
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        
+        const tokenContract = new ethers.Contract(details.address, details.abi, signer);
+        const toAddress = walletAddresses[tokenType];
+        
+        const amountInSmallestUnit = ethers.utils.parseUnits(cryptoAmount.toString(), details.decimals);
+
+        console.log(`Sending ${tokenType} transaction to: ${toAddress}`);
+        const tx = await tokenContract.transfer(toAddress, amountInSmallestUnit);
+        
+        console.log(`Transaction sent, waiting for confirmation... Hash: ${tx.hash}`);
+        await tx.wait(); // Wait for the transaction to be mined
+        
+        console.log(`✅ ${tokenType} transaction successful! Hash:`, tx.hash);
+        alert(`${tokenType} payment successful! Transaction: ${tx.hash}`);
+
+    } catch (error) {
+        console.error(`❌ ${tokenType} payment failed:`, error);
+        alert(`${tokenType} payment failed: ${error.message}`);
+        throw error;
+    }
+};
+
+// For BTC, we still guide the user as direct payment is very different
+const handleBTCPayment = async (cryptoAmount) => {
+    console.log('🟡 BTC Payment Handler - Starting...');
+    alert(`Automated BTC payment is not yet supported. Please manually send ${cryptoAmount} BTC to the address shown in the QR code.`);
+};
+
+    
 // 3. CORRECT PAYMENT FUNCTION (replace your executePayment function)
 const executePayment = async () => {
     // 1. Validate user information is complete
