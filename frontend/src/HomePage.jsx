@@ -237,37 +237,6 @@ const PaymentAddressDisplay = ({ selectedCrypto, walletAddresses, amount }) => {
     );
 };
 
-// Add this component right after the supportedWallets array
-
-const WalletIcon = ({ walletId }) => {
-    // Define styles and icons in a more robust way
-    const walletDetails = {
-        metamask: { icon: '🦊', color: 'bg-orange-500/20' },
-        phantom: { icon: '👻', color: 'bg-purple-500/20' },
-        walletconnect: { icon: '🔗', color: 'bg-blue-500/20' },
-        coinbase: { icon: '🔵', color: 'bg-sky-500/20' },
-        default: { icon: '❓', color: 'bg-gray-500/20' }
-    };
-
-    // Safely get the details for the current wallet, or use the default
-    const details = walletDetails[walletId] || walletDetails.default;
-
-    return (
-        <div className={`flex items-center justify-center w-7 h-7 mr-4 rounded-lg ${details.color}`}>
-            <span className="text-lg">{details.icon}</span>
-        </div>
-    );
-};
-
-// Add this before the component starts
-const supportedWallets = [
-    { id: 'metamask', name: 'MetaMask', icon: '/images/metamask-fox.svg' },
-    { id: 'phantom', name: 'Phantom', icon: '/images/phantom-icon.svg' },
-    { id: 'walletconnect', name: 'WalletConnect', icon: '/images/walletconnect-icon.svg' },
-    { id: 'coinbase', name: 'Coinbase Wallet', icon: '/images/coinbase-icon.svg' }
-];
-
-
   const HomePage = () => {
   const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
@@ -283,62 +252,6 @@ const supportedWallets = [
   USDC: 1.00,
   USDT: 1.00
 })
-// Wallet Connection States
-const [walletConnected, setWalletConnected] = useState(false);
-const [connectedWallet, setConnectedWallet] = useState('');
-const [connectedAddress, setConnectedAddress] = useState('');
-const [showWalletChoice, setShowWalletChoice] = useState(false);
-
-
-// NEW Wallet Connection Function
-const connectWallet = async (walletType) => {
-    console.log(`🔗 Connecting to ${walletType}...`);
-    
-    try {
-        switch (walletType) {
-            case 'metamask':
-                if (typeof window.ethereum !== 'undefined') {
-                    const accounts = await window.ethereum.request({
-                        method: 'eth_requestAccounts'
-                    });
-                    console.log('✅ MetaMask connected:', accounts[0]);
-                    setWalletConnected(true);
-                    setConnectedWallet('MetaMask');
-                    setConnectedAddress(accounts[0]);
-                    // Don't call executePayment here - let user click Continue to Payment
-                } else {
-                    alert('MetaMask not detected. Please install MetaMask.');
-                }
-                break;
-                
-            case 'phantom':
-                if (window.solana && window.solana.isPhantom) {
-                    const response = await window.solana.connect();
-                    console.log('✅ Phantom connected:', response.publicKey.toString());
-                    setWalletConnected(true);
-                    setConnectedWallet('Phantom');
-                    setConnectedAddress(response.publicKey.toString());
-                    // Don't call executePayment here - let user click Continue to Payment
-                } else {
-                    alert('Phantom wallet not detected. Please install Phantom.');
-                }
-                break;
-                
-            case 'walletconnect':
-                alert('WalletConnect integration coming soon!');
-                break;
-                
-            default:
-                alert('Wallet type not supported yet.');
-        }
-    } catch (error) {
-        console.error('❌ Wallet connection failed:', error);
-        alert(`Wallet connection failed: ${error.message}`);
-    }
-};
-
-
-
 
     
 // Comprehensive countries function using all ISO 3166-1 alpha-2 codes
@@ -1559,60 +1472,37 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                         </div>
                     )}
 
-                    {/* --- FINAL, FOOTER-STYLE WALLET CONNECTION UI --- */}
-                    <div className="mt-6 text-center">
-                        {!walletConnected ? (
-                            <button onClick={() => setShowWalletChoice(true)} className="w-full bg-yellow-500 text-black py-3 rounded-lg font-semibold hover:bg-yellow-600 transition-all">Connect Wallet</button>
-                        ) : (
-                            <div className="space-y-4">
-                                <div className="p-3 bg-green-900/30 border border-green-500/50 rounded-lg"><p className="text-sm text-green-400">✅ {connectedWallet} Connected</p><p className="font-mono text-xs text-gray-400 mt-1 truncate">{connectedAddress}</p></div>
-                                <button onClick={executePayment} disabled={!amount || !selectedCrypto} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">Continue to Payment</button>
-                            </div>
-                        )}
-                    </div>
-
-                   {/* --- CORRECTLY STYLED WALLET CHOICE MODAL --- */}
-{showWalletChoice && (
-    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowWalletChoice(false)}>
-        <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-xs" onClick={(e) => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-6">
-                <h4 className="text-xl font-bold text-white">Connect a Wallet</h4>
-                <button onClick={() => setShowWalletChoice(false)} className="text-gray-400 text-2xl">&times;</button>
+                 {/* --- CORRECTED WALLET CONNECTION UI (Using Footer Logic) --- */}
+<div className="mt-6 text-center">
+    
+    {/* Check the CORRECT connection state from useAccount() */}
+    {!isConnected ? (
+        <div className="space-y-4">
+            <p className="text-gray-300">Connect your wallet to continue</p>
+            {/* Use the CORRECT ConnectButton component */}
+            <div className="p-4 bg-gray-900/50 rounded-lg">
+                <ConnectButton />
             </div>
-            <div className="space-y-3">
-                {supportedWallets.map((wallet) => (
-                    <button
-                        key={wallet.id}
-                        onClick={() => {
-                            // WalletConnect and Coinbase are not implemented yet, so we show an alert
-                            if (['walletconnect', 'coinbase'].includes(wallet.id)) {
-                                alert(`${wallet.name} integration is coming soon!`);
-                            } else {
-                                connectWallet(wallet.id);
-                                setShowWalletChoice(false);
-                            }
-                        }}
-                        className="flex items-center w-full bg-gray-800 hover:bg-gray-700/80 border border-gray-700 text-white py-3 px-4 rounded-xl transition-colors"
-                    >
-                        <img src={wallet.icon} alt={wallet.name} className="w-7 h-7 mr-4"/>
-                        <span className="font-medium">{wallet.name}</span>
-                    </button>
-                ))}
+            <p className="text-xs text-gray-500">Or select a specific wallet from the options above.</p>
+        </div>
+    ) : (
+        <div className="space-y-4">
+            <div className="p-3 bg-green-900/30 border border-green-500/50 rounded-lg">
+                <p className="text-sm text-green-400">✅ Wallet Connected</p>
+                <p className="font-mono text-xs text-gray-400 mt-1 truncate">{address}</p>
             </div>
+            
+            <button 
+                onClick={executePayment}
+                disabled={!amount || !selectedCrypto}
+                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
+            >
+                Continue to Payment
+            </button>
         </div>
-    </div>
-)}
-
-
-                    {/* The manual payment display remains */}
-                    {selectedCrypto && amount && (
-                        <PaymentAddressDisplay selectedCrypto={selectedCrypto} walletAddresses={walletAddresses} amount={calculateCrypto().totalCrypto}/>
-                    )}
-                </div>
-            )}
-        </div>
-    </div>
-)}
+    )}
+</div>
+  
 
 
 {/* Footer Buy Modal - COMPLETE CORRECTED VERSION */}
