@@ -240,7 +240,6 @@ const PaymentAddressDisplay = ({ selectedCrypto, walletAddresses, amount }) => {
   const HomePage = () => {
   const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
-  const { data: txHash, isPending, sendTransaction } = useSendTransaction();
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [paymentStep, setPaymentStep] = useState('selection')
   const [amount, setAmount] = useState('')
@@ -1484,7 +1483,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                                     <ConnectButton />
                                 </div>
                             </div>
-                        ) : (
+                        ) : 
                            // REPLACE lines 1487-1497 with this block
 <div className="space-y-4">
     {/* Wallet Connected Display with Disconnect Button */}
