@@ -1382,21 +1382,23 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 
 // COMPLETE AND CORRECT PAYMENT MODAL
 
+// THIS IS THE COMPLETE AND CORRECT PAYMENT MODAL.
+// PASTE THIS WHERE THE OLD MODAL WAS.
+
 {showPaymentModal && (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
         <div className="bg-gray-800 rounded-3xl max-w-2xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto relative">
             
             {/* Close Button */}
-<button 
-    onClick={() => {
-        setShowPaymentModal(false);
-        setPaymentStep('userInfo'); // <-- ADD THIS LINE
-    }}
-    className="absolute top-4 right-5 text-gray-400 hover:text-white text-3xl z-50"
->
-    &times;
-</button>
-
+            <button 
+                onClick={() => {
+                    setShowPaymentModal(false);
+                    setPaymentStep('userInfo'); // Reset state on close
+                }}
+                className="absolute top-4 right-5 text-gray-400 hover:text-white text-3xl z-50"
+            >
+                &times;
+            </button>
 
             {/* Step 1: User Information Form */}
             {paymentStep === 'userInfo' && (
@@ -1472,36 +1474,38 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                         </div>
                     )}
 
-                 {/* --- CORRECTED WALLET CONNECTION UI (Using Footer Logic) --- */}
-<div className="mt-6 text-center">
-    
-    {/* Check the CORRECT connection state from useAccount() */}
-    {!isConnected ? (
-        <div className="space-y-4">
-            <p className="text-gray-300">Connect your wallet to continue</p>
-            {/* Use the CORRECT ConnectButton component */}
-            <div className="p-4 bg-gray-900/50 rounded-lg">
-                <ConnectButton />
-            </div>
-            <p className="text-xs text-gray-500">Or select a specific wallet from the options above.</p>
+                    {/* --- CORRECTED WALLET CONNECTION UI (Using Footer Logic) --- */}
+                    <div className="mt-6 text-center">
+                        {!isConnected ? (
+                            <div className="space-y-4">
+                                <p className="text-gray-300">Connect your wallet to continue</p>
+                                <div className="p-4 bg-gray-900/50 rounded-lg">
+                                    <ConnectButton />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="p-3 bg-green-900/30 border border-green-500/50 rounded-lg">
+                                    <p className="text-sm text-green-400">✅ Wallet Connected</p>
+                                    <p className="font-mono text-xs text-gray-400 mt-1 truncate">{address}</p>
+                                </div>
+                                <button onClick={executePayment} disabled={!amount || !selectedCrypto} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">
+                                    Continue to Payment
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* The manual payment display remains */}
+                    {selectedCrypto && amount && (
+                        <PaymentAddressDisplay selectedCrypto={selectedCrypto} walletAddresses={walletAddresses} amount={calculateCrypto().totalCrypto}/>
+                    )}
+                </div>
+            )}
         </div>
-    ) : (
-        <div className="space-y-4">
-            <div className="p-3 bg-green-900/30 border border-green-500/50 rounded-lg">
-                <p className="text-sm text-green-400">✅ Wallet Connected</p>
-                <p className="font-mono text-xs text-gray-400 mt-1 truncate">{address}</p>
-            </div>
-            
-            <button 
-                onClick={executePayment}
-                disabled={!amount || !selectedCrypto}
-                className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
-            >
-                Continue to Payment
-            </button>
-        </div>
-    )}
-</div>
+    </div>
+)}
+
   
 
 
