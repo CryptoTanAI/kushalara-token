@@ -237,6 +237,45 @@ const PaymentAddressDisplay = ({ selectedCrypto, walletAddresses, amount }) => {
     );
 };
 
+// Add this component right after the supportedWallets array
+
+const WalletIcon = ({ walletId, className }) => {
+    const icons = {
+        metamask: (
+            <svg viewBox="0 0 112 104" fill="none" className={className}>
+                {/* This is the SVG path data for the MetaMask fox icon */}
+                <path d="M..." fill="#E17726"/> 
+                {/* ... (rest of the complex SVG path data) ... */}
+            </svg>
+        ),
+        phantom: (
+            <svg viewBox="0 0 24 24" fill="none" className={className}>
+                {/* This is the SVG path data for the Phantom ghost icon */}
+                <path d="M..." fill="url(#paint0_linear_1_2)"/>
+                {/* ... (rest of the complex SVG path data) ... */}
+            </svg>
+        ),
+        // Add other wallet SVGs here if needed
+    };
+
+    // If you don't have the full SVG path data, we can use a simple placeholder
+    const placeholderIcons = {
+        metamask: '🦊',
+        phantom: '👻',
+        walletconnect: '🔗',
+        coinbase: '🔵'
+    };
+
+    // For now, let's use the simple emoji placeholders as they are guaranteed to work
+    // without needing the large SVG path data.
+    return (
+        <div className={`flex items-center justify-center w-7 h-7 mr-4 rounded-lg ${walletId === 'metamask' ? 'bg-orange-500/20' : 'bg-purple-500/20'}`}>
+            <span className="text-lg">{placeholderIcons[walletId] || '❓'}</span>
+        </div>
+    );
+};
+
+
 
   const HomePage = () => {
   const { address, isConnected } = useAccount()
