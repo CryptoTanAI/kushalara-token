@@ -1541,18 +1541,38 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                         )}
                     </div>
 
-                    {/* --- THE WALLET CHOICE MODAL (Pop-up over the main modal) --- */}
-                    {showWalletChoice && (
-                        <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-                            <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 max-w-sm w-full">
-                                <div className="flex justify-between items-center mb-6"><h4 className="text-xl font-bold text-white">Connect a Wallet</h4><button onClick={() => setShowWalletChoice(false)} className="text-gray-400 text-2xl">&times;</button></div>
-                                <div className="space-y-3">
-                                    <button onClick={() => { connectWallet('metamask'); setShowWalletChoice(false); }} className="flex items-center w-full bg-gray-800 hover:bg-gray-700/80 border border-gray-700 text-white py-3 px-4 rounded-xl transition-colors"><img src="/images/metamask-fox.svg" alt="MetaMask" className="w-6 h-6 mr-4"/><span>MetaMask</span></button>
-                                    <button onClick={() => { connectWallet('phantom'); setShowWalletChoice(false); }} className="flex items-center w-full bg-gray-800 hover:bg-gray-700/80 border border-gray-700 text-white py-3 px-4 rounded-xl transition-colors"><img src="/images/phantom-icon.svg" alt="Phantom" className="w-6 h-6 mr-4"/><span>Phantom</span></button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                   {/* --- CORRECTLY STYLED WALLET CHOICE MODAL --- */}
+{showWalletChoice && (
+    <div className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50" onClick={() => setShowWalletChoice(false)}>
+        <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 w-full max-w-xs" onClick={(e) => e.stopPropagation()}>
+            <div className="flex justify-between items-center mb-6">
+                <h4 className="text-xl font-bold text-white">Connect a Wallet</h4>
+                <button onClick={() => setShowWalletChoice(false)} className="text-gray-400 text-2xl">&times;</button>
+            </div>
+            <div className="space-y-3">
+                {supportedWallets.map((wallet) => (
+                    <button
+                        key={wallet.id}
+                        onClick={() => {
+                            // WalletConnect and Coinbase are not implemented yet, so we show an alert
+                            if (['walletconnect', 'coinbase'].includes(wallet.id)) {
+                                alert(`${wallet.name} integration is coming soon!`);
+                            } else {
+                                connectWallet(wallet.id);
+                                setShowWalletChoice(false);
+                            }
+                        }}
+                        className="flex items-center w-full bg-gray-800 hover:bg-gray-700/80 border border-gray-700 text-white py-3 px-4 rounded-xl transition-colors"
+                    >
+                        <img src={wallet.icon} alt={wallet.name} className="w-7 h-7 mr-4"/>
+                        <span className="font-medium">{wallet.name}</span>
+                    </button>
+                ))}
+            </div>
+        </div>
+    </div>
+)}
+
 
                     {/* The manual payment display remains */}
                     {selectedCrypto && amount && (
