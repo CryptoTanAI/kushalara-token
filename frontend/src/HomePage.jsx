@@ -240,6 +240,7 @@ const PaymentAddressDisplay = ({ selectedCrypto, walletAddresses, amount }) => {
   const HomePage = () => {
   const { address, isConnected } = useAccount()
   const { disconnect } = useDisconnect()
+  const { data: txHash, isPending, sendTransaction } = useSendTransaction();
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [paymentStep, setPaymentStep] = useState('selection')
   const [amount, setAmount] = useState('')
@@ -1484,17 +1485,32 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                                 </div>
                             </div>
                         ) : (
-                            <div className="space-y-4">
-                                <div className="p-3 bg-green-900/30 border border-green-500/50 rounded-lg">
-                                    <p className="text-sm text-green-400">✅ Wallet Connected</p>
-                                    <p className="font-mono text-xs text-gray-400 mt-1 truncate">{address}</p>
-                                </div>
-                                <button onClick={executePayment} disabled={!amount || !selectedCrypto} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">
-                                    Continue to Payment
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                           // REPLACE lines 1487-1497 with this block
+<div className="space-y-4">
+    {/* Wallet Connected Display with Disconnect Button */}
+    <div className="p-3 bg-green-900/30 border border-green-500/50 rounded-lg">
+        <div className="flex justify-between items-center">
+            <p className="text-sm text-green-400">✅ Wallet Connected</p>
+            <button 
+                onClick={() => disconnect()} 
+                className="text-red-500 hover:text-red-400 text-xs underline font-semibold"
+            >
+                Disconnect
+            </button>
+        </div>
+        <p className="font-mono text-xs text-gray-400 mt-1 truncate">{address}</p>
+    </div>
+    
+    {/* Continue to Payment Button */}
+    <button 
+        onClick={executePayment}
+        disabled={!amount || !selectedCrypto}
+        className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
+    >
+        Continue to Payment
+    </button>
+</div>
+
 
                     {/* The manual payment display remains */}
                     {selectedCrypto && amount && (
