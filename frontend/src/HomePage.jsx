@@ -718,7 +718,7 @@ const executePayment = async () => {
     }
 
     // 2. Validate a wallet is connected
-    if (!walletConnected) {
+   if (!isConnected) { 
         alert('Please connect your wallet to proceed.');
         // Here, you might want to trigger the wallet connection modal
         return;
@@ -740,9 +740,9 @@ const executePayment = async () => {
     const paymentData = {
         user: userInfo,
         wallet: {
-            type: connectedWallet,
-            address: connectedAddress,
-        },
+    type: 'Web3',
+    address: address, 
+},
         payment: {
             amount_usd: parseFloat(amount),
             cryptocurrency: selectedCrypto,
