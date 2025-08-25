@@ -275,6 +275,13 @@ const WalletIcon = ({ walletId, className }) => {
     );
 };
 
+// Add this before the component starts
+const supportedWallets = [
+    { id: 'metamask', name: 'MetaMask', icon: '/images/metamask-fox.svg' },
+    { id: 'phantom', name: 'Phantom', icon: '/images/phantom-icon.svg' },
+    { id: 'walletconnect', name: 'WalletConnect', icon: '/images/walletconnect-icon.svg' },
+    { id: 'coinbase', name: 'Coinbase Wallet', icon: '/images/coinbase-icon.svg' }
+];
 
 
   const HomePage = () => {
