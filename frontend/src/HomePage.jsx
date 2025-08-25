@@ -1444,12 +1444,16 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
         <div className="bg-gray-800 rounded-3xl max-w-2xl w-full border border-gray-700 max-h-[90vh] overflow-y-auto relative">
             
             {/* Close Button */}
-            <button 
-                onClick={() => setShowPaymentModal(false)}
-                className="absolute top-4 right-5 text-gray-400 hover:text-white text-3xl z-50"
-            >
-                &times;
-            </button>
+<button 
+    onClick={() => {
+        setShowPaymentModal(false);
+        setPaymentStep('userInfo'); // <-- ADD THIS LINE
+    }}
+    className="absolute top-4 right-5 text-gray-400 hover:text-white text-3xl z-50"
+>
+    &times;
+</button>
+
 
             {/* Step 1: User Information Form */}
             {paymentStep === 'userInfo' && (
