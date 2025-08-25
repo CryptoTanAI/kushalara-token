@@ -1512,9 +1512,9 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 
 
                     {/* The manual payment display remains */}
-                    {selectedCrypto && amount && (
+                    {selectedCrypto && amount && 
                         <PaymentAddressDisplay selectedCrypto={selectedCrypto} walletAddresses={walletAddresses} amount={calculateCrypto().totalCrypto}/>
-                    )}
+                    }
                 </div>
             )}
         </div>
