@@ -1483,8 +1483,8 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                                     <ConnectButton />
                                 </div>
                             </div>
-                        ) : 
-                           // REPLACE lines 1487-1497 with this block
+                        ) }: 
+                          
 <div className="space-y-4">
     {/* Wallet Connected Display with Disconnect Button */}
     <div className="p-3 bg-green-900/30 border border-green-500/50 rounded-lg">
