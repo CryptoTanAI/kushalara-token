@@ -1483,7 +1483,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                                     <ConnectButton />
                                 </div>
                             </div>
-                        ) }: 
+                        ) : }
                           
 <div className="space-y-4">
     {/* Wallet Connected Display with Disconnect Button */}
