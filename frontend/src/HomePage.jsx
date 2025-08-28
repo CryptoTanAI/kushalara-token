@@ -253,50 +253,6 @@ const PaymentAddressDisplay = ({ selectedCrypto, walletAddresses, amount }) => {
   USDT: 1.00
 })
 
-    
-// Comprehensive countries function using all ISO 3166-1 alpha-2 codes
-const getCountries = () => {
-    const countries = [];
-    const regionNames = new Intl.DisplayNames(["en"], { type: "region" });
-
-    // All ISO 3166-1 alpha-2 country codes
-    const allCountryCodes = [
-        "AF", "AX", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ",
-        "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BQ", "BA", "BW", "BV", "BR",
-        "IO", "BN", "BG", "BF", "BI", "CV", "KH", "CM", "CA", "KY", "CF", "TD", "CL", "CN", "CX", "CC",
-        "CO", "KM", "CD", "CG", "CK", "CR", "CI", "HR", "CU", "CW", "CY", "CZ", "DK", "DJ", "DM", "DO",
-        "EC", "EG", "SV", "GQ", "ER", "EE", "SZ", "ET", "FK", "FO", "FJ", "FI", "FR", "GF", "PF", "TF",
-        "GA", "GM", "GE", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GG", "GN", "GW", "GY",
-        "HT", "HM", "VA", "HN", "HK", "HU", "IS", "IN", "ID", "IR", "IQ", "IE", "IM", "IL", "IT", "JM",
-        "JP", "JE", "JO", "KZ", "KE", "KI", "KP", "KR", "KW", "KG", "LA", "LV", "LB", "LS", "LR", "LY",
-        "LI", "LT", "LU", "MO", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX",
-        "FM", "MD", "MC", "MN", "ME", "MS", "MA", "MZ", "MM", "NA", "NR", "NP", "NL", "NC", "NZ", "NI",
-        "NE", "NG", "NU", "NF", "MP", "MK", "NO", "OM", "PK", "PW", "PS", "PA", "PG", "PY", "PE", "PH",
-        "PN", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "SH", "KN", "LC", "MF", "PM", "VC",
-        "WS", "SM", "ST", "SA", "SN", "RS", "SC", "SL", "SG", "SX", "SK", "SI", "SB", "SO", "ZA", "GS",
-        "SS", "ES", "LK", "SD", "SR", "SJ", "SE", "CH", "SY", "TW", "TJ", "TZ", "TH", "TL", "TG", "TK",
-        "TO", "TT", "TN", "TR", "TM", "TC", "TV", "UG", "UA", "AE", "GB", "US", "UM", "UY", "UZ", "VU",
-        "VE", "VN", "VG", "VI", "WF", "EH", "YE", "ZM", "ZW"
-    ];
-
-    allCountryCodes.forEach(code => {
-        try {
-            countries.push({
-                code: code,
-                name: regionNames.of(code)
-            });
-        } catch (e) {
-            // Some codes might not have a display name in all environments, skip them
-        }
-    });
-
-    return countries.sort((a, b) => a.name.localeCompare(b.name));
-};
-
-// Call the function once and store the result
-const countries = getCountries();
-
-
 const [selectedDemoCrypto, setSelectedDemoCrypto] = useState('ETH')
 const [selectedDemoFiat, setSelectedDemoFiat] = useState('USD')  
 const [selectedDemoPayment, setSelectedDemoPayment] = useState('')
@@ -315,15 +271,7 @@ const [showWalletInstall, setShowWalletInstall] = useState(false)
 const [selectedWalletType, setSelectedWalletType] = useState('')
 const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-// User information state
-const [userInfo, setUserInfo] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    country: ''
-});
-const [userFormCompleted, setUserFormCompleted] = useState(false);
-const [showUserForm, setShowUserForm] = useState(true);
+
 
 
   // Get user's ETH balance
@@ -451,22 +399,6 @@ const validateEmail = (email) => {
 };
 
 
-
-const validateUserInfo = () => {
-    console.log('🔍 Validating user info...', userInfo);
-    
-    if (!userInfo.firstName.trim()) {
-        alert('Please enter your first name');
-        return false;
-    }
-    if (!userInfo.lastName.trim()) {
-        alert('Please enter your last name');
-        return false;
-    }
-    if (!userInfo.email.trim()) {
-        alert('Please enter your email address');
-        return false;
-    }
     
     // Debug email validation
     console.log('🔍 Checking email:', userInfo.email);
@@ -487,26 +419,6 @@ const validateUserInfo = () => {
     return true;
 };
 
-
-const handleUserFormSubmit = () => {
-    if (validateUserInfo()) {
-        setUserFormCompleted(true);
-        setPaymentStep('selection');
-        setShowUserForm(false);
-    }
-};
-
-const resetUserForm = () => {
-    setUserInfo({
-        firstName: '',
-        lastName: '',
-        email: '',
-        country: ''
-    });
-    setUserFormCompleted(false);
-    setPaymentStep('userInfo');
-    setShowUserForm(true);
-};
     
 
 // Fetch real-time network fees
