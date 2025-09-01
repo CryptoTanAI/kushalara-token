@@ -639,7 +639,7 @@ const executePayment = async () => {
     console.log(JSON.stringify(paymentData, null, 2));
 
     console.log('=== PAYMENT INITIATED ===');
-    console.log('Wallet Info:', { type: connectedWallet, address: connectedAddress });
+    // console.log('Wallet Info:', { type: connectedWallet, address: connectedAddress });
     console.log('Amount (USD):', amount);
     console.log('Selected Crypto:', selectedCrypto);
     console.log('Total Crypto Amount:', totalCrypto);
