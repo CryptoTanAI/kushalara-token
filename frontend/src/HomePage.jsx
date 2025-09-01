@@ -417,7 +417,7 @@ const validateEmail = (email) => {
     
     console.log('✅ All validation passed');
     return true;
-};
+
 
     
 
