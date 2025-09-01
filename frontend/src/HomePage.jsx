@@ -1722,6 +1722,6 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
       
 </div>
 
-  )
-}
+  );
+};
 export default HomePage
