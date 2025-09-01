@@ -444,7 +444,7 @@ useEffect(() => {
         USDC: erc20FeeUSD,
         USDT: erc20FeeUSD
       })
-    } catch (error) {
+     catch (error) {
       setRealTimeFees({
         ETH: 5, BTC: 2, SOL: 0.01, USDC: 8, USDT: 8
       })
