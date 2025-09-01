@@ -600,14 +600,7 @@ const handleBTCPayment = async (cryptoAmount) => {
     
 // 3. CORRECT PAYMENT FUNCTION (replace your executePayment function)
 const executePayment = async () => {
-    // 1. Validate user information is complete
-    if (!userFormCompleted || !validateUserInfo()) {
-        alert('Please complete your information first.');
-        setPaymentStep('userInfo'); // Go back to user info step
-        return;
-    }
-
-    // 2. Validate a wallet is connected
+    
    if (!isConnected) { 
         alert('Please connect your wallet to proceed.');
         // Here, you might want to trigger the wallet connection modal
@@ -657,22 +650,22 @@ const executePayment = async () => {
     try {
         if (selectedCrypto === 'ETH') {
             console.log('🟠 ETH Payment - Using Web3 wallets');
-            // await handleETHPayment(totalCrypto); // This will still fail until the function exists
+             await handleETHPayment(totalCrypto); // This will still fail until the function exists
             alert('Automated payment for ETH is not available yet. Please use the manual payment address shown.');
         } else if (selectedCrypto === 'BTC') {
             console.log('🟡 BTC Payment - Using Bitcoin wallets');
-            // await handleBTCPayment(totalCrypto); // This will still fail
+             await handleBTCPayment(totalCrypto); // This will still fail
             alert('Automated payment for BTC is not available yet. Please use the manual payment address shown.');
         } else if (selectedCrypto === 'SOL') {
             console.log('🟣 SOL Payment - Using Solana wallets ONLY');
             await handleSOLPayment(totalCrypto); // This is the one that should work
         } else if (selectedCrypto === 'USDC') {
             console.log('🔵 USDC Payment - Using Web3 wallets');
-            // await handleUSDCPayment(totalCrypto); // This will still fail
+             await handleUSDCPayment(totalCrypto); // This will still fail
             alert('Automated payment for USDC is not available yet. Please use the manual payment address shown.');
         } else if (selectedCrypto === 'USDT') {
             console.log('🟢 USDT Payment - Using Web3 wallets');
-            // await handleUSDTPayment(totalCrypto); // This will still fail
+             await handleUSDTPayment(totalCrypto); // This will still fail
             alert('Automated payment for USDT is not available yet. Please use the manual payment address shown.');
         } else {
             throw new Error(`Unsupported cryptocurrency: ${selectedCrypto}`);
