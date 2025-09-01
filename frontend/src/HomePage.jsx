@@ -397,28 +397,6 @@ const validateEmail = (email) => {
     console.log('✅ Email validation passed');
     return true;
 };
-
-
-    
-    // Debug email validation
-    console.log('🔍 Checking email:', userInfo.email);
-    const isEmailValid = validateEmail(userInfo.email);
-    console.log('🔍 Email validation result:', isEmailValid);
-    
-    if (!isEmailValid) {
-        alert('Please enter a valid email address. Check for typos in common domains like gmail.com');
-        return false;
-    }
-    
-    if (!userInfo.country) {
-        alert('Please select your country');
-        return false;
-    }
-    
-    console.log('✅ All validation passed');
-    return true;
-  };
-
     
 
 // Fetch real-time network fees
