@@ -1363,7 +1363,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                                 Continue to Payment
                             </button>
                         </div>
-                    )
+                    )}
                 </div>
 
                 {/* Manual Payment Display */}
