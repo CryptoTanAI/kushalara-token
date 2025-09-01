@@ -279,22 +279,24 @@ const [isMenuOpen, setIsMenuOpen] = useState(false)
     address: address,
   })
 
-// Add this with your other hook declarations
-const { data: hash, sendTransaction } = useSendTransaction()
 
-    const { isLoading: isWaiting, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
-  hash,
-})
+const { 
+    data: ethTxHash, 
+    isPending: isSendingEth, 
+    sendTransaction 
+} = useSendTransaction();
 
+// Hook for writing to a smart contract (for ERC20 tokens like USDC, USDT)
+const { 
+    data: contractTxHash, 
+    isPending: isSendingContract, 
+    writeContract 
+} = useWriteContract();
 
-    
-  // Contract write hook for sending ETH
-  const { data: WriteHash, writeContract, isPending, error } = useWriteContract()
+// You can use these hooks later to show transaction status to the user
+const { isLoading: isConfirmingEth, isSuccess: isConfirmedEth } = useWaitForTransactionReceipt({ hash: ethTxHash });
+const { isLoading: isConfirmingContract, isSuccess: isConfirmedContract } = useWaitForTransactionReceipt({ hash: contractTxHash });
 
-  // Wait for transaction confirmation
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    WriteHash,
-  })
 
   // Wallet addresses for receiving payments
   const walletAddresses = {
@@ -545,51 +547,85 @@ const handleSOLPayment = async (amount) => {
     }
 };
 
+// --- ACTION: REPLACE the old handleETHPayment function with this one ---
+
 const handleETHPayment = async (cryptoAmount) => {
-    console.log('🟠 ETH Payment Handler - Starting...');
-    try {
-        if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
-            throw new Error('MetaMask not found. Please install MetaMask to proceed.');
-        }
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const amountInWei = ethers.utils.parseEther(cryptoAmount.toString());
-        const txHash = await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [{ from: accounts[0], to: walletAddresses['ETH'], value: amountInWei.toHexString() }],
-        });
-        alert(`ETH payment successful! Transaction: ${txHash}`);
-    } catch (error) {
-        console.error('❌ ETH payment failed:', error);
-        alert(`ETH payment failed: ${error.message}`);
-        throw error;
-    }
+    console.log('🟠 ETH Payment Handler - Using wagmi...');
+
+    // 1. Convert the amount to Wei using parseEther from viem (which you already import)
+    const amountInWei = parseEther(cryptoAmount.toString());
+
+    // 2. Prepare the transaction details
+    const transactionDetails = {
+        to: walletAddresses['ETH'], // Recipient address
+        value: amountInWei,
+    };
+
+    // 3. Call the sendTransaction function from the wagmi hook
+    sendTransaction(transactionDetails, {
+        onSuccess: (hash) => {
+            console.log('✅ ETH payment sent! Transaction hash:', hash);
+            alert(`ETH payment successful! Transaction: ${hash}`);
+            // You can add logic here to track the confirmation using isConfirmingEth
+        },
+        onError: (error) => {
+            console.error('❌ ETH payment failed:', error);
+            const message = error.message.includes("User rejected the request")
+                ? "Transaction was rejected by the user."
+                : "An error occurred during the transaction.";
+            alert(`ETH payment failed: ${message}`);
+        },
+    });
 };
 
+
+// --- ACTION: REPLACE the old handleTokenPayment function with this one ---
+
 const handleTokenPayment = async (cryptoAmount, tokenType) => {
-    console.log(`🔵 ${tokenType} Payment Handler - Starting...`);
+    console.log(`🔵 ${tokenType} Payment Handler - Using wagmi...`);
+
     const tokenDetails = {
         USDC: { address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', decimals: 6 },
         USDT: { address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', decimals: 6 }
     };
     const details = tokenDetails[tokenType];
     if (!details) throw new Error(`Unsupported token: ${tokenType}`);
-    try {
-        if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
-            throw new Error('MetaMask not found. Please install MetaMask to proceed.');
-        }
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const tokenContract = new ethers.Contract(details.address, ["function transfer(address to, uint256 amount)"], signer);
-        const amountInSmallestUnit = ethers.utils.parseUnits(cryptoAmount.toString(), details.decimals);
-        const tx = await tokenContract.transfer(walletAddresses[tokenType], amountInSmallestUnit);
-        await tx.wait();
-        alert(`${tokenType} payment successful! Transaction: ${tx.hash}`);
-    } catch (error) {
-        console.error(`❌ ${tokenType} payment failed:`, error);
-        alert(`${tokenType} payment failed: ${error.message}`);
-        throw error;
-    }
+
+    // 1. Convert amount to the token's smallest unit using parseUnits from viem
+    const amountInSmallestUnit = parseUnits(cryptoAmount.toString(), details.decimals);
+
+    // 2. Call the writeContract function from the wagmi hook
+    writeContract({
+        address: details.address, // The token's contract address
+        abi: [ // Minimal ABI for a transfer function
+            {
+                "name": "transfer",
+                "type": "function",
+                "inputs": [
+                    { "name": "to", "type": "address" },
+                    { "name": "amount", "type": "uint256" }
+                ],
+                "outputs": [{ "name": "", "type": "bool" }],
+                "stateMutability": "nonpayable"
+            }
+        ],
+        functionName: 'transfer',
+        args: [walletAddresses[tokenType], amountInSmallestUnit], // recipient address and amount
+    }, {
+        onSuccess: (hash) => {
+            console.log(`✅ ${tokenType} payment sent! Transaction hash:`, hash);
+            alert(`${tokenType} payment successful! Transaction: ${hash}`);
+        },
+        onError: (error) => {
+            console.error(`❌ ${tokenType} payment failed:`, error);
+            const message = error.message.includes("User rejected the request")
+                ? "Transaction was rejected by the user."
+                : "An error occurred during the transaction.";
+            alert(`${tokenType} payment failed: ${message}`);
+        },
+    });
 };
+
 
 const handleBTCPayment = async (cryptoAmount) => {
     console.log('🟡 BTC Payment Handler - Starting...');
@@ -644,27 +680,20 @@ const executePayment = async () => {
     console.log('Selected Crypto:', selectedCrypto);
     console.log('Total Crypto Amount:', totalCrypto);
 
-   
+
     try {
         if (selectedCrypto === 'ETH') {
             console.log('🟠 ETH Payment - Using Web3 wallets');
-             await handleETHPayment(totalCrypto); // This will still fail until the function exists
-            alert('Automated payment for ETH is not available yet. Please use the manual payment address shown.');
+            await handleETHPayment(totalCrypto); // Use the new wagmi-powered function
+        } else if (selectedCrypto === 'USDC' || selectedCrypto === 'USDT') {
+            console.log(`🔵 ${selectedCrypto} Payment - Using Web3 wallets`);
+            await handleTokenPayment(totalCrypto, selectedCrypto); // Use the new wagmi-powered function
         } else if (selectedCrypto === 'BTC') {
             console.log('🟡 BTC Payment - Using Bitcoin wallets');
-             await handleBTCPayment(totalCrypto); // This will still fail
-            alert('Automated payment for BTC is not available yet. Please use the manual payment address shown.');
+            await handleBTCPayment(totalCrypto); // This remains manual for now
         } else if (selectedCrypto === 'SOL') {
             console.log('🟣 SOL Payment - Using Solana wallets ONLY');
-            await handleSOLPayment(totalCrypto); // This is the one that should work
-        } else if (selectedCrypto === 'USDC') {
-            console.log('🔵 USDC Payment - Using Web3 wallets');
-             await handleUSDCPayment(totalCrypto); // This will still fail
-            alert('Automated payment for USDC is not available yet. Please use the manual payment address shown.');
-        } else if (selectedCrypto === 'USDT') {
-            console.log('🟢 USDT Payment - Using Web3 wallets');
-             await handleUSDTPayment(totalCrypto); // This will still fail
-            alert('Automated payment for USDT is not available yet. Please use the manual payment address shown.');
+            await handleSOLPayment(totalCrypto); // This uses its own logic
         } else {
             throw new Error(`Unsupported cryptocurrency: ${selectedCrypto}`);
         }
@@ -672,9 +701,6 @@ const executePayment = async () => {
         console.error('Payment processing failed:', error);
         alert(`Payment failed: ${error.message}`);
     }
-};
-
-
 
 
 // executePayment function ends here. Below is the wallet detection
