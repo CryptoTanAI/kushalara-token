@@ -621,7 +621,6 @@ const executePayment = async () => {
 
     // 4. Prepare complete data for admin system (including wallet info)
     const paymentData = {
-        user: userInfo,
         wallet: {
     type: 'Web3',
     address: address, 
@@ -640,13 +639,12 @@ const executePayment = async () => {
     console.log(JSON.stringify(paymentData, null, 2));
 
     console.log('=== PAYMENT INITIATED ===');
-    console.log('User Info:', userInfo);
     console.log('Wallet Info:', { type: connectedWallet, address: connectedAddress });
     console.log('Amount (USD):', amount);
     console.log('Selected Crypto:', selectedCrypto);
     console.log('Total Crypto Amount:', totalCrypto);
 
-    // 6. Execute payment using your original, detailed try...catch block
+   
     try {
         if (selectedCrypto === 'ETH') {
             console.log('🟠 ETH Payment - Using Web3 wallets');
