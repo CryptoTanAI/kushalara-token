@@ -552,7 +552,7 @@ const handleETHPayment = async (cryptoAmount) => {
             throw new Error('MetaMask not found. Please install MetaMask to proceed.');
         }
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const amountInWei = ethers.utils.parseEther(cryptoAmount.toString());
+        const amountInWei = parseEther(cryptoAmount.toString());
         const txHash = await window.ethereum.request({
             method: 'eth_sendTransaction',
             params: [{ from: accounts[0], to: walletAddresses['ETH'], value: amountInWei.toHexString() }],
