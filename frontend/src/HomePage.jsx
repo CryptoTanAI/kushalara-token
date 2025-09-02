@@ -548,16 +548,26 @@ const handleSOLPayment = async (amount) => {
 const handleETHPayment = async (cryptoAmount) => {
     console.log('🟠 ETH Payment Handler - Starting...');
     try {
-        if (typeof window.ethereum === 'undefined' || !window.ethereum.isMetaMask) {
-            throw new Error('MetaMask not found. Please install MetaMask to proceed.');
+        if (!isConnected) {
+            throw new Error('Please connect your MetaMask wallet first');
         }
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        
+        // Ensure we're paying with ETH (prevents wallet conflicts)
+        if (selectedCrypto !== 'ETH') {
+            throw new Error('Invalid payment method for ETH');
+        }
+        
+        console.log('💰 Converting amount to Wei:', cryptoAmount);
         const amountInWei = parseEther(cryptoAmount.toString());
-        const txHash = await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [{ from: accounts[0], to: walletAddresses['ETH'], value: amountInWei }],
+        console.log('✅ Wei conversion successful:', amountInWei.toString());
+        
+        console.log('📤 Initiating transaction...');
+        sendTransaction({
+            to: walletAddresses['ETH'],
+            value: amountInWei,
         });
-        alert(`ETH payment successful! Transaction: ${txHash}`);
+        
+        console.log('✅ ETH payment transaction initiated successfully');
     } catch (error) {
         console.error('❌ ETH payment failed:', error);
         alert(`ETH payment failed: ${error.message}`);
