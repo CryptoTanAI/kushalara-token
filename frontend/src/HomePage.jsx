@@ -555,7 +555,7 @@ const handleETHPayment = async (cryptoAmount) => {
         const amountInWei = parseEther(cryptoAmount.toString());
         const txHash = await window.ethereum.request({
             method: 'eth_sendTransaction',
-            params: [{ from: accounts[0], to: walletAddresses['ETH'], value: amountInWei.toHexString() }],
+            params: [{ from: accounts[0], to: walletAddresses['ETH'], value: amountInWei }],
         });
         alert(`ETH payment successful! Transaction: ${txHash}`);
     } catch (error) {
