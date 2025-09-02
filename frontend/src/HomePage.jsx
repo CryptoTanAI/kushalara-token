@@ -270,14 +270,14 @@ const [realTimeFees, setRealTimeFees] = useState({
 const [showWalletInstall, setShowWalletInstall] = useState(false)
 const [selectedWalletType, setSelectedWalletType] = useState('')
 const [isMenuOpen, setIsMenuOpen] = useState(false)
+const [email, setEmail] = useState('');
+const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+const [transactionHash, setTransactionHash] = useState('');
 
-
-
-
-  // Get user's ETH balance
-  const { data: balance } = useBalance({
+const { data: balance, isLoading: balanceLoading } = useBalance({
     address: address,
-  })
+    enabled: !!address && isConnected,
+});
 
 // Add this with your other hook declarations
 const { data: hash, sendTransaction } = useSendTransaction()
@@ -366,6 +366,31 @@ const data = JSON.parse(proxyData.contents);
     }
   }
 
+const checkSufficientBalance = (requiredAmount, cryptocurrency) => {
+    if (!balance || balanceLoading) {
+        return { sufficient: false, message: 'Loading balance...' };
+    }
+    
+    // Convert balance to number for comparison
+    const balanceInEth = parseFloat(formatEther(balance.value));
+    const requiredInEth = parseFloat(requiredAmount);
+    
+    console.log('💰 Balance Check:', {
+        available: balanceInEth,
+        required: requiredInEth,
+        cryptocurrency
+    });
+    
+    if (balanceInEth < requiredInEth) {
+        return {
+            sufficient: false,
+            message: `Insufficient ${cryptocurrency} balance. You have ${balanceInEth.toFixed(6)} ${cryptocurrency}, but need ${requiredInEth.toFixed(6)} ${cryptocurrency}.`
+        };
+    }
+    
+    return { sufficient: true, message: 'Sufficient balance' };
+};
+    
 // User Information Validation Functions
 const validateEmail = (email) => {
     console.log('🔍 validateEmail called with:', email);
@@ -546,34 +571,43 @@ const handleSOLPayment = async (amount) => {
 };
 
 const handleETHPayment = async (cryptoAmount) => {
-    console.log('🟠 ETH Payment Handler - Starting...');
+    console.log("🟠 ETH Payment Handler - Starting...");
     try {
         if (!isConnected) {
-            throw new Error('Please connect your MetaMask wallet first');
+            throw new Error("Please connect your MetaMask wallet first");
         }
         
         // Ensure we're paying with ETH (prevents wallet conflicts)
-        if (selectedCrypto !== 'ETH') {
-            throw new Error('Invalid payment method for ETH');
+        if (selectedCrypto !== "ETH") {
+            throw new Error("Invalid payment method for ETH");
         }
         
-        console.log('💰 Converting amount to Wei:', cryptoAmount);
+        console.log("💰 Converting amount to Wei:", cryptoAmount);
         const amountInWei = parseEther(cryptoAmount.toString());
-        console.log('✅ Wei conversion successful:', amountInWei.toString());
+        console.log("✅ Wei conversion successful:", amountInWei.toString());
         
-        console.log('📤 Initiating transaction...');
-        sendTransaction({
-            to: walletAddresses['ETH'],
+        console.log("📤 Initiating transaction...");
+        
+        // Use the sendTransaction hook from wagmi
+        // This is the key change from your old function
+        const result = await sendTransaction({
+            to: walletAddresses["ETH"],
             value: amountInWei,
         });
         
-        console.log('✅ ETH payment transaction initiated successfully');
+        console.log("✅ ETH payment transaction initiated successfully");
+        
+        // Show success message (these are the lines you asked about)
+        setShowSuccessMessage(true);
+        setTransactionHash(result?.hash || "pending");
+        
     } catch (error) {
-        console.error('❌ ETH payment failed:', error);
+        console.error("❌ ETH payment failed:", error);
         alert(`ETH payment failed: ${error.message}`);
         throw error;
     }
 };
+
 
 const handleTokenPayment = async (cryptoAmount, tokenType) => {
     console.log(`🔵 ${tokenType} Payment Handler - Starting...`);
@@ -622,12 +656,22 @@ const executePayment = async () => {
         alert('Please enter an amount and select a cryptocurrency.');
         return;
     }
-
+  
+   if (!email) {
+    alert('Please enter your email address for transaction confirmation.');
+    return;
+}
     const { totalCrypto } = calculateCrypto();
     if (totalCrypto <= 0) {
         alert('Amount must be greater than zero.');
         return;
     }
+  // 🔍 BALANCE CHECK BEFORE TRANSACTION
+const balanceCheck = checkSufficientBalance(totalCrypto, selectedCrypto);
+if (!balanceCheck.sufficient) {
+    alert(balanceCheck.message);
+    return;
+}
 
     // 4. Prepare complete data for admin system (including wallet info)
     const paymentData = {
@@ -1338,6 +1382,44 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                                 </div>
                                 <p className="font-mono text-xs text-gray-400 mt-1 truncate">{address}</p>
                             </div>
+                {/* Email Field */}
+<div className="mb-4">
+    <label className="block text-white text-sm font-medium mb-2">
+        Email Address *
+    </label>
+    <input
+        type="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+        placeholder="Enter your email for transaction confirmation"
+        className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-500"
+        required
+    />
+</div>
+
+{/* Balance Display */}
+{isConnected && balance && (
+    <div className="mb-4 p-3 bg-gray-700 rounded-md">
+        <p className="text-sm text-gray-300">
+            Your {selectedCrypto} Balance: {parseFloat(formatEther(balance.value)).toFixed(6)} ETH
+        </p>
+    </div>
+)}
+
+{/* Success Message */}
+{showSuccessMessage && (
+    <div className="mb-4 p-4 bg-green-600 rounded-md">
+        <h3 className="text-white font-semibold mb-2">🎉 Transaction Successful!</h3>
+        <p className="text-white text-sm">
+            Your payment has been initiated. You will receive a confirmation email at {email} once the transaction is confirmed on the blockchain.
+        </p>
+        {transactionHash && (
+            <p className="text-white text-xs mt-2">
+                Transaction Hash: {transactionHash}
+            </p>
+        )}
+    </div>
+)}
                             <button onClick={executePayment} disabled={!amount || !selectedCrypto} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">
                                 Continue to Payment
                             </button>
