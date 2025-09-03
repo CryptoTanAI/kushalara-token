@@ -1552,7 +1552,7 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                 }
             </div>
         </div>
-    </div>
+    
 )}
 
 
