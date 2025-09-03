@@ -1464,7 +1464,11 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 
 {amount > 0 && selectedCrypto && paymentType === 'crypto' && (
     <div className="bg-gray-900/50 rounded-lg p-4 mb-6 text-center">
-
+        <div className="text-gray-300 text-sm">You will send:</div>
+        <div className="text-2xl font-bold text-yellow-400">{calculateCrypto().totalCrypto.toFixed(8)} {selectedCrypto}</div>
+        <div className="text-gray-400 text-sm">Network fee: ${calculateCrypto().networkFee.toFixed(2)} • Processing fee: ${calculateCrypto().processingFee.toFixed(2)}</div>
+    </div>
+)}
 
                 {/* Wallet Connection UI */}
                 <div className="mt-6 text-center">
