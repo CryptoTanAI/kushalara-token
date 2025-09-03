@@ -618,6 +618,24 @@ const handleETHPayment = async (cryptoAmount) => {
         // CRITICAL: Set the transaction hash
         setTransactionHash(result || 'pending');
         console.log('📋 Transaction Hash set to:', result || 'pending');
+              
+        // IMMEDIATELY show success message (don't wait for confirmation)
+        setShowSuccessMessage(true);
+        console.log('✅ Success message shown immediately');
+        
+        // Prepare data for backend
+        const paymentData = {
+            transactionHash: result,
+            walletAddress: address,
+            amount: cryptoAmount,
+            cryptocurrency: 'ETH',
+            recipientAddress: walletAddresses['ETH'],
+            timestamp: new Date().toISOString(),
+            userEmail: email
+        };
+        
+        console.log('📤 Payment data prepared for backend:', paymentData);
+        // Here you would send this data to your backend API
         
     } catch (error) {
         console.error('❌ ETH payment failed:', error);
