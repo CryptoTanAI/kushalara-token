@@ -1426,10 +1426,10 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 {/* Success Message - Only show when transaction is CONFIRMED */}
 {isConfirmed && transactionHash && (
     <div className="mb-4 p-4 bg-green-600 rounded-md">
-        <h3 className="text-white font-semibold mb-2">🎉 Transaction Successful!</h3>
-        <p className="text-white text-sm">
-            Your payment has been confirmed on the blockchain! You will receive a confirmation email at {email}.
-        </p>
+       <h3 className="text-white font-semibold mb-2">🎉 Thank You!</h3>
+<p className="text-white text-sm">
+  Your payment has been submitted successfully. You will receive an email confirmation with transaction details shortly.
+</p>
         <p className="text-white text-xs mt-2">
             Transaction Hash: {transactionHash}
         </p>
