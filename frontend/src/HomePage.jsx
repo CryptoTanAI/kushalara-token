@@ -287,6 +287,12 @@ const { data: transactionReceipt, isLoading: isConfirming, isSuccess: isConfirme
     hash: transactionHash,
     enabled: !!transactionHash,
 });
+    useEffect(() => {
+    if (isConfirmed) {
+        console.log('✅ Transaction confirmed! Showing success message.');
+        setShowSuccessMessage(true);
+    }
+}, [isConfirmed]); 
     
   // Contract write hook for sending ETH
   const { data: WriteHash, writeContract, isPending, error } = useWriteContract()
