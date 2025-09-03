@@ -282,6 +282,11 @@ const { data: balance, isLoading: balanceLoading } = useBalance({
 // Add this with your other hook declarations
 const { data: hash, sendTransaction } = useSendTransaction()
 
+// Transaction confirmation tracking
+const { data: transactionReceipt, isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: transactionHash,
+    enabled: !!transactionHash,
+});
 
 // Add this useEffect to debug the hook's state
 useEffect(() => {
@@ -293,7 +298,20 @@ useEffect(() => {
     });
 }, [transactionHash, isConfirming, isConfirmed, transactionReceipt]);
 
+    
+  useEffect(() => {
+    console.log('🔍 useEffect triggered - isConfirmed:', isConfirmed, 'transactionHash:', transactionHash);
+    
+    if (isConfirmed && transactionHash) {
+        console.log('✅ Transaction confirmed! Showing success message.');
+        setShowSuccessMessage(true);
+        console.log('✅ Success message state set to true');
+    } else {
+        console.log('⏳ Waiting for confirmation - isConfirmed:', isConfirmed, 'transactionHash:', transactionHash);
+    }
+}, [isConfirmed, transactionHash]);
 
+    
   // Contract write hook for sending ETH
   const { data: WriteHash, writeContract, isPending, error } = useWriteContract()
 
