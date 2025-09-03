@@ -293,7 +293,7 @@ useEffect(() => {
     });
 }, [transactionHash, isConfirming, isConfirmed, transactionReceipt]);
 
- 
+
   // Contract write hook for sending ETH
   const { data: WriteHash, writeContract, isPending, error } = useWriteContract()
 
@@ -600,24 +600,6 @@ const handleETHPayment = async (cryptoAmount) => {
         // CRITICAL: Set the transaction hash
         setTransactionHash(result || 'pending');
         console.log('📋 Transaction Hash set to:', result || 'pending');
-              
-        // IMMEDIATELY show success message (don't wait for confirmation)
-        setShowSuccessMessage(true);
-        console.log('✅ Success message shown immediately');
-        
-        // Prepare data for backend
-        const paymentData = {
-            transactionHash: result,
-            walletAddress: address,
-            amount: cryptoAmount,
-            cryptocurrency: 'ETH',
-            recipientAddress: walletAddresses['ETH'],
-            timestamp: new Date().toISOString(),
-            userEmail: email
-        };
-        
-        console.log('📤 Payment data prepared for backend:', paymentData);
-        // Here you would send this data to your backend API
         
     } catch (error) {
         console.error('❌ ETH payment failed:', error);
@@ -1426,10 +1408,10 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 {/* Success Message - Only show when transaction is CONFIRMED */}
 {isConfirmed && transactionHash && (
     <div className="mb-4 p-4 bg-green-600 rounded-md">
-       <h3 className="text-white font-semibold mb-2">🎉 Thank You!</h3>
-<p className="text-white text-sm">
-  Your payment has been submitted successfully. You will receive an email confirmation with transaction details shortly.
-</p>
+        <h3 className="text-white font-semibold mb-2">🎉 Transaction Successful!</h3>
+        <p className="text-white text-sm">
+            Your payment has been confirmed on the blockchain! You will receive a confirmation email at {email}.
+        </p>
         <p className="text-white text-xs mt-2">
             Transaction Hash: {transactionHash}
         </p>
