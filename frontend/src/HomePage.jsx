@@ -273,6 +273,7 @@ const [isMenuOpen, setIsMenuOpen] = useState(false)
 const [email, setEmail] = useState('');
 const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 const [transactionHash, setTransactionHash] = useState('');
+const [paymentType, setPaymentType] = useState(''); // 'crypto' or 'fiat'
 
 const { data: balance, isLoading: balanceLoading } = useBalance({
     address: address,
@@ -1372,17 +1373,42 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
                         <label className="block text-white mb-2 font-semibold">Amount (USD $)</label>
                         <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="Enter amount" className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400"/>
                     </div>
-                    <div>
-                        <label className="block text-white mb-2 font-semibold">Payment Method</label>
-                        <select value={selectedCrypto} onChange={(e) => setSelectedCrypto(e.target.value)} className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400">
-                            <option value="">Choose cryptocurrency</option>
-                            <option value="ETH">Ethereum (ETH)</option>
-                            <option value="BTC">Bitcoin (BTC)</option>
-                            <option value="SOL">Solana (SOL)</option>
-                            <option value="USDC">USD Coin (USDC)</option>
-                            <option value="USDT">Tether (USDT)</option>
-                        </select>
-                    </div>
+                   <div>
+    <label className="block text-white mb-2 font-semibold">Payment Method</label>
+    <div className="grid grid-cols-2 gap-4">
+        {/* Crypto Option */}
+        <button 
+            onClick={() => setPaymentType('crypto')}
+            className={`p-4 rounded-lg border-2 transition-colors ${
+                paymentType === 'crypto' 
+                    ? 'border-yellow-400 bg-yellow-400/10' 
+                    : 'border-gray-600 bg-gray-700/50'
+            }`}
+        >
+            <div className="text-center">
+                <div className="text-2xl mb-2">🪙</div>
+                <div className="text-white font-semibold">Crypto</div>
+                <div className="text-gray-400 text-sm">ETH, BTC, SOL, etc.</div>
+            </div>
+        </button>
+        
+        {/* Fiat Option */}
+        <button 
+            onClick={() => setPaymentType('fiat')}
+            className={`p-4 rounded-lg border-2 transition-colors ${
+                paymentType === 'fiat' 
+                    ? 'border-purple-400 bg-purple-400/10' 
+                    : 'border-gray-600 bg-gray-700/50'
+            }`}
+        >
+            <div className="text-center">
+                <div className="text-2xl mb-2">💳</div>
+                <div className="text-white font-semibold">USD</div>
+                <div className="text-gray-400 text-sm">Credit/Debit Card</div>
+            </div>
+        </button>
+    </div>
+</div>
                 </div>
                 
                 {amount > 0 && selectedCrypto && (
