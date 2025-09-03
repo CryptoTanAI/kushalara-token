@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt, useSendTransaction } from 'wagmi'
+import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useWaitForTransactionReceipt, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { parseEther, formatEther, parseUnits } from 'viem'
 import CountdownTimer from './CountdownTimer.jsx'
@@ -286,7 +286,11 @@ const { data: hash, sendTransaction } = useSendTransaction()
   hash,
 })
 
-
+// Transaction confirmation tracking
+const { data: transactionReceipt, isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: transactionHash,
+    enabled: !!transactionHash,
+});
     
   // Contract write hook for sending ETH
   const { data: WriteHash, writeContract, isPending, error } = useWriteContract()
@@ -571,38 +575,39 @@ const handleSOLPayment = async (amount) => {
 };
 
 const handleETHPayment = async (cryptoAmount) => {
-    console.log("🟠 ETH Payment Handler - Starting...");
+    console.log('🟠 ETH Payment Handler - Starting...');
     try {
         if (!isConnected) {
-            throw new Error("Please connect your MetaMask wallet first");
+            throw new Error('Please connect your MetaMask wallet first');
         }
         
         // Ensure we're paying with ETH (prevents wallet conflicts)
-        if (selectedCrypto !== "ETH") {
-            throw new Error("Invalid payment method for ETH");
+        if (selectedCrypto !== 'ETH') {
+            throw new Error('Invalid payment method for ETH');
         }
         
-        console.log("💰 Converting amount to Wei:", cryptoAmount);
+        console.log('💰 Converting amount to Wei:', cryptoAmount);
         const amountInWei = parseEther(cryptoAmount.toString());
-        console.log("✅ Wei conversion successful:", amountInWei.toString());
+        console.log('✅ Wei conversion successful:', amountInWei.toString());
         
-        console.log("📤 Initiating transaction...");
+        console.log('📤 Initiating transaction...');
         
         // Use the sendTransaction hook from wagmi
-        // This is the key change from your old function
         const result = await sendTransaction({
-            to: walletAddresses["ETH"],
+            to: walletAddresses['ETH'],
             value: amountInWei,
         });
         
-        console.log("✅ ETH payment transaction initiated successfully");
+        console.log('✅ ETH payment transaction initiated successfully');
         
-        // Show success message (these are the lines you asked about)
-        setShowSuccessMessage(true);
-        setTransactionHash(result?.hash || "pending");
+        // CRITICAL FIX: Only set transaction hash, NOT success message
+        // Success message will be shown when transaction is confirmed
+        setTransactionHash(result?.hash || 'pending');
+        
+        // DO NOT set showSuccessMessage here - it's too early!
         
     } catch (error) {
-        console.error("❌ ETH payment failed:", error);
+        console.error('❌ ETH payment failed:', error);
         alert(`ETH payment failed: ${error.message}`);
         throw error;
     }
@@ -700,11 +705,7 @@ if (!balanceCheck.sufficient) {
 
    
     try {
-        if (selectedCrypto === 'ETH') {
-            console.log('🟠 ETH Payment - Using Web3 wallets');
-             await handleETHPayment(totalCrypto); // This will still fail until the function exists
-            alert('Automated payment for ETH is not available yet. Please use the manual payment address shown.');
-        } else if (selectedCrypto === 'BTC') {
+         if (selectedCrypto === 'BTC') {
             console.log('🟡 BTC Payment - Using Bitcoin wallets');
              await handleBTCPayment(totalCrypto); // This will still fail
             alert('Automated payment for BTC is not available yet. Please use the manual payment address shown.');
@@ -1406,18 +1407,29 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
     </div>
 )}
 
-{/* Success Message */}
-{showSuccessMessage && (
+{/* Success Message - Only show when transaction is CONFIRMED */}
+{isConfirmed && transactionHash && (
     <div className="mb-4 p-4 bg-green-600 rounded-md">
         <h3 className="text-white font-semibold mb-2">🎉 Transaction Successful!</h3>
         <p className="text-white text-sm">
-            Your payment has been initiated. You will receive a confirmation email at {email} once the transaction is confirmed on the blockchain.
+            Your payment has been confirmed on the blockchain! You will receive a confirmation email at {email}.
         </p>
-        {transactionHash && (
-            <p className="text-white text-xs mt-2">
-                Transaction Hash: {transactionHash}
-            </p>
-        )}
+        <p className="text-white text-xs mt-2">
+            Transaction Hash: {transactionHash}
+        </p>
+    </div>
+)}
+
+{/* Loading Message - Show while transaction is being confirmed */}
+{isConfirming && transactionHash && (
+    <div className="mb-4 p-4 bg-yellow-600 rounded-md">
+        <h3 className="text-white font-semibold mb-2">⏳ Confirming Transaction...</h3>
+        <p className="text-white text-sm">
+            Your transaction is being confirmed on the blockchain. Please wait...
+        </p>
+        <p className="text-white text-xs mt-2">
+            Transaction Hash: {transactionHash}
+        </p>
     </div>
 )}
                             <button onClick={executePayment} disabled={!amount || !selectedCrypto} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">
