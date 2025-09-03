@@ -287,12 +287,15 @@ const { data: transactionReceipt, isLoading: isConfirming, isSuccess: isConfirme
     hash: transactionHash,
     enabled: !!transactionHash,
 });
+
+    
     useEffect(() => {
-    if (isConfirmed) {
+    if (isConfirmed && transactionHash) {
         console.log('✅ Transaction confirmed! Showing success message.');
         setShowSuccessMessage(true);
     }
-}, [isConfirmed]); 
+}, [isConfirmed, transactionHash]);
+
     
   // Contract write hook for sending ETH
   const { data: WriteHash, writeContract, isPending, error } = useWriteContract()
@@ -596,10 +599,12 @@ const handleETHPayment = async (cryptoAmount) => {
         });
         
         console.log('✅ ETH payment transaction initiated successfully');
+        console.log('📋 Transaction Hash:', result);
         
+        // Set the transaction hash - this will trigger the useWaitForTransactionReceipt hook
         setTransactionHash(result || 'pending');
         
-        // DO NOT set showSuccessMessage here - it's too early!
+        // The success message will be set by the useEffect that watches isConfirmed
         
     } catch (error) {
         console.error('❌ ETH payment failed:', error);
