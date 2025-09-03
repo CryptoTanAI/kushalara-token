@@ -696,7 +696,10 @@ if (!balanceCheck.sufficient) {
 
    
     try {
-         if (selectedCrypto === 'BTC') {
+          if (selectedCrypto === 'ETH') {
+            console.log('🟠 ETH Payment - Using Web3 wallets');
+             await handleETHPayment(totalCrypto);
+   } else if (selectedCrypto === 'BTC') {
             console.log('🟡 BTC Payment - Using Bitcoin wallets');
              await handleBTCPayment(totalCrypto); // This will still fail
             alert('Automated payment for BTC is not available yet. Please use the manual payment address shown.');
