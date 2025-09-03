@@ -597,9 +597,7 @@ const handleETHPayment = async (cryptoAmount) => {
         
         console.log('✅ ETH payment transaction initiated successfully');
         
-        // CRITICAL FIX: Only set transaction hash, NOT success message
-        // Success message will be shown when transaction is confirmed
-        setTransactionHash(result?.hash || 'pending');
+        setTransactionHash(result || 'pending');
         
         // DO NOT set showSuccessMessage here - it's too early!
         
