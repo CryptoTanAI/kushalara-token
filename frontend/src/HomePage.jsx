@@ -572,7 +572,7 @@ const handleSOLPayment = async (amount) => {
 };
 
 const handleETHPayment = async (cryptoAmount) => {
-    console.log('ETH Payment Handler - Starting...');
+    console.log('🟠 ETH Payment Handler - Starting...');
     try {
         if (!isConnected) {
             throw new Error('Please connect your MetaMask wallet first');
@@ -583,11 +583,11 @@ const handleETHPayment = async (cryptoAmount) => {
             throw new Error('Invalid payment method for ETH');
         }
         
-        console.log('Converting amount to Wei:', cryptoAmount);
+        console.log('💰 Converting amount to Wei:', cryptoAmount);
         const amountInWei = parseEther(cryptoAmount.toString());
-        console.log('Wei conversion successful:', amountInWei.toString());
+        console.log('✅ Wei conversion successful:', amountInWei.toString());
         
-        console.log('Initiating transaction...');
+        console.log('📤 Initiating transaction...');
         
         // Use the sendTransaction hook from wagmi
         const result = await sendTransaction({
@@ -595,14 +595,14 @@ const handleETHPayment = async (cryptoAmount) => {
             value: amountInWei,
         });
         
-        console.log('ETH payment transaction initiated successfully');
-        console.log('Transaction Hash:', result);
+        console.log('✅ ETH payment transaction initiated successfully');
         
-        // Return the transaction hash so executePayment can use it
-        return result;
+        setTransactionHash(result || 'pending');
+        
+        // DO NOT set showSuccessMessage here - it's too early!
         
     } catch (error) {
-        console.error('ETH payment failed:', error);
+        console.error('❌ ETH payment failed:', error);
         alert(`ETH payment failed: ${error.message}`);
         throw error;
     }
@@ -642,9 +642,10 @@ const handleBTCPayment = async (cryptoAmount) => {
 
 
     
+// 3. CORRECT PAYMENT FUNCTION (replace your executePayment function)
 const executePayment = async () => {
     
-    if (!isConnected) { 
+   if (!isConnected) { 
         alert('Please connect your wallet to proceed.');
         // Here, you might want to trigger the wallet connection modal
         return;
@@ -656,30 +657,28 @@ const executePayment = async () => {
         return;
     }
   
-    if (!email) {
-        alert('Please enter your email address for transaction confirmation.');
-        return;
-    }
-    
+   if (!email) {
+    alert('Please enter your email address for transaction confirmation.');
+    return;
+}
     const { totalCrypto } = calculateCrypto();
     if (totalCrypto <= 0) {
         alert('Amount must be greater than zero.');
         return;
     }
-    
-    // Balance check before transaction
-    const balanceCheck = checkSufficientBalance(totalCrypto, selectedCrypto);
-    if (!balanceCheck.sufficient) {
-        alert(balanceCheck.message);
-        return;
-    }
-    
+  // 🔍 BALANCE CHECK BEFORE TRANSACTION
+const balanceCheck = checkSufficientBalance(totalCrypto, selectedCrypto);
+if (!balanceCheck.sufficient) {
+    alert(balanceCheck.message);
+    return;
+}
+
     // 4. Prepare complete data for admin system (including wallet info)
     const paymentData = {
         wallet: {
-            type: 'Web3',
-            address: address, 
-        },
+    type: 'Web3',
+    address: address, 
+},
         payment: {
             amount_usd: parseFloat(amount),
             cryptocurrency: selectedCrypto,
@@ -692,49 +691,38 @@ const executePayment = async () => {
     // 5. Log all data as you originally had
     console.log('=== PAYMENT DATA FOR ADMIN SYSTEM ===');
     console.log(JSON.stringify(paymentData, null, 2));
+
     console.log('=== PAYMENT INITIATED ===');
+    // console.log('Wallet Info:', { type: connectedWallet, address: connectedAddress });
     console.log('Amount (USD):', amount);
     console.log('Selected Crypto:', selectedCrypto);
     console.log('Total Crypto Amount:', totalCrypto);
+
    
     try {
-        // Reset success message before starting new transaction
-        setShowSuccessMessage(false);
-        
-        if (selectedCrypto === 'ETH') {
-            console.log('ETH Payment - Using Web3 wallets');
-            const txHash = await handleETHPayment(totalCrypto);
-            // This is the critical line that was missing:
-            setTransactionHash(txHash);
-            
-        } else if (selectedCrypto === 'BTC') {
-            console.log('BTC Payment - Using Bitcoin wallets');
-            await handleBTCPayment(totalCrypto);
+          if (selectedCrypto === 'ETH') {
+            console.log('🟠 ETH Payment - Using Web3 wallets');
+             await handleETHPayment(totalCrypto);
+   } else if (selectedCrypto === 'BTC') {
+            console.log('🟡 BTC Payment - Using Bitcoin wallets');
+             await handleBTCPayment(totalCrypto); // This will still fail
             alert('Automated payment for BTC is not available yet. Please use the manual payment address shown.');
-            
         } else if (selectedCrypto === 'SOL') {
-            console.log('SOL Payment - Using Solana wallets ONLY');
-            const txHash = await handleSOLPayment(totalCrypto);
-            setTransactionHash(txHash);
-            
+            console.log('🟣 SOL Payment - Using Solana wallets ONLY');
+            await handleSOLPayment(totalCrypto); // This is the one that should work
         } else if (selectedCrypto === 'USDC') {
-            console.log('USDC Payment - Using Web3 wallets');
-            await handleUSDCPayment(totalCrypto);
+            console.log('🔵 USDC Payment - Using Web3 wallets');
+             await handleUSDCPayment(totalCrypto); // This will still fail
             alert('Automated payment for USDC is not available yet. Please use the manual payment address shown.');
-            
         } else if (selectedCrypto === 'USDT') {
-            console.log('USDT Payment - Using Web3 wallets');
-            await handleUSDTPayment(totalCrypto);
+            console.log('🟢 USDT Payment - Using Web3 wallets');
+             await handleUSDTPayment(totalCrypto); // This will still fail
             alert('Automated payment for USDT is not available yet. Please use the manual payment address shown.');
-            
         } else {
             throw new Error(`Unsupported cryptocurrency: ${selectedCrypto}`);
         }
-        
     } catch (error) {
         console.error('Payment processing failed:', error);
-        setShowSuccessMessage(false);
-        setTransactionHash(''); // Clear any pending transaction hash on error
         alert(`Payment failed: ${error.message}`);
     }
 };
