@@ -1411,13 +1411,60 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
 </div>
                 </div>
                 
-                {amount > 0 && selectedCrypto && (
-                    <div className="bg-gray-900/50 rounded-lg p-4 mb-6 text-center">
-                        <div className="text-gray-300 text-sm">You will send:</div>
-                        <div className="text-2xl font-bold text-yellow-400">{calculateCrypto().totalCrypto.toFixed(8)} {selectedCrypto}</div>
-                        <div className="text-gray-400 text-sm">Network fee: ${calculateCrypto().networkFee.toFixed(2)} • Processing fee: ${calculateCrypto().processingFee.toFixed(2)}</div>
+                </div>
+
+{/* Crypto Selection - Only show when crypto is selected */}
+{paymentType === 'crypto' && (
+    <div>
+        <label className="block text-white mb-2 font-semibold">Select Cryptocurrency</label>
+        <select 
+            value={selectedCrypto} 
+            onChange={(e) => setSelectedCrypto(e.target.value)} 
+            className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-yellow-400"
+        >
+            <option value="">Choose cryptocurrency</option>
+            <option value="ETH">Ethereum (ETH)</option>
+            <option value="BTC">Bitcoin (BTC)</option>
+            <option value="SOL">Solana (SOL)</option>
+            <option value="USDC">USD Coin (USDC)</option>
+            <option value="USDT">Tether (USDT)</option>
+        </select>
+    </div>
+)}
+
+{/* Fiat Payment Interface - Only show when fiat is selected */}
+{paymentType === 'fiat' && (
+    <div className="bg-gray-900/50 rounded-lg p-6 border border-purple-400/30">
+        <div className="text-center mb-4">
+            <div className="text-purple-400 font-semibold">Pay with USD</div>
+            <div className="text-gray-400 text-sm">Credit card, debit card, or bank account via Stripe Link</div>
+        </div>
+        
+        <div className="space-y-4">
+            <div>
+                <label className="block text-white text-sm mb-2">You will receive</label>
+                <div className="bg-gray-800 p-3 rounded-lg flex justify-between items-center">
+                    <span className="text-white text-lg">
+                        {amount ? (parseFloat(amount) / kushPrice).toLocaleString(undefined, {maximumFractionDigits: 0}) : '0'}
+                    </span>
+                    <div className="flex items-center space-x-2">
+                        <div className="w-6 h-6 bg-yellow-400 rounded-full flex items-center justify-center">
+                            <span className="text-black text-xs font-bold">K</span>
+                        </div>
+                        <span className="text-white">KUSH</span>
                     </div>
-                )}
+                </div>
+                <div className="text-xs text-gray-400 mt-1">
+                    Rate: ${kushPrice.toFixed(4)} per KUSH
+                </div>
+            </div>
+        </div>
+    </div>
+)}
+
+{amount > 0 && selectedCrypto && paymentType === 'crypto' && (
+    <div className="bg-gray-900/50 rounded-lg p-4 mb-6 text-center">
+
 
                 {/* Wallet Connection UI */}
                 <div className="mt-6 text-center">
