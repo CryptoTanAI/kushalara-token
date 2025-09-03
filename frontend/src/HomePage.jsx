@@ -282,10 +282,6 @@ const { data: balance, isLoading: balanceLoading } = useBalance({
 // Add this with your other hook declarations
 const { data: hash, sendTransaction } = useSendTransaction()
 
-    const { isLoading: isWaiting, isSuccess: isTransactionSuccess } = useWaitForTransactionReceipt({
-  hash,
-})
-
 // Transaction confirmation tracking
 const { data: transactionReceipt, isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash: transactionHash,
@@ -294,11 +290,6 @@ const { data: transactionReceipt, isLoading: isConfirming, isSuccess: isConfirme
     
   // Contract write hook for sending ETH
   const { data: WriteHash, writeContract, isPending, error } = useWriteContract()
-
-  // Wait for transaction confirmation
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    WriteHash,
-  })
 
   // Wallet addresses for receiving payments
   const walletAddresses = {
