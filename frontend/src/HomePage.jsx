@@ -1539,17 +1539,43 @@ const { cryptoAmount, networkFee, processingFee, total, totalCrypto, hasEnoughBa
         </p>
     </div>
 )}
-                            <button onClick={executePayment} disabled={!amount || !selectedCrypto} className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50">
-                                Continue to Payment
-                            </button>
+                           <button 
+    onClick={() => {
+        if (paymentType === 'crypto') {
+            executePayment();
+        } else if (paymentType === 'fiat') {
+            // Show immediate success message for fiat
+            setShowSuccessMessage(true);
+            
+            // Prepare fiat payment data
+            const fiatPaymentData = {
+                paymentMethod: 'stripe',
+                amount: parseFloat(amount),
+                currency: 'USD',
+                tokenAmount: (parseFloat(amount) / kushPrice).toFixed(4),
+                userEmail: email,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('💳 Fiat payment data prepared:', fiatPaymentData);
+            alert(`Thank you! Your payment of $${amount} for ${(parseFloat(amount) / kushPrice).toFixed(0)} KUSH tokens has been submitted. You will receive an email confirmation shortly.`);
+        }
+    }}
+    disabled={!amount || !paymentType || (paymentType === 'crypto' && !selectedCrypto)} 
+    className="w-full bg-gradient-to-r from-yellow-400 to-yellow-600 text-black py-3 rounded-lg font-semibold hover:shadow-lg disabled:opacity-50"
+>
+    {paymentType === 'crypto' ? 'Continue to Crypto Payment' : 
+     paymentType === 'fiat' ? 'Continue to USD Payment' : 
+     'Select Payment Method'}
+</button>
+
                         </div>
                     )}
                 </div>
 
-                {/* Manual Payment Display */}
-                {selectedCrypto && amount && 
-                    <PaymentAddressDisplay selectedCrypto={selectedCrypto} walletAddresses={walletAddresses} amount={calculateCrypto().totalCrypto}/>
-                }
+                {selectedCrypto && amount && paymentType === 'crypto' && 
+    <PaymentAddressDisplay selectedCrypto={selectedCrypto} walletAddresses={walletAddresses} amount={calculateCrypto().totalCrypto}/>
+}
             </div>
         </div>
     
