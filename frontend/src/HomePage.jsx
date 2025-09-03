@@ -288,11 +288,26 @@ const { data: transactionReceipt, isLoading: isConfirming, isSuccess: isConfirme
     enabled: !!transactionHash,
 });
 
+// Add this useEffect to debug the hook's state
+useEffect(() => {
+    console.log('🔍 useWaitForTransactionReceipt state:', {
+        transactionHash,
+        isConfirming,
+        isConfirmed,
+        transactionReceipt
+    });
+}, [transactionHash, isConfirming, isConfirmed, transactionReceipt]);
+
     
-    useEffect(() => {
+  useEffect(() => {
+    console.log('🔍 useEffect triggered - isConfirmed:', isConfirmed, 'transactionHash:', transactionHash);
+    
     if (isConfirmed && transactionHash) {
         console.log('✅ Transaction confirmed! Showing success message.');
         setShowSuccessMessage(true);
+        console.log('✅ Success message state set to true');
+    } else {
+        console.log('⏳ Waiting for confirmation - isConfirmed:', isConfirmed, 'transactionHash:', transactionHash);
     }
 }, [isConfirmed, transactionHash]);
 
@@ -581,7 +596,6 @@ const handleETHPayment = async (cryptoAmount) => {
             throw new Error('Please connect your MetaMask wallet first');
         }
         
-        // Ensure we're paying with ETH (prevents wallet conflicts)
         if (selectedCrypto !== 'ETH') {
             throw new Error('Invalid payment method for ETH');
         }
@@ -592,19 +606,18 @@ const handleETHPayment = async (cryptoAmount) => {
         
         console.log('📤 Initiating transaction...');
         
-        // Use the sendTransaction hook from wagmi
         const result = await sendTransaction({
             to: walletAddresses['ETH'],
             value: amountInWei,
         });
         
         console.log('✅ ETH payment transaction initiated successfully');
-        console.log('📋 Transaction Hash:', result);
+        console.log('📋 Transaction Hash (raw result):', result);
+        console.log('📋 Transaction Hash (type):', typeof result);
         
-        // Set the transaction hash - this will trigger the useWaitForTransactionReceipt hook
+        // CRITICAL: Set the transaction hash
         setTransactionHash(result || 'pending');
-        
-        // The success message will be set by the useEffect that watches isConfirmed
+        console.log('📋 Transaction Hash set to:', result || 'pending');
         
     } catch (error) {
         console.error('❌ ETH payment failed:', error);
