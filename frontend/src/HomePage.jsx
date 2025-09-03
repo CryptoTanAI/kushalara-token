@@ -300,12 +300,10 @@ useEffect(() => {
 
    useEffect(() => {
     console.log('🔍 useEffect triggered - isConfirmed:', isConfirmed, 'transactionHash:', transactionHash);
-    
-    if (isConfirmed && transactionHash) {
-        console.log('✅ Transaction confirmed! Showing success message.');
-        setShowSuccessMessage(true);
-        console.log('✅ Success message state set to true');
-    } else {
+
+     if (isConfirmed && transactionHash) {
+    console.log('✅ Transaction confirmed on blockchain.');
+  }   else {
         console.log('⏳ Waiting for confirmation - isConfirmed:', isConfirmed, 'transactionHash:', transactionHash);
     }
 }, [isConfirmed, transactionHash]);
