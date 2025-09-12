@@ -9,7 +9,7 @@ import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } f
 import QRCode from 'qrcode'
 import WhitepaperPDF from './assets/Whitepaper.pdf';
 
-
+}} // remove this brackets for the website to work
 // Wallet Detection and Installation Helper
 const WalletInstallationModal = ({ isOpen, onClose, walletType }) => {
   const walletInfo = {
