@@ -1,14 +1,3 @@
-import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useAccount, useConnect, useDisconnect, useBalance, useWriteContract, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi'
-import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { parseEther, formatEther, parseUnits } from 'viem'
-import CountdownTimer from './CountdownTimer.jsx'
-import KushCrestLogo from './assets/kush-crest.png';
-import { Connection, PublicKey, Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
-import QRCode from 'qrcode'
-import WhitepaperPDF from './assets/Whitepaper.pdf';
-
 
 
 //QR code generator
